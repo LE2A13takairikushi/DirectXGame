@@ -51,4 +51,24 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	uint32_t textureHandle_ = 0;
+
+	//スプライト(2dモデル)
+	Sprite* sprite_ = nullptr;
+
+	//3Dモデル
+	Model* model_ = nullptr;
+
+	//ワールドトランスフォーム
+	WorldTransform worldTransform_;
+	//ビュープロジェクション
+	ViewProjection viewprojection_;
+
+	//サウンドデータハンドル
+	uint32_t soundDateHanle_ = 0;
+
+	//音声再生ハンドル
+	uint32_t voiceHandle_ = 0;
+
+	int32_t value_ = 0;
 };
