@@ -35,19 +35,23 @@ void GameScene::Initialize() {
 
 	for (int i = 0; i < _countof(worldTransform_); i++) {
 		worldTransform_[i].scale_ = {1.0f, 1.0f, 1.0f};
-		worldTransform_[i].rotation_ = {XM_PI / 4.0f, XM_PI / 4.0f, 0.0f};
-		worldTransform_[i].translation_ = {10.0f, 10.0f, 10.0f};
+		worldTransform_[i].rotation_ = {rotDist(engine), rotDist(engine), rotDist(engine)};
+		worldTransform_[i].translation_ = {posDist(engine), posDist(engine), posDist(engine)};
 
 		// 3dモデルの初期化
 		worldTransform_[i].Initialize();
 	}
+
+	viewProjection_.eye = {0, 0, -10};
 
 	//カメラの初期化
 	viewProjection_.Initialize();
 }
 
 void GameScene::Update() { 
+	if (input_->TriggerKey(DIK_W)) {
 
+	}
 }
 
 void GameScene::Draw() {
