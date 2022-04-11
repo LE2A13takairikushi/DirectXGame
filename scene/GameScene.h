@@ -51,7 +51,7 @@ class GameScene {
 	uint32_t textureHandle_ = 0;
 	Model* model_ = nullptr;
 
-	WorldTransform worldTransform_;
+	WorldTransform worldTransform_[100];
 	ViewProjection viewProjection_;
 
 	/// <summary>

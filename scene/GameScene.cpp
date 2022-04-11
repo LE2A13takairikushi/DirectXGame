@@ -1,6 +1,7 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
+#include <random>
 
 using namespace DirectX;
 
@@ -20,12 +21,28 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("mario.jpg");
 	model_ = Model::Create();
 
-	worldTransform_.scale_ = {5.0f, 5.0f, 5.0f};
-	worldTransform_.rotation_ = {XM_PI / 4.0f, XM_PI / 4.0f, 0.0f};
-	worldTransform_.translation_ = {10.0f, 10.0f, 10.0f};
+	//乱数シード生成器
+	std::random_device seed_gen;
 
-	//3dモデルの初期化
-	worldTransform_.Initialize();
+	//メルセンヌ・ツイスター
+	std::mt19937_64 engine(seed_gen());
+
+	//乱数範囲(回転角用)
+	std::uniform_real_distribution<float> rotDist(0.0f, XM_2PI);
+
+	//乱数範囲(座標用)
+	std::uniform_real_distribution<float> posDist(-10.0f, 10.0f);
+
+	for (int i = 0; i < _countof(worldTransform_); i++) {
+		worldTransform_[i].scale_ = {1.0f, 1.0f, 1.0f};
+		worldTransform_[i].rotation_ = {XM_PI / 4.0f, XM_PI / 4.0f, 0.0f};
+		worldTransform_[i].translation_ = {10.0f, 10.0f, 10.0f};
+
+		// 3dモデルの初期化
+		worldTransform_[i].Initialize();
+	}
+
+	//カメラの初期化
 	viewProjection_.Initialize();
 }
 
@@ -59,7 +76,9 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	model_->Draw(worldTransform_, viewProjection_,textureHandle_);
+	for (int i = 0; i < _countof(worldTransform_); i++) {
+		model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
+	}
 
 
 	// 3Dオブジェクト描画後処理
@@ -76,6 +95,7 @@ void GameScene::Draw() {
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
+
 	//
 	// スプライト描画後処理
 	Sprite::PostDraw();
