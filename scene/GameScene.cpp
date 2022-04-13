@@ -49,8 +49,28 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() { 
-	if (input_->TriggerKey(DIK_W)) {
 
+	if (input_->PushKey(DIK_W)) {
+		viewProjection_.eye.z += 1;
+	}
+	if (input_->PushKey(DIK_S)) {
+		viewProjection_.eye.z -= 1;
+	}
+	if (input_->PushKey(DIK_D)) {
+		viewProjection_.eye.x += 1;
+	}
+	if (input_->PushKey(DIK_A)) {
+		viewProjection_.eye.x -= 1;
+	}
+
+	for (int i = 0; i < _countof(worldTransform_); i++) {
+		worldTransform_[i].rotation_.x += 0.1f;
+	}
+
+	viewProjection_.UpdateMatrix();
+
+	for (int i = 0; i < _countof(worldTransform_); i++) {
+		worldTransform_[i].UpdateMatrix();
 	}
 }
 
