@@ -10,6 +10,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <DirectXMath.h>
+#include "Vecter3.h"
 
 /// <summary>
 /// ゲームシーン
@@ -49,10 +50,10 @@ class GameScene {
 	DebugText* debugText_ = nullptr;
 
 	Model* model_ = nullptr;
-	Model* centerModel_ = nullptr;
+
+	Vector3 center = { 0,0,1 };
 
 	WorldTransform worldTransform_;
-	WorldTransform centerVec;
 	ViewProjection viewProjection_;
 
 	/// <summary>
