@@ -2,7 +2,7 @@
 #include "TextureManager.h"
 #include <cassert>
 
-using namespace DirectX;
+//using namespace DirectX;
 
 GameScene::GameScene() {}
 
@@ -32,23 +32,35 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-	float modelSpd = 0.2f;
+	float modelSpd = 0.5f;
+	float modelRota = 0.02f;
 
-	if (input_->PushKey(DIK_W))
-	{
+	nyuryoku.x = input_->PushKey(DIK_UP) - input_->PushKey(DIK_DOWN);
+	nyuryoku.z = input_->PushKey(DIK_UP) - input_->PushKey(DIK_DOWN);
 
-	}
+	rota.y = input_->PushKey(DIK_RIGHT) - input_->PushKey(DIK_LEFT);
+
+	//worldTransform_.rotation_.x += rota.x * modelRota;
+	worldTransform_.rotation_.y += rota.y * modelRota;
+	//worldTransform_.rotation_.z += rota.z * modelRota;
+
+	
 
 	//回転
-	result.x = cos(worldTransform_.translation_.y) * center.x + sin(worldTransform_.translation_.y) * center.z;
-	result.z = -sin(worldTransform_.translation_.y) * center.x + cos(worldTransform_.translation_.y) * center.z;
-
-	worldTransform_.translation_.x = /* 移動 *modelSpd + */ result.x;
-	worldTransform_.translation_.y = /* 移動 *modelSpd + */ result.y;
-	worldTransform_.translation_.z = /* 移動 *modelSpd + */ result.z;
+	result.x = cos(worldTransform_.rotation_.y) * center.x + sin(worldTransform_.rotation_.y) * center.z;
+	result.z = -sin(worldTransform_.rotation_.y) * center.x + cos(worldTransform_.rotation_.y) * center.z;
+	
+	worldTransform_.translation_.x += (nyuryoku.x * modelSpd) * result.x;
+	worldTransform_.translation_.y += (nyuryoku.y * modelSpd) * result.y;
+	worldTransform_.translation_.z += (nyuryoku.z * modelSpd) * result.z;
 
 	worldTransform_.UpdateMatrix();
 	viewProjection_.UpdateMatrix();
+
+	debugText_->MyPrintf(50, 50, "worldTransform : %f,%f,%f",
+		worldTransform_.translation_.x,
+		worldTransform_.translation_.y,
+		worldTransform_.translation_.z);
 }
 
 void GameScene::Draw() {

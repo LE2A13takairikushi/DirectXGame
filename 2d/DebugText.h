@@ -42,6 +42,8 @@ class DebugText {
 	/// <param name="fmt">書式付き文字列</param>
 	void Printf(const char* fmt, ...);
 
+	void MyPrintf(float x,float y,const char* fmt, ...);
+
 	/// <summary>
 	/// 書式付きコンソール出力
 	/// </summary>

@@ -11,6 +11,8 @@
 #include "WorldTransform.h"
 #include <DirectXMath.h>
 
+using namespace DirectX;
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -55,6 +57,9 @@ class GameScene {
 
 	XMFLOAT3 center = { 0,0,1 };
 	XMFLOAT3 result = { 0,0,1 };
+	XMFLOAT3 nyuryoku = { 0,0,0 };
+
+	XMFLOAT3 rota = { 0,0,0 };
 
 	/// <summary>
 	/// ゲームシーン用

@@ -41,6 +41,18 @@ void DebugText::Printf(const char* fmt, ...) {
 	va_end(args);
 }
 
+void DebugText::MyPrintf(float x, float y, const char* fmt, ...)
+{
+	posX_ = x;
+	posY_ = y;
+
+	va_list args;
+	va_start(args, fmt);
+	int w = vsnprintf(buffer, kBufferSize - 1, fmt, args);
+	NPrint(w, buffer);
+	va_end(args);
+}
+
 void DebugText::ConsolePrintf(const char* fmt, ...) {
 	// 書式付き文字列を変換
 	va_list args;
