@@ -24,7 +24,7 @@ void GameScene::Initialize() {
 	worldTransform_[0].translation_ = { 0.0f,0.0f,0.0f };
 	worldTransform_[0].rotation_ = { 0.0f,0.0f,0.0f };
 
-	viewProjection_.eye = { -10,10,-100 };
+	viewProjection_.eye = { -10,30,-100 };
 
 	//親
 	worldTransform_[0].Initialize();
