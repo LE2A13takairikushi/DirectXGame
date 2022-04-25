@@ -51,13 +51,17 @@ class GameScene {
 	DebugText* debugText_ = nullptr;
 
 	Model* model_ = nullptr;
+	Model* centerModel = nullptr;
 
-	WorldTransform worldTransform_;
+	WorldTransform worldTransform_[2];
 	ViewProjection viewProjection_;
 
-	XMFLOAT3 center = { 0,0,1 };
-	XMFLOAT3 result = { 0,0,1 };
-	XMFLOAT3 nyuryoku = { 0,0,0 };
+	XMFLOAT3 centerVec = { 0,0,1 };
+	XMFLOAT3 result[2] = { 
+		{0,0,1},
+		{0,0,1}
+	};
+	XMFLOAT3 keyInput = { 0,0,0 };
 
 	XMFLOAT3 rota = { 0,0,0 };
 

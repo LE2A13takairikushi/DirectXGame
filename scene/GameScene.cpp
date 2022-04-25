@@ -18,14 +18,23 @@ void GameScene::Initialize() {
 	debugText_ = DebugText::GetInstance();
 
 	model_ = Model::Create();
+	centerModel = Model::Create();
 
-	worldTransform_.scale_ = { 5.0f,5.0f,5.0f };
-	worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
-	worldTransform_.rotation_ = { 0.0f,0.0f,0.0f };
+	worldTransform_[0].scale_ = {5.0f,5.0f,5.0f};
+	worldTransform_[0].translation_ = { 0.0f,0.0f,0.0f };
+	worldTransform_[0].rotation_ = { 0.0f,0.0f,0.0f };
 
 	viewProjection_.eye = { -10,10,-100 };
 
-	worldTransform_.Initialize();
+	//親
+	worldTransform_[0].Initialize();
+
+	//子
+	worldTransform_[1].scale_ = { 0.5f ,0.5f ,0.5f };
+	worldTransform_[1].translation_ = { 0,0,5 };
+	worldTransform_[1].parent_ = &worldTransform_[0];
+	worldTransform_[1].Initialize();
+
 	viewProjection_.Initialize();
 
 }
@@ -35,32 +44,34 @@ void GameScene::Update() {
 	float modelSpd = 0.5f;
 	float modelRota = 0.02f;
 
-	nyuryoku.x = input_->PushKey(DIK_UP) - input_->PushKey(DIK_DOWN);
-	nyuryoku.z = input_->PushKey(DIK_UP) - input_->PushKey(DIK_DOWN);
+	keyInput.x = input_->PushKey(DIK_UP) - input_->PushKey(DIK_DOWN);
+	keyInput.z = input_->PushKey(DIK_UP) - input_->PushKey(DIK_DOWN);
 
 	rota.y = input_->PushKey(DIK_RIGHT) - input_->PushKey(DIK_LEFT);
 
-	//worldTransform_.rotation_.x += rota.x * modelRota;
-	worldTransform_.rotation_.y += rota.y * modelRota;
-	//worldTransform_.rotation_.z += rota.z * modelRota;
+	worldTransform_[0].rotation_.x += rota.x * modelRota;
+	worldTransform_[0].rotation_.y += rota.y * modelRota;
+	worldTransform_[0].rotation_.z += rota.z * modelRota;
 
-	
 
 	//回転
-	result.x = cos(worldTransform_.rotation_.y) * center.x + sin(worldTransform_.rotation_.y) * center.z;
-	result.z = -sin(worldTransform_.rotation_.y) * center.x + cos(worldTransform_.rotation_.y) * center.z;
+	result[0].x = cos(worldTransform_[0].rotation_.y) * centerVec.x + sin(worldTransform_[0].rotation_.y) * centerVec.z;
+	result[0].z = -sin(worldTransform_[0].rotation_.y) * centerVec.x + cos(worldTransform_[0].rotation_.y) * centerVec.z;
 	
-	worldTransform_.translation_.x += (nyuryoku.x * modelSpd) * result.x;
-	worldTransform_.translation_.y += (nyuryoku.y * modelSpd) * result.y;
-	worldTransform_.translation_.z += (nyuryoku.z * modelSpd) * result.z;
+	worldTransform_[0].translation_.x += (keyInput.x * modelSpd) * result[0].x;
+	worldTransform_[0].translation_.y += (keyInput.y * modelSpd) * result[0].y;
+	worldTransform_[0].translation_.z += (keyInput.z * modelSpd) * result[0].z;
 
-	worldTransform_.UpdateMatrix();
+	for (int i = 0; i < 2; i++)
+	{
+		worldTransform_[i].UpdateMatrix();
+	}
 	viewProjection_.UpdateMatrix();
 
 	debugText_->MyPrintf(50, 50, "worldTransform : %f,%f,%f",
-		worldTransform_.translation_.x,
-		worldTransform_.translation_.y,
-		worldTransform_.translation_.z);
+		worldTransform_[0].translation_.x,
+		worldTransform_[0].translation_.y,
+		worldTransform_[0].translation_.z);
 }
 
 void GameScene::Draw() {
@@ -89,7 +100,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	model_->Draw(worldTransform_, viewProjection_);
+	model_->Draw(worldTransform_[0], viewProjection_);
+	centerModel->Draw(worldTransform_[1], viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
