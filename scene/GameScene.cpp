@@ -32,13 +32,20 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
+	float modelSpd = 0.2f;
+
 	if (input_->PushKey(DIK_W))
 	{
 
 	}
 
+	//回転
 	result.x = cos(worldTransform_.translation_.y) * center.x + sin(worldTransform_.translation_.y) * center.z;
 	result.z = -sin(worldTransform_.translation_.y) * center.x + cos(worldTransform_.translation_.y) * center.z;
+
+	worldTransform_.translation_.x = /* 移動 *modelSpd + */ result.x;
+	worldTransform_.translation_.y = /* 移動 *modelSpd + */ result.y;
+	worldTransform_.translation_.z = /* 移動 *modelSpd + */ result.z;
 
 	worldTransform_.UpdateMatrix();
 	viewProjection_.UpdateMatrix();
