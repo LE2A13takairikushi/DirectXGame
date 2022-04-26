@@ -35,8 +35,16 @@ void GameScene::Initialize() {
 	worldTransform_[1].parent_ = &worldTransform_[0];
 	worldTransform_[1].Initialize();
 
-	viewProjection_.Initialize();
+	for (int i = 2; i < 12; i++)
+	{
+		worldTransform_[i].scale_ = { 5.0f,5.0f,5.0f };
+		worldTransform_[i].translation_ = { 0.0f,-35.0f,i * 30.0f - 50.0f };
+		worldTransform_[i].rotation_ = { 0.0f,0.0f,0.0f };
 
+		worldTransform_[i].Initialize();
+	}
+
+	viewProjection_.Initialize();
 }
 
 void GameScene::Update() {
@@ -55,12 +63,21 @@ void GameScene::Update() {
 
 
 	//回転
-	result[0].x = cos(worldTransform_[0].rotation_.y) * centerVec.x + sin(worldTransform_[0].rotation_.y) * centerVec.z;
-	result[0].z = -sin(worldTransform_[0].rotation_.y) * centerVec.x + cos(worldTransform_[0].rotation_.y) * centerVec.z;
-	
-	worldTransform_[0].translation_.x += (keyInput.x * modelSpd) * result[0].x;
-	worldTransform_[0].translation_.y += (keyInput.y * modelSpd) * result[0].y;
-	worldTransform_[0].translation_.z += (keyInput.z * modelSpd) * result[0].z;
+	result.x = cos(worldTransform_[0].rotation_.y) * centerVec.x + sin(worldTransform_[0].rotation_.y) * centerVec.z;
+	result.z = -sin(worldTransform_[0].rotation_.y) * centerVec.x + cos(worldTransform_[0].rotation_.y) * centerVec.z;
+
+	worldTransform_[0].translation_.x += (keyInput.x * modelSpd) * result.x;
+	worldTransform_[0].translation_.y += (keyInput.y * modelSpd) * result.y;
+	worldTransform_[0].translation_.z += (keyInput.z * modelSpd) * result.z;
+
+	//カメラ回転
+	viewProjection_.eye.x = worldTransform_[0].translation_.x + ( -result.x * 100);
+	viewProjection_.eye.y = worldTransform_[0].translation_.y + ( -result.y * 10) + 50;
+	viewProjection_.eye.z = worldTransform_[0].translation_.z + ( -result.z * 100);
+
+	viewProjection_.target.x = worldTransform_[0].translation_.x;
+	viewProjection_.target.y = worldTransform_[0].translation_.y;
+	viewProjection_.target.z = worldTransform_[0].translation_.z;
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -72,6 +89,16 @@ void GameScene::Update() {
 		worldTransform_[0].translation_.x,
 		worldTransform_[0].translation_.y,
 		worldTransform_[0].translation_.z);
+
+	debugText_->MyPrintf(50, 70, "centerVector : %f,%f,%f",
+		result.x,
+		result.y,
+		result.z);
+
+	debugText_->MyPrintf(50, 90, "viewProjection_.eye : %f,%f,%f",
+		viewProjection_.eye.x,
+		viewProjection_.eye.y,
+		viewProjection_.eye.z);
 }
 
 void GameScene::Draw() {
@@ -102,6 +129,11 @@ void GameScene::Draw() {
 	/// </summary>
 	model_->Draw(worldTransform_[0], viewProjection_);
 	centerModel->Draw(worldTransform_[1], viewProjection_);
+
+	for (int i = 2; i < 12; i++)
+	{
+		model_->Draw(worldTransform_[i], viewProjection_);
+	}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
