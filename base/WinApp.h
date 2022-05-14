@@ -91,7 +91,7 @@ class WinApp {
 	/// <returns></returns>
 	SizeChangeMode GetSizeChangeMode() const;
 
-  private: // メンバ関数
+  public: // メンバ関数
 	WinApp() = default;
 	~WinApp() = default;
 	WinApp(const WinApp&) = delete;
