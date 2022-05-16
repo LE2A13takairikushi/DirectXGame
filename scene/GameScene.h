@@ -52,7 +52,7 @@ private: // メンバ変数
 
 	Model* model_ = nullptr;
 
-	WorldTransform worldTransform_;
+	WorldTransform worldTransform_[100];
 	ViewProjection viewProjection_;
 
 	WinApp winApp_;
@@ -61,6 +61,7 @@ private: // メンバ変数
 	void CreateScale(Vector3& scaleMag, WorldTransform& worldTransform_);
 	void CreateRot(Vector3& rotMag, WorldTransform& worldTransform_);
 	void CreateTrans(Vector3& move, WorldTransform& worldTransform_);
+	void MatrixCmp();
 
 	/// <summary>
 	/// ゲームシーン用

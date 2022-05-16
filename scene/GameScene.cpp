@@ -3,6 +3,7 @@
 #include <cassert>
 #include "AxisIndicator.h"
 #include "PrimitiveDrawer.h"
+#include <random>
 
 const float XM_PM = 3.14;
 
@@ -25,25 +26,48 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("mario.jpg");
 	model_ = Model::Create();
 
-	worldTransform_.Initialize();
-	viewProjection_.Initialize();
+	for (int i = 0; i < _countof(worldTransform_); i++)
+	{
+		worldTransform_[i].Initialize();
+	}
+
+	std::random_device seed_gen;
+
+	std::mt19937_64 engine(seed_gen());
+
+	std::uniform_real_distribution<float> rotdist(0.0f, XM_PM);
+
+	std::uniform_real_distribution<float> posdist(-10.0f, 10.0f);
 
 	//スケール
 	Vector3 scale = { 5.0f,2.0f,2.0f };
 
-	CreateScale(scale, worldTransform_);
+	for (size_t i = 0; i < _countof(worldTransform_); i++)
+	{
+		CreateScale(scale, worldTransform_[i]);
+	}
 
 	//回転
-	Vector3 rot = { XM_PM / 3.0f, XM_PM / 5.0f, XM_PM / 4.0f };
+	Vector3 rot[100];
 
-	CreateRot(rot,worldTransform_);
+	for (size_t i = 0; i < _countof(worldTransform_); i++)
+	{
+		rot[i] = { rotdist(engine), rotdist(engine), rotdist(engine)};
+		CreateRot(rot[i], worldTransform_[i]);
+	}
 
 	//平行移動
-	Vector3 Transform = { 10.0f,0.0f,0.0f };
+	Vector3 Transform[100];
 
-	CreateTrans(Transform, worldTransform_);
+	for (size_t i = 0; i < _countof(worldTransform_); i++)
+	{
+		Transform[i] = { posdist(engine), posdist(engine), posdist(engine) };
+		CreateTrans(Transform[i], worldTransform_[i]);
+	
+		worldTransform_[i].TransferMatrix();
+	}
 
-	worldTransform_.TransferMatrix();
+	viewProjection_.Initialize();
 
 	winApp_;
 	debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
@@ -52,6 +76,7 @@ void GameScene::Initialize() {
 	
 	AxisIndicator::GetInstance()->SetVisible(true);
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
+
 }
 
 void GameScene::Update() {
@@ -85,7 +110,10 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	
-	model_->Draw(worldTransform_, debugCamera_->GetViewProjection(), textureHandle_);
+	for (size_t i = 0; i < _countof(worldTransform_); i++)
+	{
+		model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
+	}
 
 	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(-100, 0, 0), Vector3(100, 0, 0), Vector4(255, 0, 0, 255));
 	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(0, -100, 0), Vector3(0, 100, 0), Vector4(0, 255, 0, 255));
@@ -171,4 +199,15 @@ void GameScene::CreateTrans(Vector3& move, WorldTransform& worldTransform_)
 
 	worldTransform_.matWorld_.MatrixUint();
 	worldTransform_.matWorld_ *= matTrans;
+}
+
+void GameScene::MatrixCmp()
+{
+	worldTransform_->matWorld_.MatrixUint();
+	//スケーリング行列
+
+	//回転行列
+	
+	//平行移動行列
+
 }
