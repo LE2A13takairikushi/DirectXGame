@@ -1,12 +1,16 @@
 ﻿#pragma once
-
 /// <summary>
 /// 行列
 /// </summary>
 class Matrix4 {
   public:
 	// 行x列
-	  float m[4][4];
+	  //行
+	  static const int rows = 4;
+	  //列
+	  static const int cols = 4;
+
+	  float m[rows][cols];
 
 	// コンストラクタ
 	Matrix4();
@@ -17,10 +21,9 @@ class Matrix4 {
 	  float m20, float m21, float m22, float m23,
 	  float m30, float m31, float m32, float m33);
 
-	void MatrixUint();
+	//単位行列にする関数　(注意! : 行列自体を単位行列にするため、
+	//これを使う際は専用のインスタンスを作った方がいい)
+	Matrix4 MatrixUint();
 
-	// 代入演算子オーバーロード
-	Matrix4& operator*=(const Matrix4& m2);
-
-	Matrix4& operator*(const Matrix4& m2);
+	Matrix4& operator *=(const Matrix4& m2);
 };
