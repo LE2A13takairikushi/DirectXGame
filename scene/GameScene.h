@@ -58,6 +58,10 @@ private: // メンバ変数
 	WinApp winApp_;
 	DebugCamera* debugCamera_ = nullptr;
 
+	void CreateScale(Vector3& scaleMag, WorldTransform& worldTransform_);
+	void CreateRot(Vector3& rotMag, WorldTransform& worldTransform_);
+	void CreateTrans(Vector3& move, WorldTransform& worldTransform_);
+
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
