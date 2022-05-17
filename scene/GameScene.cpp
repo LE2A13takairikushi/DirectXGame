@@ -32,14 +32,21 @@ void GameScene::Initialize() {
 		worldTransform_[i].Initialize();
 	}
 
-	std::random_device seed_gen;
+	worldTransform_[0].Initialize();
+	worldTransform_[1].Initialize();
+	worldTransform_[1].translation_ = { 0,4.5f,0 };
+	worldTransform_[1].parent_ = &worldTransform_[0];
 
-	std::mt19937_64 engine(seed_gen());
+	if (false)
+	{
+		std::random_device seed_gen;
 
-	std::uniform_real_distribution<float> rotdist(0.0f, XM_PM);
+		std::mt19937_64 engine(seed_gen());
 
-	std::uniform_real_distribution<float> posdist(-10.0f, 10.0f);
+		std::uniform_real_distribution<float> rotdist(0.0f, XM_PM);
 
+		std::uniform_real_distribution<float> posdist(-10.0f, 10.0f);
+	}
 	//スケール
 	Vector3 scale = { 1.0f,1.0f,1.0f };
 	//回転
@@ -47,18 +54,21 @@ void GameScene::Initialize() {
 	//平行移動
 	Vector3 Transform[100];
 
-	for (size_t i = 0; i < _countof(worldTransform_); i++)
+	if (false)
 	{
-		CreateScale(scale, worldTransform_[i]);
-		rot[i] = { rotdist(engine), rotdist(engine), rotdist(engine) };
-		CreateRot(rot[i], worldTransform_[i]);
-		Transform[i] = { posdist(engine), posdist(engine), posdist(engine) };
-		CreateTrans(Transform[i], worldTransform_[i]);
-		MatrixCmp(worldTransform_[i]);
-		worldTransform_[i].TransferMatrix();
+		for (size_t i = 0; i < _countof(worldTransform_); i++)
+		{
+			CreateScale(scale, worldTransform_[i]);
+			//rot[i] = { rotdist(engine), rotdist(engine), rotdist(engine) };
+			CreateRot(rot[i], worldTransform_[i]);
+			//Transform[i] = { posdist(engine), posdist(engine), posdist(engine) };
+			CreateTrans(Transform[i], worldTransform_[i]);
+			MatrixCmp(worldTransform_[i]);
+			worldTransform_[i].TransferMatrix();
+		}
 	}
 
-	//viewProjection_.eye = { 0,0,0 };
+	viewProjection_.eye = { 0,0,-50 };
 	//viewProjection_.target = { 0,0,0 };
 	//viewProjection_.up = { cosf(XM_PM / 4.0f),sinf(XM_PM / 4.0f),0.0f };
 	//viewProjection_.up = {0.0f,0.0f,0.0f };
@@ -103,6 +113,25 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	debugCamera_->Update();
 
+	//移動処理
+	//キャラクターの移動ベクトル
+	Vector3 move = { 0,0,0 };
+	float moveSpeed = 0.1f;
+
+	if (input_->PushKey(DIK_RIGHT))
+	{
+		move.x += moveSpeed;
+	}
+	if (input_->PushKey(DIK_LEFT))
+	{
+		move.x -= moveSpeed;
+	}
+
+	worldTransform_[0].translation_ += move;
+	MatrixCmp(worldTransform_[0]);
+	worldTransform_[0].TransferMatrix();
+
+	//ビュー処理
 	//ビューいじった名残
 	if (false)
 	{
@@ -180,10 +209,9 @@ void GameScene::Update() {
 
 	viewProjection_.UpdateMatrix();
 
-	debugText_->SetPos(50, 110);
-	debugText_->Printf("fovAngleY(Degree);%f", RadConversionFreq(viewProjection_.fovAngleY));
-	debugText_->SetPos(50, 130);
-	debugText_->Printf("nearZ;%f", viewProjection_.nearZ);
+	debugText_->SetPos(50, 50);
+	debugText_->Printf(" worldTransform_[0].translation_.(x:%f),(y:%f),(z:%f)", worldTransform_[0].translation_.x,
+		worldTransform_[0].translation_.y, worldTransform_[0].translation_.z);
 }
 
 void GameScene::Draw() {
@@ -213,18 +241,23 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	
-	for (size_t i = 0; i < _countof(worldTransform_); i++)
+	if (false)
 	{
-		//デバッグカメラ
-		if (debugCameraMode)
+		for (size_t i = 0; i < _countof(worldTransform_); i++)
 		{
-			model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
-		}
-		else
-		{
-			model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
+			//デバッグカメラ
+			if (debugCameraMode)
+			{
+				model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
+			}
+			else
+			{
+				model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
+			}
 		}
 	}
+	model_->Draw(worldTransform_[0], viewProjection_, textureHandle_);
+	model_->Draw(worldTransform_[1], viewProjection_, textureHandle_);
 
 	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(-100, 0, 0), Vector3(100, 0, 0), Vector4(255, 0, 0, 255));
 	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(0, -100, 0), Vector3(0, 100, 0), Vector4(0, 255, 0, 255));
