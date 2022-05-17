@@ -4,6 +4,7 @@
 #include "AxisIndicator.h"
 #include "PrimitiveDrawer.h"
 #include <random>
+#include "MyMath.h"
 
 const float XM_PM = 3.14;
 
@@ -57,9 +58,28 @@ void GameScene::Initialize() {
 		worldTransform_[i].TransferMatrix();
 	}
 
-	viewProjection_.eye = { 0,0,50 };
-	viewProjection_.target = { 10,0,0 };
-	viewProjection_.up = { cosf(XM_PM / 4.0f),sinf(XM_PM / 4.0f),0.0f };
+	//viewProjection_.eye = { 0,0,0 };
+	//viewProjection_.target = { 0,0,0 };
+	//viewProjection_.up = { cosf(XM_PM / 4.0f),sinf(XM_PM / 4.0f),0.0f };
+	//viewProjection_.up = {0.0f,0.0f,0.0f };
+
+	viewProjection_.fovAngleY = FreqConversionRad(10.0f);
+
+	//アスペクト比
+	viewProjection_.aspectRatio = 1.0f;
+
+	if (false)
+	{
+		//ニアクリップ距離を設定
+		viewProjection_.nearZ = 52.0f;
+
+		//ファークリップ距離を設定
+		viewProjection_.farZ = 53.0f;
+
+		//↑こいつらなーにー？
+		// カメラに近い側(ニア)と遠い側	(ファー)の表示限界
+		// これの間に挟まれた部分しか描画されなくなる
+	}
 
 	viewProjection_.Initialize();
 
@@ -83,55 +103,87 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	debugCamera_->Update();
 
-	Vector3 move = {0,0,0};
+	//ビューいじった名残
+	if (false)
+	{
+		Vector3 move = { 0,0,0 };
 
-	const float kEyeSpeed = 0.2f;
+		const float kEyeSpeed = 0.2f;
 
-	if (input_->PushKey(DIK_W)) {
-		move.z -= kEyeSpeed;
+		if (input_->PushKey(DIK_W)) {
+			move.z -= kEyeSpeed;
+		}
+		if (input_->PushKey(DIK_S)) {
+			move.z += kEyeSpeed;
+		}
+
+		viewProjection_.eye += move;
+
+		Vector3 taMove = { 0,0,0 };
+
+		const float kTargetSpeed = 0.2f;
+
+		if (input_->PushKey(DIK_LEFT)) {
+			taMove.x -= kTargetSpeed;
+		}
+		if (input_->PushKey(DIK_RIGHT)) {
+			taMove.x += kTargetSpeed;
+		}
+
+		viewProjection_.target += taMove;
+
+		const float kUpRotSpeed = 0.04f;
+
+		if (input_->PushKey(DIK_SPACE)) {
+			viewAngle += kUpRotSpeed;
+
+			viewAngle = fmodf(viewAngle, XM_PM * 2.0f);
+		}
+
+		//上方向ベクトルを計算
+		viewProjection_.up = { cosf(viewAngle),sinf(viewAngle),0.0f };
+
+		//行列の再計算
+		viewProjection_.UpdateMatrix();
+
+		debugText_->SetPos(50, 50);
+		debugText_->Printf(
+			"eye:(%f,%f,%f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
+		debugText_->SetPos(50, 70);
+		debugText_->Printf(
+			"target:(%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y, viewProjection_.target.z);
+		debugText_->SetPos(50, 90);
+		debugText_->Printf(
+			"up:(%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y, viewProjection_.up.z);
 	}
-	if (input_->PushKey(DIK_S)) {
-		move.z += kEyeSpeed;
+
+	//FOV変更処理
+	if (input_->PushKey(DIK_UP)) {
+		viewProjection_.fovAngleY += 0.01f;
+		viewProjection_.fovAngleY = Max(viewProjection_.fovAngleY, XM_PM);
+	}
+	if (input_->PushKey(DIK_DOWN)) {
+		viewProjection_.fovAngleY -= 0.01f;
+		viewProjection_.fovAngleY = Min(viewProjection_.fovAngleY, 0.01f);
 	}
 
-	viewProjection_.eye += move;
-
-	Vector3 taMove = { 0,0,0 };
-
-	const float kTargetSpeed = 0.2f;
-
-	if (input_->PushKey(DIK_LEFT)) {
-		taMove.x -= kTargetSpeed;
-	}
-	if (input_->PushKey(DIK_RIGHT)) {
-		taMove.x += kTargetSpeed;
+	//ニアクリップ、ファークリップの更新の名残
+	if (false)
+	{
+		if (input_->PushKey(DIK_UP)) {
+			viewProjection_.nearZ += 0.1f;
+		}
+		if (input_->PushKey(DIK_DOWN)) {
+			viewProjection_.nearZ -= 0.1f;
+		}
 	}
 
-	viewProjection_.target += taMove;
-
-	const float kUpRotSpeed = 0.04f;
-
-	if (input_->PushKey(DIK_SPACE)) {
-		viewAngle += kUpRotSpeed;
-
-		viewAngle = fmodf(viewAngle, XM_PM * 2.0f);
-	}
-	
-	//上方向ベクトルを計算
-	viewProjection_.up = { cosf(viewAngle),sinf(viewAngle),0.0f };
-
-	//行列の再計算
 	viewProjection_.UpdateMatrix();
 
-	debugText_->SetPos(50, 50);
-	debugText_->Printf(
-		"eye:(%f,%f,%f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
-	debugText_->SetPos(50, 70);
-	debugText_->Printf(
-		"target:(%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y, viewProjection_.target.z);
-	debugText_->SetPos(50, 90);
-	debugText_->Printf(
-		"up:(%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y, viewProjection_.up.z);
+	debugText_->SetPos(50, 110);
+	debugText_->Printf("fovAngleY(Degree);%f", RadConversionFreq(viewProjection_.fovAngleY));
+	debugText_->SetPos(50, 130);
+	debugText_->Printf("nearZ;%f", viewProjection_.nearZ);
 }
 
 void GameScene::Draw() {
