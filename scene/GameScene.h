@@ -58,10 +58,20 @@ private: // メンバ変数
 	WinApp winApp_;
 	DebugCamera* debugCamera_ = nullptr;
 
+	Matrix4 matTrans;
+	Matrix4 matRot;
+	Matrix4 matRotX, matRotY, matRotZ;
+	Matrix4 matScale;
+
+	//カメラ上方向の角度
+	float viewAngle = 0.0f;
+
 	void CreateScale(Vector3& scaleMag, WorldTransform& worldTransform_);
 	void CreateRot(Vector3& rotMag, WorldTransform& worldTransform_);
 	void CreateTrans(Vector3& move, WorldTransform& worldTransform_);
-	void MatrixCmp();
+	void MatrixCmp(WorldTransform& worldTransform_);
+
+	bool debugCameraMode = false;
 
 	/// <summary>
 	/// ゲームシーン用

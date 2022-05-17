@@ -40,47 +40,98 @@ void GameScene::Initialize() {
 	std::uniform_real_distribution<float> posdist(-10.0f, 10.0f);
 
 	//スケール
-	Vector3 scale = { 5.0f,2.0f,2.0f };
-
-	for (size_t i = 0; i < _countof(worldTransform_); i++)
-	{
-		CreateScale(scale, worldTransform_[i]);
-	}
-
+	Vector3 scale = { 1.0f,1.0f,1.0f };
 	//回転
 	Vector3 rot[100];
-
-	for (size_t i = 0; i < _countof(worldTransform_); i++)
-	{
-		rot[i] = { rotdist(engine), rotdist(engine), rotdist(engine)};
-		CreateRot(rot[i], worldTransform_[i]);
-	}
-
 	//平行移動
 	Vector3 Transform[100];
 
 	for (size_t i = 0; i < _countof(worldTransform_); i++)
 	{
+		CreateScale(scale, worldTransform_[i]);
+		rot[i] = { rotdist(engine), rotdist(engine), rotdist(engine) };
+		CreateRot(rot[i], worldTransform_[i]);
 		Transform[i] = { posdist(engine), posdist(engine), posdist(engine) };
 		CreateTrans(Transform[i], worldTransform_[i]);
-	
+		MatrixCmp(worldTransform_[i]);
 		worldTransform_[i].TransferMatrix();
 	}
+
+	viewProjection_.eye = { 0,0,50 };
+	viewProjection_.target = { 10,0,0 };
+	viewProjection_.up = { cosf(XM_PM / 4.0f),sinf(XM_PM / 4.0f),0.0f };
 
 	viewProjection_.Initialize();
 
 	winApp_;
 	debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
 
-	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());
-	
-	AxisIndicator::GetInstance()->SetVisible(true);
-	AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
-
+	if (debugCameraMode)
+	{
+		PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());	
+		AxisIndicator::GetInstance()->SetVisible(true);
+		AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
+	}
+	else
+	{
+		PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
+		AxisIndicator::GetInstance()->SetVisible(true);
+		AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
+	}
 }
 
 void GameScene::Update() {
 	debugCamera_->Update();
+
+	Vector3 move = {0,0,0};
+
+	const float kEyeSpeed = 0.2f;
+
+	if (input_->PushKey(DIK_W)) {
+		move.z -= kEyeSpeed;
+	}
+	if (input_->PushKey(DIK_S)) {
+		move.z += kEyeSpeed;
+	}
+
+	viewProjection_.eye += move;
+
+	Vector3 taMove = { 0,0,0 };
+
+	const float kTargetSpeed = 0.2f;
+
+	if (input_->PushKey(DIK_LEFT)) {
+		taMove.x -= kTargetSpeed;
+	}
+	if (input_->PushKey(DIK_RIGHT)) {
+		taMove.x += kTargetSpeed;
+	}
+
+	viewProjection_.target += taMove;
+
+	const float kUpRotSpeed = 0.04f;
+
+	if (input_->PushKey(DIK_SPACE)) {
+		viewAngle += kUpRotSpeed;
+
+		viewAngle = fmodf(viewAngle, XM_PM * 2.0f);
+	}
+	
+	//上方向ベクトルを計算
+	viewProjection_.up = { cosf(viewAngle),sinf(viewAngle),0.0f };
+
+	//行列の再計算
+	viewProjection_.UpdateMatrix();
+
+	debugText_->SetPos(50, 50);
+	debugText_->Printf(
+		"eye:(%f,%f,%f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
+	debugText_->SetPos(50, 70);
+	debugText_->Printf(
+		"target:(%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y, viewProjection_.target.z);
+	debugText_->SetPos(50, 90);
+	debugText_->Printf(
+		"up:(%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y, viewProjection_.up.z);
 }
 
 void GameScene::Draw() {
@@ -112,7 +163,15 @@ void GameScene::Draw() {
 	
 	for (size_t i = 0; i < _countof(worldTransform_); i++)
 	{
-		model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
+		//デバッグカメラ
+		if (debugCameraMode)
+		{
+			model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
+		}
+		else
+		{
+			model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
+		}
 	}
 
 	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(-100, 0, 0), Vector3(100, 0, 0), Vector4(255, 0, 0, 255));
@@ -144,7 +203,7 @@ void GameScene::Draw() {
 void GameScene::CreateScale(Vector3& scaleMag, WorldTransform& worldTransform_)
 {
 	//スケーリング行列
-	Matrix4 matScale;
+
 
 	//スケールを設定するやつら
 	matScale.m[0][0] = scaleMag.x;
@@ -158,8 +217,6 @@ void GameScene::CreateScale(Vector3& scaleMag, WorldTransform& worldTransform_)
 
 void GameScene::CreateRot(Vector3& rotMag, WorldTransform& worldTransform_)
 {
-	Matrix4 matRot;
-	Matrix4 matRotX, matRotY, matRotZ;
 
 	matRot.MatrixUint();
 	matRotX.MatrixUint();
@@ -191,7 +248,7 @@ void GameScene::CreateRot(Vector3& rotMag, WorldTransform& worldTransform_)
 
 void GameScene::CreateTrans(Vector3& move, WorldTransform& worldTransform_)
 {
-	Matrix4 matTrans = MathUtility::Matrix4Identity();
+	matTrans = MathUtility::Matrix4Identity();
 
 	matTrans.m[3][0] = move.x;
 	matTrans.m[3][1] = move.y;
@@ -201,13 +258,13 @@ void GameScene::CreateTrans(Vector3& move, WorldTransform& worldTransform_)
 	worldTransform_.matWorld_ *= matTrans;
 }
 
-void GameScene::MatrixCmp()
+void GameScene::MatrixCmp(WorldTransform& worldTransform_)
 {
-	worldTransform_->matWorld_.MatrixUint();
+	worldTransform_.matWorld_.MatrixUint();
 	//スケーリング行列
-
+	worldTransform_.matWorld_ *= matScale;
 	//回転行列
-	
+	worldTransform_.matWorld_ *= matRot;
 	//平行移動行列
-
+	worldTransform_.matWorld_ *= matTrans;
 }
