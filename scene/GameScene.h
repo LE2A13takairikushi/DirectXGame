@@ -11,6 +11,7 @@
 #include "WorldTransform.h"
 #include "DebugCamera.h"
 #include "WinApp.h"
+#include "Vector3.h"
 
 /// <summary>
 /// ゲームシーン
@@ -72,6 +73,19 @@ private: // メンバ変数
 	void MatrixCmp(WorldTransform& worldTransform_);
 
 	bool debugCameraMode = false;
+
+	enum PartId {
+		kRoot,	//元座標
+		kSpine,	//脊髄
+		kChest,	//胸
+		kHead,	//頭
+		kArmL,	//左腕
+		kArmR,	//右腕
+		kHip,	//尻
+		kLegL,	//左足
+		kLegR,	//右足
+		kNumPartId	//パーツの総数を表す数
+	};
 
 	/// <summary>
 	/// ゲームシーン用
