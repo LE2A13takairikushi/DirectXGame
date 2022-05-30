@@ -31,8 +31,11 @@ void GameScene::Initialize() {
 	{
 		for (int j = 0; j < 9; j++)
 		{
-			worldTransform_[i][j].Initialize();
-			worldTransform_[i][j].translation_ = { -1000,-1000,-1000 };
+			for (int k = 0; k < 9; k++)
+			{
+				worldTransform_[i][j][k].Initialize();
+				worldTransform_[i][j][k].translation_ = { -1000,-1000,-1000 };
+			}
 		}
 	}
 
@@ -40,11 +43,14 @@ void GameScene::Initialize() {
 	{
 		for (int j = 0; j < 9; j++)
 		{
-			worldTransform_[i][j].translation_ = {-12.0f + i * 3.0f,16.0f - j * 4.0f,0};
-			if (i % 2 != 0 && j % 2 != 0)
+			for (int k = 0; k < 9; k++) 
 			{
-				worldTransform_[i][j].scale_ = {0,0,0};
+				worldTransform_[i][j][k].translation_ = {-12.0f + i * 3.0f,16.0f - j * 4.0f,0 + k * 10.0f};
 			}
+			//if (i % 2 != 0 && j % 2 != 0)
+			//{
+			//	worldTransform_[i][j].scale_ = {0,0,0};
+			//}
 		}
 	}
 
@@ -127,12 +133,15 @@ void GameScene::Update() {
 	{
 		for (int j = 0; j < 9; j++)
 		{
-			worldTransform_[i][j].translation_ += move;
-			CreateScale(worldTransform_[i][j].scale_, worldTransform_[i][j]);
-			CreateRot(worldTransform_[i][j].rotation_, worldTransform_[i][j]);
-			CreateTrans(worldTransform_[i][j].translation_, worldTransform_[i][j]);
-			MatrixCmp(worldTransform_[i][j]);
-			worldTransform_[i][j].TransferMatrix();
+			for (int k = 0; k < 9; k++)
+			{
+				worldTransform_[i][j][k].translation_ += move;
+				CreateScale(worldTransform_[i][j][k].scale_, worldTransform_[i][j][k]);
+				CreateRot(worldTransform_[i][j][k].rotation_, worldTransform_[i][j][k]);
+				CreateTrans(worldTransform_[i][j][k].translation_, worldTransform_[i][j][k]);
+				MatrixCmp(worldTransform_[i][j][k]);
+				worldTransform_[i][j][k].TransferMatrix();
+			}
 		}
 	}
 
@@ -256,8 +265,11 @@ void GameScene::Draw() {
 	{
 		for (int j = 0; j < 9; j++)
 		{
-			model_->Draw(worldTransform_[i][j], viewProjection_, textureHandle_);
-			//model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
+			for (int k = 0; k < 9; k++)
+			{
+				model_->Draw(worldTransform_[i][j][k], viewProjection_, textureHandle_);
+				//model_->Draw(worldTransform_[i][j][k], debugCamera_->GetViewProjection(), textureHandle_);
+			}
 		}
 	}
 	
