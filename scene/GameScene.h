@@ -53,7 +53,9 @@ private: // メンバ変数
 
 	Model* model_ = nullptr;
 
-	WorldTransform worldTransform_[9][9][9];
+	static const int WTFNum = 10;
+	WorldTransform worldTransform_[WTFNum];
+	Vector3 WTFStartPoint;
 	ViewProjection viewProjection_;
 
 	WinApp winApp_;
@@ -71,8 +73,11 @@ private: // メンバ変数
 	void CreateRot(Vector3& rotMag, WorldTransform& worldTransform_);
 	void CreateTrans(Vector3& move, WorldTransform& worldTransform_);
 	void MatrixCmp(WorldTransform& worldTransform_);
+	void MatrixUpdate(WorldTransform& worldTransform_);
 
 	bool debugCameraMode = false;
+
+	float angle = 0.0f;
 
 	enum PartId {
 		kRoot,	//元座標

@@ -27,32 +27,17 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("mario.jpg");
 	model_ = Model::Create();
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < _countof(worldTransform_); i++)
 	{
-		for (int j = 0; j < 9; j++)
-		{
-			for (int k = 0; k < 9; k++)
-			{
-				worldTransform_[i][j][k].Initialize();
-				worldTransform_[i][j][k].translation_ = { -1000,-1000,-1000 };
-			}
-		}
+		worldTransform_[i].Initialize();
+		worldTransform_[i].translation_ = { 0,10,0 };
+		WTFStartPoint = worldTransform_[0].translation_;
 	}
 
-	for (int i = 0; i < 9; i++)
-	{
-		for (int j = 0; j < 9; j++)
-		{
-			for (int k = 0; k < 9; k++) 
-			{
-				worldTransform_[i][j][k].translation_ = {-12.0f + i * 3.0f,16.0f - j * 4.0f,0 + k * 10.0f};
-			}
-			//if (i % 2 != 0 && j % 2 != 0)
-			//{
-			//	worldTransform_[i][j].scale_ = {0,0,0};
-			//}
-		}
-	}
+	//worldTransform_[1].translation_.x =
+	//	cos(angle) * worldTransform_[0].translation_.x + -sin(angle) * worldTransform_[0].translation_.y;
+	//worldTransform_[1].translation_.y =
+	//	sin(angle) * worldTransform_[0].translation_.x + cos(angle) * worldTransform_[0].translation_.y;
 
 	if (false)
 	{
@@ -129,20 +114,26 @@ void GameScene::Update() {
 		move.x -= moveSpeed;
 	}
 
-	for (int i = 0; i < 9; i++)
+	angle += 2;
+	if (angle >= 360)
 	{
-		for (int j = 0; j < 9; j++)
-		{
-			for (int k = 0; k < 9; k++)
-			{
-				worldTransform_[i][j][k].translation_ += move;
-				CreateScale(worldTransform_[i][j][k].scale_, worldTransform_[i][j][k]);
-				CreateRot(worldTransform_[i][j][k].rotation_, worldTransform_[i][j][k]);
-				CreateTrans(worldTransform_[i][j][k].translation_, worldTransform_[i][j][k]);
-				MatrixCmp(worldTransform_[i][j][k]);
-				worldTransform_[i][j][k].TransferMatrix();
-			}
-		}
+		angle = 0;
+	}
+
+	for (int i = 0; i < _countof(worldTransform_); i++)
+	{
+		worldTransform_[i].translation_ += move;
+
+		MatrixUpdate(worldTransform_[i]);
+	}
+
+	for (int i = 0; i < _countof(worldTransform_); i++)
+	{
+		//多分位置が同じ奴らがいるので１個消えてる
+		worldTransform_[i].translation_.x =
+			cos(FreqConversionRad(angle)) * WTFStartPoint.x + -sin(FreqConversionRad(angle - i * 40.0f)) * WTFStartPoint.y;
+		worldTransform_[i].translation_.y =
+			sin(FreqConversionRad(angle)) * WTFStartPoint.x + cos(FreqConversionRad(angle - i * 40.0f)) * WTFStartPoint.y;
 	}
 
 
@@ -225,12 +216,16 @@ void GameScene::Update() {
 
 	viewProjection_.UpdateMatrix();
 
-	//debugText_->SetPos(50, 50);
-	//debugText_->Printf("%f", viewProjection_.fovAngleY);
-	//debugText_->SetPos(50, 70);
-	//debugText_->Printf("%f %f %f", worldTransform_[1][0].translation_.x,
-	//	worldTransform_[1][0].translation_.y,
-	//	worldTransform_[1][0].translation_.z);
+	debugText_->SetPos(50, 50);
+	debugText_->Printf("%f", viewProjection_.fovAngleY);
+	debugText_->SetPos(50, 70);
+	debugText_->Printf("%f %f %f", worldTransform_[1].translation_.x,
+		worldTransform_[1].translation_.y,
+		worldTransform_[1].translation_.z);
+	debugText_->SetPos(50, 90);
+	debugText_->Printf("%f %f %f", worldTransform_[2].translation_.x,
+		worldTransform_[2].translation_.y,
+		worldTransform_[2].translation_.z);
 }
 
 void GameScene::Draw() {
@@ -261,16 +256,10 @@ void GameScene::Draw() {
 	/// </summary>
 
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < _countof(worldTransform_); i++)
 	{
-		for (int j = 0; j < 9; j++)
-		{
-			for (int k = 0; k < 9; k++)
-			{
-				model_->Draw(worldTransform_[i][j][k], viewProjection_, textureHandle_);
-				//model_->Draw(worldTransform_[i][j][k], debugCamera_->GetViewProjection(), textureHandle_);
-			}
-		}
+		model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
+		//model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
 	}
 	
 	//sennnobyouga
@@ -367,4 +356,13 @@ void GameScene::MatrixCmp(WorldTransform& worldTransform_)
 	worldTransform_.matWorld_ *= matRot;
 	//平行移動行列
 	worldTransform_.matWorld_ *= matTrans;
+}
+
+void GameScene::MatrixUpdate(WorldTransform& worldTransform_)
+{
+	CreateScale(worldTransform_.scale_, worldTransform_);
+	CreateRot(worldTransform_.rotation_, worldTransform_);
+	CreateTrans(worldTransform_.translation_, worldTransform_);
+	MatrixCmp(worldTransform_);
+	worldTransform_.TransferMatrix();
 }
