@@ -27,16 +27,25 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("mario.jpg");
 	model_ = Model::Create();
 
-	for (int i = 0; i < _countof(worldTransform_); i++)
+	for (int i = 0; i < 9; i++)
 	{
-		worldTransform_[i].Initialize();
-		worldTransform_[i].translation_ = {-1000,-1000,-1000};
+		for (int j = 0; j < 9; j++)
+		{
+			worldTransform_[i][j].Initialize();
+			worldTransform_[i][j].translation_ = { -1000,-1000,-1000 };
+		}
 	}
 
 	for (int i = 0; i < 9; i++)
 	{
-		worldTransform_[i].translation_ = { -8.0f + i * 2.0f,8,0 };
-		worldTransform_[i + 9].translation_ = { -8.0f + i * 2.0f,-8,0 };
+		for (int j = 0; j < 9; j++)
+		{
+			worldTransform_[i][j].translation_ = {-12.0f + i * 3.0f,16.0f - j * 4.0f,0};
+			if (i % 2 != 0 && j % 2 != 0)
+			{
+				worldTransform_[i][j].scale_ = {0,0,0};
+			}
+		}
 	}
 
 	if (false)
@@ -58,7 +67,7 @@ void GameScene::Initialize() {
 	Vector3 Transform[100];
 
 
-	viewProjection_.eye = { 0,0,-100 };
+	viewProjection_.eye = { 0,0,-300 };
 
 	viewProjection_.fovAngleY = FreqConversionRad(10.0f);
 
@@ -114,14 +123,17 @@ void GameScene::Update() {
 		move.x -= moveSpeed;
 	}
 
-	for (int i = 0; i < _countof(worldTransform_); i++)
+	for (int i = 0; i < 9; i++)
 	{
-		worldTransform_[i].translation_ += move;
-		CreateScale(worldTransform_[i].scale_, worldTransform_[i]);
-		CreateRot(worldTransform_[i].rotation_, worldTransform_[i]);
-		CreateTrans(worldTransform_[i].translation_, worldTransform_[i]);
-		MatrixCmp(worldTransform_[i]);
-		worldTransform_[i].TransferMatrix();
+		for (int j = 0; j < 9; j++)
+		{
+			worldTransform_[i][j].translation_ += move;
+			CreateScale(worldTransform_[i][j].scale_, worldTransform_[i][j]);
+			CreateRot(worldTransform_[i][j].rotation_, worldTransform_[i][j]);
+			CreateTrans(worldTransform_[i][j].translation_, worldTransform_[i][j]);
+			MatrixCmp(worldTransform_[i][j]);
+			worldTransform_[i][j].TransferMatrix();
+		}
 	}
 
 
@@ -204,12 +216,12 @@ void GameScene::Update() {
 
 	viewProjection_.UpdateMatrix();
 
-	debugText_->SetPos(50, 50);
-	debugText_->Printf("%f", viewProjection_.fovAngleY);
-	debugText_->SetPos(50, 70);
-	debugText_->Printf("%f %f %f", worldTransform_[9].translation_.x, 
-		worldTransform_[9].translation_.y, 
-		worldTransform_[9].translation_.z);
+	//debugText_->SetPos(50, 50);
+	//debugText_->Printf("%f", viewProjection_.fovAngleY);
+	//debugText_->SetPos(50, 70);
+	//debugText_->Printf("%f %f %f", worldTransform_[1][0].translation_.x,
+	//	worldTransform_[1][0].translation_.y,
+	//	worldTransform_[1][0].translation_.z);
 }
 
 void GameScene::Draw() {
@@ -238,27 +250,15 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	
-	if (false)
-	{
-		for (size_t i = 0; i < _countof(worldTransform_); i++)
-		{
-			//デバッグカメラ
-			if (debugCameraMode)
-			{
-				model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
-			}
-			else
-			{
-				model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
-			}
-		}
-	}
 
-	for (int i = 0; i < _countof(worldTransform_); i++)
+
+	for (int i = 0; i < 9; i++)
 	{
-		model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
-		//model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
+		for (int j = 0; j < 9; j++)
+		{
+			model_->Draw(worldTransform_[i][j], viewProjection_, textureHandle_);
+			//model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
+		}
 	}
 	
 	//sennnobyouga
