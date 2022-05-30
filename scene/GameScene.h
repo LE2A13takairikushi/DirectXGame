@@ -53,7 +53,7 @@ private: // メンバ変数
 
 	Model* model_ = nullptr;
 
-	WorldTransform worldTransform_[100];
+	WorldTransform worldTransform_[20];
 	ViewProjection viewProjection_;
 
 	WinApp winApp_;
