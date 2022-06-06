@@ -125,15 +125,7 @@ void GameScene::Update() {
 		worldTransform_[i].translation_ += move;
 
 		MatrixUpdate(worldTransform_[i]);
-	}
-
-	for (int i = 0; i < _countof(worldTransform_); i++)
-	{
-		//多分位置が同じ奴らがいるので１個消えてる
-		worldTransform_[i].translation_.x =
-			cos(FreqConversionRad(angle)) * WTFStartPoint.x + -sin(FreqConversionRad(angle - i * 40.0f)) * WTFStartPoint.y;
-		worldTransform_[i].translation_.y =
-			sin(FreqConversionRad(angle)) * WTFStartPoint.x + cos(FreqConversionRad(angle - i * 40.0f)) * WTFStartPoint.y;
+		RotaMove(worldTransform_[i], WTFStartPoint, angle - i * 10.0f);
 	}
 
 
@@ -216,16 +208,16 @@ void GameScene::Update() {
 
 	viewProjection_.UpdateMatrix();
 
-	debugText_->SetPos(50, 50);
-	debugText_->Printf("%f", viewProjection_.fovAngleY);
-	debugText_->SetPos(50, 70);
-	debugText_->Printf("%f %f %f", worldTransform_[1].translation_.x,
-		worldTransform_[1].translation_.y,
-		worldTransform_[1].translation_.z);
-	debugText_->SetPos(50, 90);
-	debugText_->Printf("%f %f %f", worldTransform_[2].translation_.x,
-		worldTransform_[2].translation_.y,
-		worldTransform_[2].translation_.z);
+	//debugText_->SetPos(50, 50);
+	//debugText_->Printf("%f", viewProjection_.fovAngleY);
+	//debugText_->SetPos(50, 70);
+	//debugText_->Printf("%f %f %f", worldTransform_[1].translation_.x,
+	//	worldTransform_[1].translation_.y,
+	//	worldTransform_[1].translation_.z);
+	//debugText_->SetPos(50, 90);
+	//debugText_->Printf("%f %f %f", worldTransform_[2].translation_.x,
+	//	worldTransform_[2].translation_.y,
+	//	worldTransform_[2].translation_.z);
 }
 
 void GameScene::Draw() {
@@ -365,4 +357,12 @@ void GameScene::MatrixUpdate(WorldTransform& worldTransform_)
 	CreateTrans(worldTransform_.translation_, worldTransform_);
 	MatrixCmp(worldTransform_);
 	worldTransform_.TransferMatrix();
+}
+
+void GameScene::RotaMove(WorldTransform& worldTransform_,Vector3 startPoint,float angle)
+{
+	worldTransform_.translation_.x =
+		cos(FreqConversionRad(angle)) * startPoint.x + -sin(FreqConversionRad(angle)) * startPoint.y;
+	worldTransform_.translation_.y =
+		sin(FreqConversionRad(angle)) * startPoint.x + cos(FreqConversionRad(angle)) * startPoint.y;
 }

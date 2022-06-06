@@ -45,6 +45,7 @@ Vector3 Vector3::operator+()const
 Vector3 Vector3::operator-()const
 {
 	return Vector3(-x,-y,-z);
+	//return -*this;
 }
 
 Vector3& Vector3::operator+=(const Vector3& v)

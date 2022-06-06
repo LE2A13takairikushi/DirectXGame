@@ -74,6 +74,9 @@ private: // メンバ変数
 	void CreateTrans(Vector3& move, WorldTransform& worldTransform_);
 	void MatrixCmp(WorldTransform& worldTransform_);
 	void MatrixUpdate(WorldTransform& worldTransform_);
+	
+	//なんかいい動きする　オブジェクトの座標を回転させる
+	void RotaMove(WorldTransform& worldTransform_, Vector3 startPoint, float angle);
 
 	bool debugCameraMode = false;
 
