@@ -3,8 +3,8 @@
 #include <cassert>
 #include "AxisIndicator.h"
 #include "PrimitiveDrawer.h"
-#include <random>
 #include "MyMath.h"
+#include "Random.h"
 
 const float XM_PM = 3.14;
 
@@ -52,9 +52,25 @@ void GameScene::Initialize() {
 		std::uniform_real_distribution<float> posdist(-10.0f, 10.0f);
 	}*/
 
-	viewProjection_[0].eye = {0,0,-300};
-	viewProjection_[1].eye = {0,200,100};
-	viewProjection_[2].eye = {100,0,250};
+	for (int i = 0; i < _countof(viewProjection_); i++)
+	{
+		viewProjection_[i].Initialize();
+	}
+
+	float eyeX[3] = { 0 };
+	float eyeY[3] = { 0 };
+	float eyeZ[3] = { 0 };
+
+	for (int i = 0; i < 3; i++)
+	{
+		eyeX[i] = random(-100, 100);
+		eyeY[i] = random(-100, 100);
+		eyeZ[i] = random(-100, 100);
+	}
+
+	viewProjection_[0].eye = { eyeX[0],eyeY[0],eyeZ[0]};
+	viewProjection_[1].eye = { eyeX[1],eyeY[1],eyeZ[1] };
+	viewProjection_[2].eye = { eyeX[2],eyeY[2],eyeZ[2] };
 
 	for (int i = 0; i < _countof(viewProjection_); i++)
 	{
@@ -62,8 +78,6 @@ void GameScene::Initialize() {
 
 		//アスペクト比
 		viewProjection_[i].aspectRatio = 1.0f;
-
-		viewProjection_[i].Initialize();
 	
 		debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
 
@@ -203,6 +217,20 @@ void GameScene::Update() {
 	//	}
 	//}
 
+	debugText_->SetPos(50, 50);
+	debugText_->Printf("viewProjection : %d",viewChangeNum);
+
+	debugText_->SetPos(50, 70);
+	debugText_->Printf("viewProjection[0] : %f %f %f", viewProjection_[0].eye.x, viewProjection_[0].eye.y, viewProjection_[0].eye.z);
+
+	debugText_->SetPos(50, 90);
+	debugText_->Printf("viewProjection[1] : %f %f %f", viewProjection_[1].eye.x, viewProjection_[1].eye.y, viewProjection_[1].eye.z);
+
+	debugText_->SetPos(50, 110);
+	debugText_->Printf("viewProjection[2] : %f %f %f", viewProjection_[2].eye.x, viewProjection_[2].eye.y, viewProjection_[2].eye.z);
+
+	debugText_->SetPos(400, 50);
+	debugText_->Printf("key(1) : viewProjection change");
 }
 
 void GameScene::Draw() {
