@@ -30,8 +30,10 @@ void GameScene::Initialize() {
 	for (int i = 0; i < _countof(worldTransform_); i++)
 	{
 		worldTransform_[i].Initialize();
-		worldTransform_[i].translation_ = { 0,10,0 };
-		WTFStartPoint = worldTransform_[0].translation_;
+		worldTransform_[i].translation_ = { 0,0,0 };
+		worldTransform_[i].scale_ = { 5.0f,5.0f,5.0f };
+		worldTransform_[i].rotation_ = { 0,0,0 };
+		//WTFStartPoint = worldTransform_[0].translation_;
 	}
 
 	//worldTransform_[1].translation_.x =
@@ -39,7 +41,7 @@ void GameScene::Initialize() {
 	//worldTransform_[1].translation_.y =
 	//	sin(angle) * worldTransform_[0].translation_.x + cos(angle) * worldTransform_[0].translation_.y;
 
-	if (false)
+	/*if (false)
 	{
 		std::random_device seed_gen;
 
@@ -48,57 +50,49 @@ void GameScene::Initialize() {
 		std::uniform_real_distribution<float> rotdist(0.0f, XM_PM);
 
 		std::uniform_real_distribution<float> posdist(-10.0f, 10.0f);
-	}
-
-	//スケール
-	Vector3 scale = { 1.0f,1.0f,1.0f };
-	//回転
-	Vector3 rot[100];
-	//平行移動
-	Vector3 Transform[100];
-
-
-	viewProjection_.eye = { 0,0,-300 };
-
-	viewProjection_.fovAngleY = FreqConversionRad(10.0f);
-
-	//アスペクト比
-	viewProjection_.aspectRatio = 1.0f;
-
-	/*if (false)
-	{
-		//ニアクリップ距離を設定
-		viewProjection_.nearZ = 52.0f;
-
-		//ファークリップ距離を設定
-		viewProjection_.farZ = 53.0f;
-
-		//↑こいつらなーにー？
-		// カメラに近い側(ニア)と遠い側	(ファー)の表示限界
-		// これの間に挟まれた部分しか描画されなくなる
 	}*/
 
-	viewProjection_.Initialize();
+	viewProjection_[0].eye = {0,0,-300};
+	viewProjection_[1].eye = {0,200,100};
+	viewProjection_[2].eye = {100,0,250};
 
-	winApp_;
-	debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
+	for (int i = 0; i < _countof(viewProjection_); i++)
+	{
+		viewProjection_[i].fovAngleY = FreqConversionRad(10.0f);
 
-	if (debugCameraMode)
-	{
-		PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());	
-		AxisIndicator::GetInstance()->SetVisible(true);
-		AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
-	}
-	else
-	{
-		PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
-		AxisIndicator::GetInstance()->SetVisible(true);
-		AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
+		//アスペクト比
+		viewProjection_[i].aspectRatio = 1.0f;
+
+		viewProjection_[i].Initialize();
+	
+		debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
+
+		if (debugCameraMode)
+		{
+			PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());
+			AxisIndicator::GetInstance()->SetVisible(true);
+			AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
+		}
+		else
+		{
+			PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_[i]);
+			AxisIndicator::GetInstance()->SetVisible(true);
+			AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_[i]);
+		}
 	}
 }
 
 void GameScene::Update() {
 	debugCamera_->Update();
+
+	if (input_->TriggerKey(DIK_1))
+	{
+		viewChangeNum++;
+		if (viewChangeNum > 2)
+		{
+			viewChangeNum = 0;
+		}
+	}
 
 	//移動処理
 	//キャラクターの移動ベクトル
@@ -127,8 +121,6 @@ void GameScene::Update() {
 		MatrixUpdate(worldTransform_[i]);
 		RotaMove(worldTransform_[i], WTFStartPoint, angle - i * 10.0f);
 	}
-
-
 
 	//ビュー処理
 	//ビューいじった名残
@@ -186,38 +178,31 @@ void GameScene::Update() {
 	}*/
 
 	//FOV変更処理
-	if (input_->PushKey(DIK_UP)) {
-		viewProjection_.fovAngleY += 0.01f;
-		viewProjection_.fovAngleY = Max(viewProjection_.fovAngleY, XM_PM);
-	}
-	if (input_->PushKey(DIK_DOWN)) {
-		viewProjection_.fovAngleY -= 0.01f;
-		viewProjection_.fovAngleY = Min(viewProjection_.fovAngleY, 0.01f);
+	for (int i = 0; i < _countof(viewProjection_); i++)
+	{
+		if (input_->PushKey(DIK_UP)) {
+			viewProjection_[i].fovAngleY += 0.01f;
+			viewProjection_[i].fovAngleY = Max(viewProjection_[i].fovAngleY, XM_PM);
+		}
+		if (input_->PushKey(DIK_DOWN)) {
+			viewProjection_[i].fovAngleY -= 0.01f;
+			viewProjection_[i].fovAngleY = Min(viewProjection_[i].fovAngleY, 0.01f);
+		}
+
+		viewProjection_[i].UpdateMatrix();
 	}
 
 	//ニアクリップ、ファークリップの更新の名残
-	if (false)
-	{
-		if (input_->PushKey(DIK_UP)) {
-			viewProjection_.nearZ += 0.1f;
-		}
-		if (input_->PushKey(DIK_DOWN)) {
-			viewProjection_.nearZ -= 0.1f;
-		}
-	}
+	//if (false)
+	//{
+	//	if (input_->PushKey(DIK_UP)) {
+	//		viewProjection_.nearZ += 0.1f;
+	//	}
+	//	if (input_->PushKey(DIK_DOWN)) {
+	//		viewProjection_.nearZ -= 0.1f;
+	//	}
+	//}
 
-	viewProjection_.UpdateMatrix();
-
-	//debugText_->SetPos(50, 50);
-	//debugText_->Printf("%f", viewProjection_.fovAngleY);
-	//debugText_->SetPos(50, 70);
-	//debugText_->Printf("%f %f %f", worldTransform_[1].translation_.x,
-	//	worldTransform_[1].translation_.y,
-	//	worldTransform_[1].translation_.z);
-	//debugText_->SetPos(50, 90);
-	//debugText_->Printf("%f %f %f", worldTransform_[2].translation_.x,
-	//	worldTransform_[2].translation_.y,
-	//	worldTransform_[2].translation_.z);
 }
 
 void GameScene::Draw() {
@@ -250,8 +235,14 @@ void GameScene::Draw() {
 
 	for (int i = 0; i < _countof(worldTransform_); i++)
 	{
-		model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
-		//model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
+		if (debugCameraMode)
+		{
+			model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
+		}
+		else
+		{
+			model_->Draw(worldTransform_[i], viewProjection_[viewChangeNum], textureHandle_);
+		}
 	}
 	
 	//sennnobyouga

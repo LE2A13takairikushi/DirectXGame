@@ -56,7 +56,8 @@ private: // メンバ変数
 	static const int WTFNum = 10;
 	WorldTransform worldTransform_[WTFNum];
 	Vector3 WTFStartPoint;
-	ViewProjection viewProjection_;
+	static const int viewNum = 3;
+	ViewProjection viewProjection_[viewNum];
 
 	WinApp winApp_;
 	DebugCamera* debugCamera_ = nullptr;
@@ -79,6 +80,7 @@ private: // メンバ変数
 	void RotaMove(WorldTransform& worldTransform_, Vector3 startPoint, float angle);
 
 	bool debugCameraMode = false;
+	int viewChangeNum = 0;
 
 	float angle = 0.0f;
 
