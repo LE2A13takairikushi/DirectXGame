@@ -52,12 +52,7 @@ void GameScene::Initialize() {
 		std::uniform_real_distribution<float> posdist(-10.0f, 10.0f);
 	}*/
 
-	for (int i = 0; i < _countof(viewProjection_); i++)
-	{
-		viewProjection_[i].Initialize();
-	}
-
-	float eyeX[3] = { 0 };
+	/*float eyeX[3] = { 0 };
 	float eyeY[3] = { 0 };
 	float eyeZ[3] = { 0 };
 
@@ -66,33 +61,32 @@ void GameScene::Initialize() {
 		eyeX[i] = random(-100, 100);
 		eyeY[i] = random(-100, 100);
 		eyeZ[i] = random(-100, 100);
-	}
+	}*/
 
-	viewProjection_[0].eye = { eyeX[0],eyeY[0],eyeZ[0]};
-	viewProjection_[1].eye = { eyeX[1],eyeY[1],eyeZ[1] };
-	viewProjection_[2].eye = { eyeX[2],eyeY[2],eyeZ[2] };
+	//viewProjection_[1].eye = { eyeX[1],eyeY[1],eyeZ[1] };
+	//viewProjection_[2].eye = { eyeX[2],eyeY[2],eyeZ[2] };
 
-	for (int i = 0; i < _countof(viewProjection_); i++)
+	viewProjection_.Initialize();
+	viewProjection_.eye = { -50,0,100 };
+
+	viewProjection_.fovAngleY = FreqConversionRad(10.0f);
+
+	//アスペクト比
+	viewProjection_.aspectRatio = 1.0f;
+
+	debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
+
+	if (debugCameraMode)
 	{
-		viewProjection_[i].fovAngleY = FreqConversionRad(10.0f);
-
-		//アスペクト比
-		viewProjection_[i].aspectRatio = 1.0f;
-	
-		debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
-
-		if (debugCameraMode)
-		{
-			PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());
-			AxisIndicator::GetInstance()->SetVisible(true);
-			AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
-		}
-		else
-		{
-			PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_[i]);
-			AxisIndicator::GetInstance()->SetVisible(true);
-			AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_[i]);
-		}
+		PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());
+		AxisIndicator::GetInstance()->SetVisible(true);
+		AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
+	}
+	else
+	{
+		PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
+		AxisIndicator::GetInstance()->SetVisible(true);
+		AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 	}
 }
 
@@ -135,6 +129,11 @@ void GameScene::Update() {
 		MatrixUpdate(worldTransform_[i]);
 		RotaMove(worldTransform_[i], WTFStartPoint, angle - i * 10.0f);
 	}
+
+	viewProjection_.eye.x =
+		cos(FreqConversionRad(angle)) * 100 + -sin(FreqConversionRad(angle)) * 100;
+	viewProjection_.eye.z =
+		sin(FreqConversionRad(angle)) * 100 + cos(FreqConversionRad(angle)) * 100;
 
 	//ビュー処理
 	//ビューいじった名残
@@ -192,19 +191,17 @@ void GameScene::Update() {
 	}*/
 
 	//FOV変更処理
-	for (int i = 0; i < _countof(viewProjection_); i++)
-	{
-		if (input_->PushKey(DIK_UP)) {
-			viewProjection_[i].fovAngleY += 0.01f;
-			viewProjection_[i].fovAngleY = Max(viewProjection_[i].fovAngleY, XM_PM);
-		}
-		if (input_->PushKey(DIK_DOWN)) {
-			viewProjection_[i].fovAngleY -= 0.01f;
-			viewProjection_[i].fovAngleY = Min(viewProjection_[i].fovAngleY, 0.01f);
-		}
 
-		viewProjection_[i].UpdateMatrix();
+	if (input_->PushKey(DIK_UP)) {
+		viewProjection_.fovAngleY += 0.01f;
+		viewProjection_.fovAngleY = Max(viewProjection_.fovAngleY, XM_PM);
 	}
+	if (input_->PushKey(DIK_DOWN)) {
+		viewProjection_.fovAngleY -= 0.01f;
+		viewProjection_.fovAngleY = Min(viewProjection_.fovAngleY, 0.01f);
+	}
+
+	viewProjection_.UpdateMatrix();
 
 	//ニアクリップ、ファークリップの更新の名残
 	//if (false)
@@ -221,13 +218,7 @@ void GameScene::Update() {
 	debugText_->Printf("viewProjection : %d",viewChangeNum);
 
 	debugText_->SetPos(50, 70);
-	debugText_->Printf("viewProjection[0] : %f %f %f", viewProjection_[0].eye.x, viewProjection_[0].eye.y, viewProjection_[0].eye.z);
-
-	debugText_->SetPos(50, 90);
-	debugText_->Printf("viewProjection[1] : %f %f %f", viewProjection_[1].eye.x, viewProjection_[1].eye.y, viewProjection_[1].eye.z);
-
-	debugText_->SetPos(50, 110);
-	debugText_->Printf("viewProjection[2] : %f %f %f", viewProjection_[2].eye.x, viewProjection_[2].eye.y, viewProjection_[2].eye.z);
+	debugText_->Printf("viewProjection : %f %f %f", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
 
 	debugText_->SetPos(400, 50);
 	debugText_->Printf("key(1) : viewProjection change");
@@ -269,7 +260,7 @@ void GameScene::Draw() {
 		}
 		else
 		{
-			model_->Draw(worldTransform_[i], viewProjection_[viewChangeNum], textureHandle_);
+			model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
 		}
 	}
 	

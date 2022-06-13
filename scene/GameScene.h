@@ -56,8 +56,8 @@ private: // メンバ変数
 	static const int WTFNum = 10;
 	WorldTransform worldTransform_[WTFNum];
 	Vector3 WTFStartPoint;
-	static const int viewNum = 3;
-	ViewProjection viewProjection_[viewNum];
+	//static const int viewNum = 3;
+	ViewProjection viewProjection_;
 
 	WinApp winApp_;
 	DebugCamera* debugCamera_ = nullptr;
