@@ -62,16 +62,12 @@ void GameScene::Update() {
 	worldTransform_[0].translation_.y += (keyInput.y * modelSpd) * result[0].y;
 	worldTransform_[0].translation_.z += (keyInput.z * modelSpd) * result[0].z;
 
-	for (int i = 0; i < 2; i++)
+	/*for (int i = 0; i < 2; i++)
 	{
 		worldTransform_[i].UpdateMatrix();
-	}
+	}*/
 	viewProjection_.UpdateMatrix();
 
-	debugText_->MyPrintf(50, 50, "worldTransform : %f,%f,%f",
-		worldTransform_[0].translation_.x,
-		worldTransform_[0].translation_.y,
-		worldTransform_[0].translation_.z);
 }
 
 void GameScene::Draw() {

@@ -36,6 +36,8 @@ class DebugText {
 	/// <param name="scale">倍率</param>
 	void Print(const std::string& text, float x, float y, float scale = 1.0f);
 
+	//void MyPrintf(float x, float y, const char* fmt, ...);
+
 	/// <summary>
 	/// 書式付き文字列追加
 	/// </summary>
