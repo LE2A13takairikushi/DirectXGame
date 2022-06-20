@@ -10,6 +10,11 @@ const float XM_PM = 3.14;
 
 //winAppを使う際は、winApp.h内のwinAppコンストラクタがprivateになっているため注意
 
+int moveX = 0;
+float t = 0;
+float tSpeed = 0.025f;
+
+
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
@@ -30,10 +35,19 @@ void GameScene::Initialize() {
 	for (int i = 0; i < _countof(worldTransform_); i++)
 	{
 		worldTransform_[i].Initialize();
-		worldTransform_[i].translation_ = { 0,0,0 };
+		worldTransform_[i].translation_ = { 0,50,0 };
 		worldTransform_[i].scale_ = { 5.0f,5.0f,5.0f };
 		worldTransform_[i].rotation_ = { 0,0,0 };
 		//WTFStartPoint = worldTransform_[0].translation_;
+	}
+
+	worldTransform_[0].translation_ = { 0,50,0 };
+	worldTransform_[1].translation_ = { 50,0,0 };
+	worldTransform_[2].translation_ = { -50,0,0 };
+
+	for (int i = 0; i < _countof(worldTransform_); i++)
+	{
+		MatrixUpdate(worldTransform_[i]);
 	}
 
 	//worldTransform_[1].translation_.x =
@@ -67,7 +81,7 @@ void GameScene::Initialize() {
 	//viewProjection_[2].eye = { eyeX[2],eyeY[2],eyeZ[2] };
 
 	viewProjection_.Initialize();
-	viewProjection_.eye = { -50,0,100 };
+	viewProjection_.eye = { 0,0,1200 };
 
 	viewProjection_.fovAngleY = FreqConversionRad(10.0f);
 
@@ -95,12 +109,54 @@ void GameScene::Update() {
 
 	if (input_->TriggerKey(DIK_1))
 	{
-		viewChangeNum++;
-		if (viewChangeNum > 2)
+		//if (moveX == 0)
+		//{
+		//	
+		//	//moveX = - worldTransform_[viewChangeNum].translation_.x;
+		//}
+
+		//viewChangeNum++;
+		//if (viewChangeNum > 2)
+		//{
+		//	viewChangeNum = 0;
+		//}
+		isViewChange = true;
+	}
+
+	if (isViewChange)
+	{
+		if (t < 1.0f)
 		{
-			viewChangeNum = 0;
+			t += tSpeed;
+		}
+		if (t == 1.0f)
+		{
+			isViewChange = false;
 		}
 	}
+
+	viewProjection_.target.x = SenkeiHokanSuruyoFunction(worldTransform_[viewChangeNum].translation_.x, worldTransform_[viewChangeNum + 1].translation_.x, t);
+	viewProjection_.target.y = SenkeiHokanSuruyoFunction(worldTransform_[viewChangeNum].translation_.y, worldTransform_[viewChangeNum + 1].translation_.y, t);
+
+	//if (moveX)
+	//{
+	//	if (worldTransform_[viewChangeNum].translation_.x < worldTransform_[viewChangeNum + 1].translation_.x)
+	//	{
+	//		worldTransform_[viewChangeNum].translation_.x -= 1;
+	//		moveX -= 1;
+	//	}
+	//}
+
+	//if (isViewChange)
+	//{
+	//	
+	//	if (worldTransform_[viewChangeNum].translation_.x < worldTransform_[viewChangeNum + 1].translation_.x)
+	//	{
+	//		//worldTransform_[viewChangeNum].translation_.x += 
+	//	}
+	//}
+
+	//viewProjection_.target = worldTransform_[viewChangeNum].translation_;
 
 	//移動処理
 	//キャラクターの移動ベクトル
@@ -127,13 +183,13 @@ void GameScene::Update() {
 		worldTransform_[i].translation_ += move;
 
 		MatrixUpdate(worldTransform_[i]);
-		RotaMove(worldTransform_[i], WTFStartPoint, angle - i * 10.0f);
+		//RotaMove(worldTransform_[i], WTFStartPoint, angle - i * 10.0f);
 	}
 
-	viewProjection_.eye.x =
-		cos(FreqConversionRad(angle)) * 100 + -sin(FreqConversionRad(angle)) * 100;
-	viewProjection_.eye.z =
-		sin(FreqConversionRad(angle)) * 100 + cos(FreqConversionRad(angle)) * 100;
+	//viewProjection_.eye.x =
+	//	cos(FreqConversionRad(angle)) * 100 + -sin(FreqConversionRad(angle)) * 100;
+	//viewProjection_.eye.z =
+	//	sin(FreqConversionRad(angle)) * 100 + cos(FreqConversionRad(angle)) * 100;
 
 	//ビュー処理
 	//ビューいじった名残
@@ -220,8 +276,29 @@ void GameScene::Update() {
 	debugText_->SetPos(50, 70);
 	debugText_->Printf("viewProjection : %f %f %f", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
 
+	debugText_->SetPos(50, 90);
+	debugText_->Printf("worldTransform[0] : %f %f %f", worldTransform_[0].translation_.x, worldTransform_[0].translation_.y, worldTransform_[0].translation_.z);
+
+	debugText_->SetPos(50, 110);
+	debugText_->Printf("worldTransform[1] : %f %f %f", worldTransform_[1].translation_.x, worldTransform_[1].translation_.y, worldTransform_[1].translation_.z);
+
+	debugText_->SetPos(50, 130);
+	debugText_->Printf("worldTransform[2] : %f %f %f", worldTransform_[2].translation_.x, worldTransform_[2].translation_.y, worldTransform_[2].translation_.z);
+
+	debugText_->SetPos(50, 150);
+	debugText_->Printf("viewProjection_.target : %f %f %f", 
+		viewProjection_.target.x,
+		viewProjection_.target.y,
+		viewProjection_.target.z);
+
+	debugText_->SetPos(50, 170);
+	debugText_->Printf("move : %d", moveX);
+	
+	debugText_->SetPos(50, 190);
+	debugText_->Printf("t : %f", t);
+
 	debugText_->SetPos(400, 50);
-	debugText_->Printf("key(1) : viewProjection change");
+	debugText_->Printf("key(1) : viewProjection.target change");
 }
 
 void GameScene::Draw() {
@@ -375,4 +452,9 @@ void GameScene::RotaMove(WorldTransform& worldTransform_,Vector3 startPoint,floa
 		cos(FreqConversionRad(angle)) * startPoint.x + -sin(FreqConversionRad(angle)) * startPoint.y;
 	worldTransform_.translation_.y =
 		sin(FreqConversionRad(angle)) * startPoint.x + cos(FreqConversionRad(angle)) * startPoint.y;
+}
+
+int GameScene::SenkeiHokanSuruyoFunction(int s, int e, float t)
+{
+	return s * (1 - t) + e * t;
 }

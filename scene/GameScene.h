@@ -56,7 +56,7 @@ private: // メンバ変数
 	static const int WTFNum = 10;
 	WorldTransform worldTransform_[WTFNum];
 	Vector3 WTFStartPoint;
-	//static const int viewNum = 3;
+	static const int viewNum = 3;
 	ViewProjection viewProjection_;
 
 	WinApp winApp_;
@@ -81,6 +81,7 @@ private: // メンバ変数
 
 	bool debugCameraMode = false;
 	int viewChangeNum = 0;
+	bool isViewChange = false;
 
 	float angle = 0.0f;
 
@@ -96,6 +97,8 @@ private: // メンバ変数
 		kLegR,	//右足
 		kNumPartId	//パーツの総数を表す数
 	};
+
+	int SenkeiHokanSuruyoFunction(int s, int e, float t);
 
 	/// <summary>
 	/// ゲームシーン用
