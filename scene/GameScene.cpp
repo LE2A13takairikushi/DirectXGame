@@ -144,6 +144,19 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	debugCamera_->Update();
 
+	Vector2 mouse = input_->GetMousePosition();
+
+	Vector2 angle;
+	angle.x -= mouse.x * 0.1f;
+	angle.y += mouse.y * 0.1f;
+
+	float length = 10.0f;
+	viewProjection_.target.x = viewProjection_.eye.x + cosf(FreqConversionRad(angle.x) * length);
+	viewProjection_.target.y = viewProjection_.eye.y + cosf(FreqConversionRad(angle.y) * length);
+	viewProjection_.target.z = viewProjection_.eye.z + sinf(FreqConversionRad(angle.x) * length);
+
+	viewProjection_.UpdateMatrix();
+
 	//移動処理
 	//キャラクターの移動ベクトル
 	Vector3 move = { 0,0,0 };
@@ -284,6 +297,10 @@ void GameScene::Update() {
 		worldTransform_[kRoot].translation_.x,
 		worldTransform_[kRoot].translation_.y,
 		worldTransform_[kRoot].translation_.z);
+
+	debugText_->SetPos(50, 70);
+	debugText_->Printf(" mouse.translation_.(x:%f),(y:%f)",
+		mouse.x,mouse.y);
 }
 
 void GameScene::Draw() {
