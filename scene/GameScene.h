@@ -53,7 +53,7 @@ private: // メンバ変数
 
 	Model* model_ = nullptr;
 
-	WorldTransform worldTransform_[100];
+	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 
 	WinApp winApp_;
@@ -73,19 +73,6 @@ private: // メンバ変数
 	void MatrixCmp(WorldTransform& worldTransform_);
 
 	bool debugCameraMode = false;
-
-	enum PartId {
-		kRoot,	//元座標
-		kSpine,	//脊髄
-		kChest,	//胸
-		kHead,	//頭
-		kArmL,	//左腕
-		kArmR,	//右腕
-		kHip,	//尻
-		kLegL,	//左足
-		kLegR,	//右足
-		kNumPartId	//パーツの総数を表す数
-	};
 
 	/// <summary>
 	/// ゲームシーン用

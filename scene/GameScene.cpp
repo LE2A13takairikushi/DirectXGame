@@ -33,40 +33,7 @@ void GameScene::Initialize() {
 	//}
 
 	//大元
-	worldTransform_[kRoot].Initialize();
-	//脊髄
-	worldTransform_[kSpine].Initialize();
-	worldTransform_[kSpine].parent_ = &worldTransform_[kRoot];
-	worldTransform_[kSpine].translation_ = { 0,4.5f,0 };
-	//胸
-	worldTransform_[kChest].Initialize();
-	worldTransform_[kChest].parent_ = &worldTransform_[kSpine];
-	worldTransform_[kChest].translation_ = { 0,0,4.5f };
-	//頭
-	worldTransform_[kHead].Initialize();
-	worldTransform_[kHead].parent_ = &worldTransform_[kChest];
-	worldTransform_[kHead].translation_ = { 0,5.0f,0 };
-	//左腕
-	worldTransform_[kArmL].Initialize();
-	worldTransform_[kArmL].parent_ = &worldTransform_[kChest];
-	worldTransform_[kArmL].translation_ = { -4.5f,0,0 };
-	//右腕
-	worldTransform_[kArmR].Initialize();
-	worldTransform_[kArmR].parent_ = &worldTransform_[kChest];
-	worldTransform_[kArmR].translation_ = { 4.5f,0,0 };
-
-	//尻
-	worldTransform_[kHip].Initialize();
-	worldTransform_[kHip].parent_ = &worldTransform_[kSpine];
-	worldTransform_[kHip].translation_ = { 0,-5.0f,0 };
-	//左足
-	worldTransform_[kLegL].Initialize();
-	worldTransform_[kLegL].parent_ = &worldTransform_[kHip];
-	worldTransform_[kLegL].translation_ = { -4.5f,0,0 };
-	//右足
-	worldTransform_[kLegR].Initialize();
-	worldTransform_[kLegR].parent_ = &worldTransform_[kHip];
-	worldTransform_[kLegR].translation_ = { 4.5f,0,0 };
+	worldTransform_.Initialize();
 
 	if (false)
 	{
@@ -99,7 +66,7 @@ void GameScene::Initialize() {
 		}
 	}*/
 
-	viewProjection_.eye = { 0,0,-100 };
+	viewProjection_.eye = { 0,50,100 };
 	//viewProjection_.target = { 0,0,0 };
 	//viewProjection_.up = { cosf(XM_PM / 4.0f),sinf(XM_PM / 4.0f),0.0f };
 	//viewProjection_.up = {0.0f,0.0f,0.0f };
@@ -146,73 +113,52 @@ void GameScene::Update() {
 
 	Vector2 mouse = input_->GetMousePosition();
 
-	Vector2 angle;
-	angle.x -= mouse.x * 0.1f;
-	angle.y += mouse.y * 0.1f;
+	if (true)
+	{
+		if (debugCameraMode == false)
+		{
+			Vector2 angle;
+			angle.x -= mouse.x * 0.1f;
+			angle.y += mouse.y * 0.1f;
 
-	float length = 10.0f;
-	viewProjection_.target.x = viewProjection_.eye.x + cosf(FreqConversionRad(angle.x) * length);
-	viewProjection_.target.y = viewProjection_.eye.y + cosf(FreqConversionRad(angle.y) * length);
-	viewProjection_.target.z = viewProjection_.eye.z + sinf(FreqConversionRad(angle.x) * length);
+			//マウスでカメラを動かす処理
+			float length = 10.0f;
+			viewProjection_.target.x = worldTransform_.translation_.x + cosf(FreqConversionRad(angle.x) * length);
+			viewProjection_.target.y = worldTransform_.translation_.y + cosf(FreqConversionRad(angle.y) * length);
+			viewProjection_.target.z = worldTransform_.translation_.z + sinf(FreqConversionRad(angle.x) * length);
 
-	viewProjection_.UpdateMatrix();
+			viewProjection_.UpdateMatrix();
+		}
+	}
 
 	//移動処理
 	//キャラクターの移動ベクトル
 	Vector3 move = { 0,0,0 };
 	float moveSpeed = 0.1f;
 
-	if (input_->PushKey(DIK_RIGHT))
+	if (input_->PushKey(DIK_W))
+	{
+		move.z += moveSpeed;
+	}
+	if (input_->PushKey(DIK_S))
+	{
+		move.z -= moveSpeed;
+	}
+	if (input_->PushKey(DIK_D))
 	{
 		move.x += moveSpeed;
 	}
-	if (input_->PushKey(DIK_LEFT))
+	if (input_->PushKey(DIK_A))
 	{
 		move.x -= moveSpeed;
 	}
 
-	worldTransform_[kRoot].translation_ += move;
-	CreateScale(worldTransform_[kRoot].scale_,worldTransform_[kRoot]);
-	CreateRot(worldTransform_[kRoot].rotation_, worldTransform_[kRoot]);
-	CreateTrans(worldTransform_[kRoot].translation_, worldTransform_[kRoot]);
-	MatrixCmp(worldTransform_[kRoot]);
-	worldTransform_[kRoot].TransferMatrix();
-
-	for (int i = kSpine; i < kNumPartId; i++)
-	{
-		CreateScale(worldTransform_[i].scale_, worldTransform_[i]);
-		CreateRot(worldTransform_[i].rotation_, worldTransform_[i]);
-		CreateTrans(worldTransform_[i].translation_, worldTransform_[i]);
-		worldTransform_[i].matWorld_.MatrixUint();
-		//スケーリング行列
-		worldTransform_[i].matWorld_ *= matScale;
-		//回転行列
-		worldTransform_[i].matWorld_ *= matRot;
-		//平行移動行列
-		worldTransform_[i].matWorld_ *= matTrans;
-
-		worldTransform_[i].matWorld_ *= worldTransform_[i].parent_->matWorld_;
-
-		worldTransform_[i].TransferMatrix();
-	}
-
-	if (input_->PushKey(DIK_U))
-	{
-		worldTransform_[kChest].rotation_ -= {0,0.1f,0};
-	}
-	if (input_->PushKey(DIK_I))
-	{
-		worldTransform_[kChest].rotation_ += {0, 0.1f, 0};
-	}
-
-	if (input_->PushKey(DIK_J))
-	{
-		worldTransform_[kHip].rotation_ -= {0, 0.1f, 0};
-	}
-	if (input_->PushKey(DIK_K))
-	{
-		worldTransform_[kHip].rotation_ += {0, 0.1f, 0};
-	}
+	worldTransform_.translation_ += move;
+	CreateScale(worldTransform_.scale_,worldTransform_);
+	CreateRot(worldTransform_.rotation_, worldTransform_);
+	CreateTrans(worldTransform_.translation_, worldTransform_);
+	MatrixCmp(worldTransform_);
+	worldTransform_.TransferMatrix();
 
 	//ビュー処理
 	//ビューいじった名残
@@ -294,13 +240,17 @@ void GameScene::Update() {
 
 	debugText_->SetPos(50, 50);
 	debugText_->Printf(" worldTransform_[0].translation_.(x:%f),(y:%f),(z:%f)", 
-		worldTransform_[kRoot].translation_.x,
-		worldTransform_[kRoot].translation_.y,
-		worldTransform_[kRoot].translation_.z);
+		worldTransform_.translation_.x,
+		worldTransform_.translation_.y,
+		worldTransform_.translation_.z);
 
 	debugText_->SetPos(50, 70);
 	debugText_->Printf(" mouse.translation_.(x:%f),(y:%f)",
 		mouse.x,mouse.y);
+
+	debugText_->SetPos(50, 90);
+	debugText_->Printf(" viewProjection_.eye.(x:%f),(y:%f),(z:%f)",
+		viewProjection_.target.x, viewProjection_.target.y, viewProjection_.target.z);
 }
 
 void GameScene::Draw() {
@@ -330,26 +280,20 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	
-	if (false)
+	if (true)
 	{
-		for (size_t i = 0; i < _countof(worldTransform_); i++)
+		//デバッグカメラ
+		if (debugCameraMode)
 		{
-			//デバッグカメラ
-			if (debugCameraMode)
-			{
-				model_->Draw(worldTransform_[i], debugCamera_->GetViewProjection(), textureHandle_);
-			}
-			else
-			{
-				model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
-			}
+			model_->Draw(worldTransform_, debugCamera_->GetViewProjection(), textureHandle_);
+		}
+		else
+		{
+			model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 		}
 	}
 
-	for (int i = 0; i < kNumPartId; i++)
-	{
-		model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
-	}
+	//model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 	//model_->Draw(worldTransform_[1], viewProjection_, textureHandle_);
 
 	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(-100, 0, 0), Vector3(100, 0, 0), Vector4(255, 0, 0, 255));
