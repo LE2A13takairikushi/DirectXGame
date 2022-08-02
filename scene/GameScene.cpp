@@ -1,10 +1,11 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
-#include "AxisIndicator.h"
 #include "PrimitiveDrawer.h"
 #include <random>
 #include "MyMath.h"
+
+//#include "AxisIndicator.h"
 
 const float XM_PM = 3.14;
 
@@ -24,16 +25,13 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
 
-	textureHandle_ = TextureManager::Load("mario.jpg");
+	textureHandle_ = TextureManager::Load("waito.jpg");
 	model_ = Model::Create();
-
-	//for (int i = 0; i < _countof(worldTransform_); i++)
-	//{
-	//	worldTransform_[i].Initialize();
-	//}
+	
+	player_.Initialize(model_,textureHandle_);
 
 	//大元
-	worldTransform_.Initialize();
+	//worldTransform_.Initialize();
 	viewProjection_.Initialize();
 
 	viewProjection_.eye = { 0,50,100 };
@@ -65,14 +63,14 @@ void GameScene::Initialize() {
 	if (debugCameraMode)
 	{
 		PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());	
-		AxisIndicator::GetInstance()->SetVisible(true);
-		AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
+		//AxisIndicator::GetInstance()->SetVisible(true);
+		//AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
 	}
 	else
 	{
 		PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
-		AxisIndicator::GetInstance()->SetVisible(true);
-		AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
+		//AxisIndicator::GetInstance()->SetVisible(true);
+		//AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 	}
 }
 
@@ -81,7 +79,7 @@ void GameScene::Update() {
 
 	Vector2 mouse = input_->GetMousePosition();
 
-	if (true)
+	if (false)
 	{
 		if (debugCameraMode == false)
 		{
@@ -93,7 +91,7 @@ void GameScene::Update() {
 			//これをカメラに入れるには、注視点オブジェクトの正面ベクトルをカメラのベクトルに代入する
 			//
 
-			viewProjection_.target = worldTransform_.translation_;
+			viewProjection_.target = player_.worldTransform.translation_;
 
 			//マウスでカメラを動かす処理
 			float length = 10.0f;
@@ -104,31 +102,9 @@ void GameScene::Update() {
 		}
 	}
 
-	//移動処理
-	//キャラクターの移動ベクトル
-	Vector3 move = { 0,0,0 };
-	float moveSpeed = 0.1f;
 
-	/*if (input_->PushKey(DIK_W))
-	{
-		move.z += moveSpeed;
-	}
-	if (input_->PushKey(DIK_S))
-	{
-		move.z -= moveSpeed;
-	}
-	if (input_->PushKey(DIK_D))
-	{
-		move.x += moveSpeed;
-	}
-	if (input_->PushKey(DIK_A))
-	{
-		move.x -= moveSpeed;
-	}*/
+	player_.Update();
 
-	worldTransform_.translation_ += move;
-	UpdateMatrix(worldTransform_);
-	worldTransform_.TransferMatrix();
 
 	//FOV変更処理
 	if (input_->PushKey(DIK_UP)) {
@@ -155,9 +131,9 @@ void GameScene::Update() {
 
 	debugText_->SetPos(50, 50);
 	debugText_->Printf(" worldTransform_[0].translation_.(x:%f),(y:%f),(z:%f)", 
-		worldTransform_.translation_.x,
-		worldTransform_.translation_.y,
-		worldTransform_.translation_.z);
+		player_.worldTransform.translation_.x,
+		player_.worldTransform.translation_.y,
+		player_.worldTransform.translation_.z);
 
 	debugText_->SetPos(50, 70);
 	debugText_->Printf(" mouse.translation_.(x:%f),(y:%f)",
@@ -199,18 +175,19 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	
-	if (true)
-	{
-		//デバッグカメラ
-		if (debugCameraMode)
-		{
-			model_->Draw(worldTransform_, debugCamera_->GetViewProjection(), textureHandle_);
-		}
-		else
-		{
-			model_->Draw(worldTransform_, viewProjection_, textureHandle_);
-		}
-	}
+	//if (true)
+	//{
+	//	//デバッグカメラ
+	//	if (debugCameraMode)
+	//	{
+	//		model_->Draw(player_.worldTransform, debugCamera_->GetViewProjection(), textureHandle_);
+	//	}
+	//	else
+	//	{
+	//		
+	//	}
+	//}
+	player_.Draw(viewProjection_);
 
 	//model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 	//model_->Draw(worldTransform_[1], viewProjection_, textureHandle_);
@@ -239,81 +216,4 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
-}
-
-void GameScene::CreateScale(WorldTransform& worldTransform_)
-{
-	//スケーリング行列
-
-
-	//スケールを設定するやつら
-	matScale.m[0][0] = worldTransform_.scale_.x;
-	matScale.m[1][1] = worldTransform_.scale_.y;
-	matScale.m[2][2] = worldTransform_.scale_.z;
-	matScale.m[3][3] = 1;
-
-	worldTransform_.matWorld_.MatrixUint();
-	worldTransform_.matWorld_ *= matScale;
-}
-
-void GameScene::CreateRot( WorldTransform& worldTransform_)
-{
-
-	matRot.MatrixUint();
-	matRotX.MatrixUint();
-	matRotY.MatrixUint();
-	matRotZ.MatrixUint();
-
-	matRotZ.m[0][0] = cos(worldTransform_.rotation_.z);
-	matRotZ.m[0][1] = sin(worldTransform_.rotation_.z);
-	matRotZ.m[1][0] = -sin(worldTransform_.rotation_.z);
-	matRotZ.m[1][1] = cos(worldTransform_.rotation_.z);
-
-	matRotX.m[1][1] = cos(worldTransform_.rotation_.x);
-	matRotX.m[1][2] = sin(worldTransform_.rotation_.x);
-	matRotX.m[2][1] = -sin(worldTransform_.rotation_.x);
-	matRotX.m[2][2] = cos(worldTransform_.rotation_.x);
-
-	matRotY.m[0][0] = cos(worldTransform_.rotation_.y);
-	matRotY.m[0][2] = -sin(worldTransform_.rotation_.y);
-	matRotY.m[2][0] = sin(worldTransform_.rotation_.y);
-	matRotY.m[2][2] = cos(worldTransform_.rotation_.y);
-
-	matRot *= matRotZ;
-	matRot *= matRotX;
-	matRot *= matRotY;
-
-	worldTransform_.matWorld_.MatrixUint();
-	worldTransform_.matWorld_ *= matRot;
-}
-
-void GameScene::CreateTrans(WorldTransform& worldTransform_)
-{
-	matTrans = MathUtility::Matrix4Identity();
-
-	matTrans.m[3][0] = worldTransform_.translation_.x;
-	matTrans.m[3][1] = worldTransform_.translation_.y;
-	matTrans.m[3][2] = worldTransform_.translation_.z;
-
-	worldTransform_.matWorld_.MatrixUint();
-	worldTransform_.matWorld_ *= matTrans;
-}
-
-void GameScene::MatrixCmp(WorldTransform& worldTransform_)
-{
-	worldTransform_.matWorld_.MatrixUint();
-	//スケーリング行列
-	worldTransform_.matWorld_ *= matScale;
-	//回転行列
-	worldTransform_.matWorld_ *= matRot;
-	//平行移動行列
-	worldTransform_.matWorld_ *= matTrans;
-}
-
-void GameScene::UpdateMatrix(WorldTransform& worldTransform_)
-{
-	CreateScale(worldTransform_);
-	CreateRot(worldTransform_);
-	CreateTrans(worldTransform_);
-	MatrixCmp(worldTransform_);
 }

@@ -27,6 +27,12 @@ public:
 	Vector3 translation_ = {0, 0, 0};
 	// ローカル → ワールド変換行列
 	Matrix4 matWorld_;
+
+	Matrix4 matTrans;
+	Matrix4 matRot;
+	Matrix4 matRotX, matRotY, matRotZ;
+	Matrix4 matScale;
+
 	// 親となるワールド変換へのポインタ
 	WorldTransform* parent_ = nullptr;
 
@@ -46,5 +52,13 @@ public:
 	/// 行列を転送する
 	/// </summary>
 	void TransferMatrix();
+
+	void CreateScale();
+	void CreateRot();
+	void CreateTrans();
+	void MatrixCmp();
+	void UpdateMatrix();
+
+	void PlayerUpdateMatrix();
 
 };
