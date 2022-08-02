@@ -1,15 +1,13 @@
 #include "MyMath.h"
 #include "WorldTransform.h"
 
-const float XM_PM = 3.14;
-
 float FreqConversionRad(float frequencymethod)
 {
-	return XM_PM / 180 * frequencymethod;
+	return PIf / 180 * frequencymethod;
 }
 
 float RadConversionFreq(float rad) {
-	return 180 / XM_PM * rad;
+	return 180 / PIf * rad;
 }
 
 float Min(const float& v, const float& low)

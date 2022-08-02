@@ -27,6 +27,8 @@ void GameScene::Initialize() {
 
 	textureHandle_ = TextureManager::Load("waito.jpg");
 	model_ = Model::Create();
+
+	skydome = Model::CreateFromOBJ("skydome");
 	
 	player_.Initialize(model_,textureHandle_);
 
@@ -39,7 +41,7 @@ void GameScene::Initialize() {
 	//viewProjection_.up = { cosf(XM_PM / 4.0f),sinf(XM_PM / 4.0f),0.0f };
 	//viewProjection_.up = {0.0f,0.0f,0.0f };
 
-	viewProjection_.fovAngleY = FreqConversionRad(10.0f);
+	viewProjection_.fovAngleY = FreqConversionRad(90.0f);
 
 	//アスペクト比
 	viewProjection_.aspectRatio = 1.0f;
@@ -72,20 +74,23 @@ void GameScene::Initialize() {
 		//AxisIndicator::GetInstance()->SetVisible(true);
 		//AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 	}
+
+	skydomeTrans.Initialize();
+	skydomeTrans.translation_ = { 0,0,0 };
+	skydomeTrans.scale_ = { 1,1,1 };
 }
 
 void GameScene::Update() {
 	debugCamera_->Update();
 
-	Vector2 mouse = input_->GetMousePosition();
+	//Vector2 mouse = input_->GetMousePosition();
 
-	if (false)
+	player_.Update();
+
+	if (true)
 	{
 		if (debugCameraMode == false)
 		{
-			Vector2 angle;
-			angle.x -= mouse.x * 0.01f;
-			angle.y += mouse.y * 0.01f;
 
 			//クォータニオンでは、注視点のオブジェクトの回転量がわかる
 			//これをカメラに入れるには、注視点オブジェクトの正面ベクトルをカメラのベクトルに代入する
@@ -94,27 +99,25 @@ void GameScene::Update() {
 			viewProjection_.target = player_.worldTransform.translation_;
 
 			//マウスでカメラを動かす処理
-			float length = 10.0f;
-			viewProjection_.eye.x = viewProjection_.target.x + cosf(FreqConversionRad(angle.x) * length);
-			viewProjection_.eye.z = viewProjection_.target.z + sinf(FreqConversionRad(angle.x) * length);
+			const float length = 10.0f;
+
+			viewProjection_.eye = player_.worldTransform.translation_ + (-player_.AxisZVec.normalize() * length);
+
 
 			viewProjection_.UpdateMatrix();
 		}
 	}
 
 
-	player_.Update();
-
-
-	//FOV変更処理
-	if (input_->PushKey(DIK_UP)) {
-		viewProjection_.fovAngleY += 0.01f;
-		viewProjection_.fovAngleY = Max(viewProjection_.fovAngleY, XM_PM);
-	}
-	if (input_->PushKey(DIK_DOWN)) {
-		viewProjection_.fovAngleY -= 0.01f;
-		viewProjection_.fovAngleY = Min(viewProjection_.fovAngleY, 0.01f);
-	}
+	////FOV変更処理
+	//if (input_->PushKey(DIK_UP)) {
+	//	viewProjection_.fovAngleY += 0.01f;
+	//	viewProjection_.fovAngleY = Max(viewProjection_.fovAngleY, XM_PM);
+	//}
+	//if (input_->PushKey(DIK_DOWN)) {
+	//	viewProjection_.fovAngleY -= 0.01f;
+	//	viewProjection_.fovAngleY = Min(viewProjection_.fovAngleY, 0.01f);
+	//}
 
 	//ニアクリップ、ファークリップの更新の名残
 	if (false)
@@ -136,8 +139,8 @@ void GameScene::Update() {
 		player_.worldTransform.translation_.z);
 
 	debugText_->SetPos(50, 70);
-	debugText_->Printf(" mouse.translation_.(x:%f),(y:%f)",
-		mouse.x,mouse.y);
+	debugText_->Printf(" player_.rot.(x:%f),(y:%f)",
+		player_.horizontalRotation, player_.verticalRotation);
 
 	debugText_->SetPos(50, 90);
 	debugText_->Printf(" viewProjection_.eye.(x:%f),(y:%f),(z:%f)",
@@ -187,6 +190,9 @@ void GameScene::Draw() {
 	//		
 	//	}
 	//}
+
+	skydome->Draw(skydomeTrans, viewProjection_);
+
 	player_.Draw(viewProjection_);
 
 	//model_->Draw(worldTransform_, viewProjection_, textureHandle_);

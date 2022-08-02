@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "MyMath.h"
 
 Player::Player()
 {
@@ -19,9 +20,12 @@ void Player::Initialize(Model *model_, TextureHandle textureHandle_)
 
 void Player::Update()
 {
+	oldmouse = mouse;
+	mouse = input_->GetMousePosition();
+
 	Move();
 
-	worldTransform.UpdateMatrix();
+	PlayerUpdateMatrix();
 	worldTransform.TransferMatrix();
 }
 
@@ -47,6 +51,15 @@ void Player::Move()
 		move.x -= moveSpeed;
 	}
 
+
+	horizontalRotation += (mouse.x - oldmouse.x) * 0.01f;
+	verticalRotation += (mouse.y - oldmouse.y) * 0.01f;
+
+	//if (horizontalRotation > 90) horizontalRotation = 90;
+	if (verticalRotation > PIf / 2 - FreqConversionRad(1.0f)) verticalRotation = PIf / 2 - FreqConversionRad(1.0f);
+	if (verticalRotation < -PIf / 2 + FreqConversionRad(1.0f)) verticalRotation = -PIf / 2 + FreqConversionRad(1.0f);
+	
+
 	worldTransform.translation_ += move;
 
 }
@@ -54,4 +67,31 @@ void Player::Move()
 void Player::Draw(ViewProjection viewProjection_)
 {
 	model_->Draw(worldTransform, viewProjection_, textureHandle_);
+}
+
+void Player::PlayerUpdateMatrix()
+{
+	worldTransform.CreateScale();
+	
+	worldTransform.rotation_.y = horizontalRotation;
+	worldTransform.CreateRot();
+
+	AxisXVec = worldTransform.matRot.ExtractAxisX();
+
+	//AxisYVec = worldTransform.matRot.ExtractAxisY();
+
+	worldTransform.CreateTrans();
+
+	worldTransform.matWorld_.MatrixUint();
+	//スケーリング行列
+	worldTransform.matWorld_ *= worldTransform.matScale;
+	//回転行列
+	//worldTransform.matWorld_ *= Matrix4::RotArbitrary(AxisYVec, horizontalRotation);
+	worldTransform.matWorld_ *= worldTransform.matRot;
+	worldTransform.matWorld_ *= Matrix4::RotArbitrary(AxisXVec, verticalRotation);
+
+	//平行移動行列
+	worldTransform.matWorld_ *= worldTransform.matTrans;
+
+	AxisZVec = worldTransform.matWorld_.ExtractAxisZ();
 }

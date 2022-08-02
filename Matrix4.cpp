@@ -38,6 +38,21 @@ Matrix4 Matrix4::RotArbitrary(Vector3 axis, float rad)
     );
 }
 
+Vector3 Matrix4::ExtractAxisX()
+{
+	return Vector3(m[0][0], m[0][1], m[0][2]);
+}
+
+Vector3 Matrix4::ExtractAxisY()
+{
+	return Vector3(m[1][0], m[1][1], m[1][2]);
+}
+
+Vector3 Matrix4::ExtractAxisZ()
+{
+	return Vector3(m[2][0], m[2][1], m[2][2]);
+}
+
 Matrix4 Matrix4::MatrixUint()
 {
 	for (int i = 0; i < 4; i++)

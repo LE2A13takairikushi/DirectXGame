@@ -21,9 +21,21 @@ public:
 	float verticalRotation = 0;
 	float horizontalRotation = 0;
 
+	//横ベクトル
+	Vector3 AxisXVec = {0,0,0};
+	//正面ベクトル
+	Vector3 AxisZVec = {0,0,0};
+
+	Vector3 AxisYVec = { 0,0,0 };
+
+	Vector2 oldmouse;
+	Vector2 mouse;
+
 	void Initialize(Model* model_, TextureHandle textureHandle_);
 	void Update();
 	void Draw(ViewProjection viewProjection_);
+
+	void PlayerUpdateMatrix();
 
 private:
 	void Move();

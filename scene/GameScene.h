@@ -57,6 +57,8 @@ private: // メンバ変数
 
 	Model* model_ = nullptr;
 
+	Model* skydome = nullptr;
+
 	//WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 
@@ -65,7 +67,7 @@ private: // メンバ変数
 
 	Player player_;
 
-	Vector3 axis = {1,0,1};
+	WorldTransform skydomeTrans;
 
 	//カメラ上方向の角度
 	float viewAngle = 0.0f;

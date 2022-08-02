@@ -28,7 +28,12 @@ class Matrix4 {
 	//これを使う際は専用のインスタンスを作った方がいい)
 	Matrix4 MatrixUint();
 
+	Vector3 ExtractAxisX();
+	Vector3 ExtractAxisY();
+	Vector3 ExtractAxisZ();
+
 	Matrix4& operator *=(const Matrix4& m2);
 
-	Matrix4 RotArbitrary(Vector3 axis, float rad);
+	static Matrix4 RotArbitrary(Vector3 axis, float rad);
+	
 };
