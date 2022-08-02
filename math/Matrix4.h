@@ -1,4 +1,7 @@
 ﻿#pragma once
+#include "Vector3.h"
+#include "Vector4.h"
+
 /// <summary>
 /// 行列
 /// </summary>
@@ -26,4 +29,6 @@ class Matrix4 {
 	Matrix4 MatrixUint();
 
 	Matrix4& operator *=(const Matrix4& m2);
+
+	Matrix4 RotArbitrary(Vector3 axis, float rad);
 };

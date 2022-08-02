@@ -34,37 +34,7 @@ void GameScene::Initialize() {
 
 	//大元
 	worldTransform_.Initialize();
-
-	if (false)
-	{
-		std::random_device seed_gen;
-
-		std::mt19937_64 engine(seed_gen());
-
-		std::uniform_real_distribution<float> rotdist(0.0f, XM_PM);
-
-		std::uniform_real_distribution<float> posdist(-10.0f, 10.0f);
-	}
-	//スケール
-	Vector3 scale = { 1.0f,1.0f,1.0f };
-	//回転
-	Vector3 rot[100];
-	//平行移動
-	Vector3 Transform[100];
-
-	/*if (false)
-	{
-		for (size_t i = 0; i < _countof(worldTransform_); i++)
-		{
-			CreateScale(scale, worldTransform_[i]);
-			//rot[i] = { rotdist(engine), rotdist(engine), rotdist(engine) };
-			CreateRot(rot[i], worldTransform_[i]);
-			//Transform[i] = { posdist(engine), posdist(engine), posdist(engine) };
-			CreateTrans(Transform[i], worldTransform_[i]);
-			MatrixCmp(worldTransform_[i]);
-			worldTransform_[i].TransferMatrix();
-		}
-	}*/
+	viewProjection_.Initialize();
 
 	viewProjection_.eye = { 0,50,100 };
 	//viewProjection_.target = { 0,0,0 };
@@ -88,8 +58,6 @@ void GameScene::Initialize() {
 		// カメラに近い側(ニア)と遠い側	(ファー)の表示限界
 		// これの間に挟まれた部分しか描画されなくなる
 	}*/
-
-	viewProjection_.Initialize();
 
 	winApp_;
 	debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
@@ -118,14 +86,19 @@ void GameScene::Update() {
 		if (debugCameraMode == false)
 		{
 			Vector2 angle;
-			angle.x -= mouse.x * 0.1f;
-			angle.y += mouse.y * 0.1f;
+			angle.x -= mouse.x * 0.01f;
+			angle.y += mouse.y * 0.01f;
+
+			//クォータニオンでは、注視点のオブジェクトの回転量がわかる
+			//これをカメラに入れるには、注視点オブジェクトの正面ベクトルをカメラのベクトルに代入する
+			//
+
+			viewProjection_.target = worldTransform_.translation_;
 
 			//マウスでカメラを動かす処理
 			float length = 10.0f;
-			viewProjection_.target.x = worldTransform_.translation_.x + cosf(FreqConversionRad(angle.x) * length);
-			viewProjection_.target.y = worldTransform_.translation_.y + cosf(FreqConversionRad(angle.y) * length);
-			viewProjection_.target.z = worldTransform_.translation_.z + sinf(FreqConversionRad(angle.x) * length);
+			viewProjection_.eye.x = viewProjection_.target.x + cosf(FreqConversionRad(angle.x) * length);
+			viewProjection_.eye.z = viewProjection_.target.z + sinf(FreqConversionRad(angle.x) * length);
 
 			viewProjection_.UpdateMatrix();
 		}
@@ -136,7 +109,7 @@ void GameScene::Update() {
 	Vector3 move = { 0,0,0 };
 	float moveSpeed = 0.1f;
 
-	if (input_->PushKey(DIK_W))
+	/*if (input_->PushKey(DIK_W))
 	{
 		move.z += moveSpeed;
 	}
@@ -151,69 +124,11 @@ void GameScene::Update() {
 	if (input_->PushKey(DIK_A))
 	{
 		move.x -= moveSpeed;
-	}
+	}*/
 
 	worldTransform_.translation_ += move;
-	CreateScale(worldTransform_.scale_,worldTransform_);
-	CreateRot(worldTransform_.rotation_, worldTransform_);
-	CreateTrans(worldTransform_.translation_, worldTransform_);
-	MatrixCmp(worldTransform_);
+	UpdateMatrix(worldTransform_);
 	worldTransform_.TransferMatrix();
-
-	//ビュー処理
-	//ビューいじった名残
-	/*if (false)
-	{
-		Vector3 move = { 0,0,0 };
-
-		const float kEyeSpeed = 0.2f;
-
-		if (input_->PushKey(DIK_W)) {
-			move.z -= kEyeSpeed;
-		}
-		if (input_->PushKey(DIK_S)) {
-			move.z += kEyeSpeed;
-		}
-
-		viewProjection_.eye += move;
-
-		Vector3 taMove = { 0,0,0 };
-
-		const float kTargetSpeed = 0.2f;
-
-		if (input_->PushKey(DIK_LEFT)) {
-			taMove.x -= kTargetSpeed;
-		}
-		if (input_->PushKey(DIK_RIGHT)) {
-			taMove.x += kTargetSpeed;
-		}
-
-		viewProjection_.target += taMove;
-
-		const float kUpRotSpeed = 0.04f;
-
-		if (input_->PushKey(DIK_SPACE)) {
-			viewAngle += kUpRotSpeed;
-
-			viewAngle = fmodf(viewAngle, XM_PM * 2.0f);
-		}
-
-		//上方向ベクトルを計算
-		viewProjection_.up = { cosf(viewAngle),sinf(viewAngle),0.0f };
-
-		//行列の再計算
-		viewProjection_.UpdateMatrix();
-
-		debugText_->SetPos(50, 50);
-		debugText_->Printf(
-			"eye:(%f,%f,%f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
-		debugText_->SetPos(50, 70);
-		debugText_->Printf(
-			"target:(%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y, viewProjection_.target.z);
-		debugText_->SetPos(50, 90);
-		debugText_->Printf(
-			"up:(%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y, viewProjection_.up.z);
-	}*/
 
 	//FOV変更処理
 	if (input_->PushKey(DIK_UP)) {
@@ -250,6 +165,10 @@ void GameScene::Update() {
 
 	debugText_->SetPos(50, 90);
 	debugText_->Printf(" viewProjection_.eye.(x:%f),(y:%f),(z:%f)",
+		viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
+
+	debugText_->SetPos(50, 110);
+	debugText_->Printf(" viewProjection_.target.(x:%f),(y:%f),(z:%f)",
 		viewProjection_.target.x, viewProjection_.target.y, viewProjection_.target.z);
 }
 
@@ -322,22 +241,22 @@ void GameScene::Draw() {
 #pragma endregion
 }
 
-void GameScene::CreateScale(Vector3& scaleMag, WorldTransform& worldTransform_)
+void GameScene::CreateScale(WorldTransform& worldTransform_)
 {
 	//スケーリング行列
 
 
 	//スケールを設定するやつら
-	matScale.m[0][0] = scaleMag.x;
-	matScale.m[1][1] = scaleMag.y;
-	matScale.m[2][2] = scaleMag.z;
+	matScale.m[0][0] = worldTransform_.scale_.x;
+	matScale.m[1][1] = worldTransform_.scale_.y;
+	matScale.m[2][2] = worldTransform_.scale_.z;
 	matScale.m[3][3] = 1;
 
 	worldTransform_.matWorld_.MatrixUint();
 	worldTransform_.matWorld_ *= matScale;
 }
 
-void GameScene::CreateRot(Vector3& rotMag, WorldTransform& worldTransform_)
+void GameScene::CreateRot( WorldTransform& worldTransform_)
 {
 
 	matRot.MatrixUint();
@@ -345,20 +264,20 @@ void GameScene::CreateRot(Vector3& rotMag, WorldTransform& worldTransform_)
 	matRotY.MatrixUint();
 	matRotZ.MatrixUint();
 
-	matRotZ.m[0][0] = cos(rotMag.z);
-	matRotZ.m[0][1] = sin(rotMag.z);
-	matRotZ.m[1][0] = -sin(rotMag.z);
-	matRotZ.m[1][1] = cos(rotMag.z);
+	matRotZ.m[0][0] = cos(worldTransform_.rotation_.z);
+	matRotZ.m[0][1] = sin(worldTransform_.rotation_.z);
+	matRotZ.m[1][0] = -sin(worldTransform_.rotation_.z);
+	matRotZ.m[1][1] = cos(worldTransform_.rotation_.z);
 
-	matRotX.m[1][1] = cos(rotMag.x);
-	matRotX.m[1][2] = sin(rotMag.x);
-	matRotX.m[2][1] = -sin(rotMag.x);
-	matRotX.m[2][2] = cos(rotMag.x);
+	matRotX.m[1][1] = cos(worldTransform_.rotation_.x);
+	matRotX.m[1][2] = sin(worldTransform_.rotation_.x);
+	matRotX.m[2][1] = -sin(worldTransform_.rotation_.x);
+	matRotX.m[2][2] = cos(worldTransform_.rotation_.x);
 
-	matRotY.m[0][0] = cos(rotMag.y);
-	matRotY.m[0][2] = -sin(rotMag.y);
-	matRotY.m[2][0] = sin(rotMag.y);
-	matRotY.m[2][2] = cos(rotMag.y);
+	matRotY.m[0][0] = cos(worldTransform_.rotation_.y);
+	matRotY.m[0][2] = -sin(worldTransform_.rotation_.y);
+	matRotY.m[2][0] = sin(worldTransform_.rotation_.y);
+	matRotY.m[2][2] = cos(worldTransform_.rotation_.y);
 
 	matRot *= matRotZ;
 	matRot *= matRotX;
@@ -368,13 +287,13 @@ void GameScene::CreateRot(Vector3& rotMag, WorldTransform& worldTransform_)
 	worldTransform_.matWorld_ *= matRot;
 }
 
-void GameScene::CreateTrans(Vector3& move, WorldTransform& worldTransform_)
+void GameScene::CreateTrans(WorldTransform& worldTransform_)
 {
 	matTrans = MathUtility::Matrix4Identity();
 
-	matTrans.m[3][0] = move.x;
-	matTrans.m[3][1] = move.y;
-	matTrans.m[3][2] = move.z;
+	matTrans.m[3][0] = worldTransform_.translation_.x;
+	matTrans.m[3][1] = worldTransform_.translation_.y;
+	matTrans.m[3][2] = worldTransform_.translation_.z;
 
 	worldTransform_.matWorld_.MatrixUint();
 	worldTransform_.matWorld_ *= matTrans;
@@ -389,4 +308,12 @@ void GameScene::MatrixCmp(WorldTransform& worldTransform_)
 	worldTransform_.matWorld_ *= matRot;
 	//平行移動行列
 	worldTransform_.matWorld_ *= matTrans;
+}
+
+void GameScene::UpdateMatrix(WorldTransform& worldTransform_)
+{
+	CreateScale(worldTransform_);
+	CreateRot(worldTransform_);
+	CreateTrans(worldTransform_);
+	MatrixCmp(worldTransform_);
 }

@@ -64,13 +64,16 @@ private: // メンバ変数
 	Matrix4 matRotX, matRotY, matRotZ;
 	Matrix4 matScale;
 
+	Vector3 axis = {1,0,1};
+
 	//カメラ上方向の角度
 	float viewAngle = 0.0f;
 
-	void CreateScale(Vector3& scaleMag, WorldTransform& worldTransform_);
-	void CreateRot(Vector3& rotMag, WorldTransform& worldTransform_);
-	void CreateTrans(Vector3& move, WorldTransform& worldTransform_);
+	void CreateScale(WorldTransform& worldTransform_);
+	void CreateRot(WorldTransform& worldTransform_);
+	void CreateTrans(WorldTransform& worldTransform_);
 	void MatrixCmp(WorldTransform& worldTransform_);
+	void UpdateMatrix(WorldTransform& worldTransform_);
 
 	bool debugCameraMode = false;
 
