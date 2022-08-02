@@ -11,6 +11,10 @@ public:
 
 	//ƒƒ“ƒoŠÖ”
 	float length() const;
+
+	//•Ô‚·‚Ì‚Í’·‚³‚Ì“ñæ ‚È‚Ì‚Åg‚¤Û‚É‚Í”äŠr‚·‚é‘ÎÛ‚à2æ‚µ‚Ä”äŠr‚·‚é‚Æ
+	//ˆ—‚ğŒyŒ¸‚Å‚«‚é
+	float lengthSquared() const;
 	Vector3& normalize();
 	float dot(const Vector3& v)const;
 	Vector3 cross(const Vector3& v)const;

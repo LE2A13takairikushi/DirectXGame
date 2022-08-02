@@ -52,8 +52,9 @@ private: // メンバ変数
 	uint32_t textureHandle_ = 0;
 
 	Model* model_ = nullptr;
+	Sprite* sprite = nullptr;
 
-	WorldTransform worldTransform_[100];
+	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 
 	WinApp winApp_;
@@ -67,26 +68,33 @@ private: // メンバ変数
 	//カメラ上方向の角度
 	float viewAngle = 0.0f;
 
-	void CreateScale(Vector3& scaleMag, WorldTransform& worldTransform_);
-	void CreateRot(Vector3& rotMag, WorldTransform& worldTransform_);
-	void CreateTrans(Vector3& move, WorldTransform& worldTransform_);
+	void CreateScale(WorldTransform& worldTransform_);
+	void CreateRot( WorldTransform& worldTransform_);
+	void CreateTrans(WorldTransform& worldTransform_);
 	void MatrixCmp(WorldTransform& worldTransform_);
+	void UpdateMatrix(WorldTransform& worldTransform_);
 
-	bool debugCameraMode = false;
+	bool debugCameraMode = true;
 
-	enum PartId {
-		kRoot,	//元座標
-		kSpine,	//脊髄
-		kChest,	//胸
-		kHead,	//頭
-		kArmL,	//左腕
-		kArmR,	//右腕
-		kHip,	//尻
-		kLegL,	//左足
-		kLegR,	//右足
-		kNumPartId	//パーツの総数を表す数
+	struct Ray
+	{
+		Vector3 direction;
+		Vector3 position;
 	};
 
+	struct Sphere
+	{
+		Vector3 position;
+		float r;
+	};
+
+	Sphere worldTransformSphere;
+	Ray ray;
+
+	bool RaySphereCol(const Ray ray, const Sphere sphere);
+
+	bool SphereCollision(Sphere circle1, Sphere circle2);
+	bool SphereCollision(Sphere circle1, Ray circle2);
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>

@@ -25,6 +25,7 @@ public:
 	Vector3 rotation_ = {0, 0, 0};
 	// ローカル座標
 	Vector3 translation_ = {0, 0, 0};
+
 	// ローカル → ワールド変換行列
 	Matrix4 matWorld_;
 	// 親となるワールド変換へのポインタ
