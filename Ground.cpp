@@ -14,7 +14,7 @@ void Ground::Initialize(Model* model_, TextureHandle textureHandle_)
 	this->model_ = model_;
 	this->textureHandle_ = textureHandle_;
 
-	worldTransform_.scale_ = { 100.0f,1.0f,100.0f };
+	worldTransform_.scale_ = { 100.0f,10.0f,100.0f };
 	worldTransform_.translation_ = { 0,-30.0f,0 };
 }
 

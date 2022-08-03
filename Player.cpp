@@ -36,20 +36,29 @@ void Player::Move()
 
 	if (input_->PushKey(DIK_W))
 	{
-		move.z += moveSpeed;
+		AxisZVec.normalize();
+
+		move.x += AxisZVec.x;
+		move.x *= moveSpeed;
+
+		move.y += AxisZVec.y;
+		move.y *= moveSpeed;
+
+		move.z += AxisZVec.z;
+		move.z *= moveSpeed;
 	}
-	if (input_->PushKey(DIK_S))
-	{
-		move.z -= moveSpeed;
-	}
-	if (input_->PushKey(DIK_D))
-	{
-		move.x += moveSpeed;
-	}
-	if (input_->PushKey(DIK_A))
-	{
-		move.x -= moveSpeed;
-	}
+	//if (input_->PushKey(DIK_S))
+	//{
+	//	move.z -= moveSpeed;
+	//}
+	//if (input_->PushKey(DIK_D))
+	//{
+	//	move.x += moveSpeed;
+	//}
+	//if (input_->PushKey(DIK_A))
+	//{
+	//	move.x -= moveSpeed;
+	//}
 
 
 	horizontalRotation += (mouse.x - oldmouse.x) * 0.01f;
