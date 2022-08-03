@@ -136,6 +136,11 @@ void GameScene::Update() {
 
 	ground.Update();
 
+	if (BoxColAABB(player_.worldTransform, ground.worldTransform_))
+	{
+		player_.worldTransform.translation_.y = ground.worldTransform_.translation_.y + ground.worldTransform_.scale_.y;
+		player_.worldTransform.translation_.y += player_.worldTransform.scale_.y + 10;
+	}
 
 	////FOV変更処理
 	//if (input_->PushKey(DIK_UP)) {
