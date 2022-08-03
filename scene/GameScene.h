@@ -13,7 +13,7 @@
 #include "WinApp.h"
 #include "Vector3.h"
 #include "Player.h"
-
+#include "Ground.h"
 #include "Utill.h"
 
 /// <summary>
@@ -54,6 +54,7 @@ private: // メンバ変数
 	DebugText* debugText_ = nullptr;
 
 	TextureHandle textureHandle_ = 0;
+	TextureHandle groundTexture = 0;
 
 	Model* model_ = nullptr;
 
@@ -69,6 +70,10 @@ private: // メンバ変数
 
 	WorldTransform skydomeTrans;
 
+	Ground ground;
+
+	Sprite *sprite = nullptr;
+
 	//カメラ上方向の角度
 	float viewAngle = 0.0f;
 
@@ -78,3 +83,5 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 };
+
+bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB);

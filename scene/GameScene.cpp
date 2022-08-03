@@ -11,11 +11,32 @@ const float XM_PM = 3.14;
 
 //winAppを使う際は、winApp.h内のwinAppコンストラクタがprivateになっているため注意
 
+bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB)
+{
+	int DistanceX = worldTransformA.translation_.x - worldTransformB.translation_.x;
+	int DistanceY = worldTransformA.translation_.y - worldTransformB.translation_.y;
+	int DistanceZ = worldTransformA.translation_.z - worldTransformB.translation_.z;
+
+	DistanceX = Abs(DistanceX);
+	DistanceY = Abs(DistanceY);
+	DistanceZ = Abs(DistanceZ);
+
+	if (DistanceX <= worldTransformA.scale_.x + worldTransformB.scale_.x &&
+		DistanceY <= worldTransformA.scale_.y + worldTransformB.scale_.y &&
+		DistanceZ <= worldTransformA.scale_.z + worldTransformB.scale_.z)
+	{
+		return true;
+	}
+	return false;
+}
+
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 	delete model_;
 	delete debugCamera_;
+	delete skydome;
+	delete sprite;
 }
 
 void GameScene::Initialize() {
@@ -26,11 +47,14 @@ void GameScene::Initialize() {
 	debugText_ = DebugText::GetInstance();
 
 	textureHandle_ = TextureManager::Load("waito.jpg");
+	groundTexture = TextureManager::Load("hogeta_white.png");
 	model_ = Model::Create();
 
 	skydome = Model::CreateFromOBJ("skydome");
 	
 	player_.Initialize(model_,textureHandle_);
+
+	sprite = Sprite::Create(textureHandle_,{0,0});
 
 	//大元
 	//worldTransform_.Initialize();
@@ -78,6 +102,8 @@ void GameScene::Initialize() {
 	skydomeTrans.Initialize();
 	skydomeTrans.translation_ = { 0,0,0 };
 	skydomeTrans.scale_ = { 1,1,1 };
+
+	ground.Initialize(model_,groundTexture);
 }
 
 void GameScene::Update() {
@@ -107,6 +133,8 @@ void GameScene::Update() {
 			viewProjection_.UpdateMatrix();
 		}
 	}
+
+	ground.Update();
 
 
 	////FOV変更処理
@@ -143,8 +171,10 @@ void GameScene::Update() {
 		player_.horizontalRotation, player_.verticalRotation);
 
 	debugText_->SetPos(50, 90);
-	debugText_->Printf(" viewProjection_.eye.(x:%f),(y:%f),(z:%f)",
-		viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
+	debugText_->Printf(" ground.worldTransform_.translation_.(x:%f),(y:%f),(z:%f)",
+		ground.worldTransform_.translation_.x,
+		ground.worldTransform_.translation_.y,
+		ground.worldTransform_.translation_.z);
 
 	debugText_->SetPos(50, 110);
 	debugText_->Printf(" viewProjection_.target.(x:%f),(y:%f),(z:%f)",
@@ -163,6 +193,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
+	
+	sprite->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -177,21 +209,10 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	
-	//if (true)
-	//{
-	//	//デバッグカメラ
-	//	if (debugCameraMode)
-	//	{
-	//		model_->Draw(player_.worldTransform, debugCamera_->GetViewProjection(), textureHandle_);
-	//	}
-	//	else
-	//	{
-	//		
-	//	}
-	//}
 
 	skydome->Draw(skydomeTrans, viewProjection_);
+
+	ground.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
