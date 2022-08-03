@@ -194,7 +194,7 @@ void GameScene::Draw() {
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
 	
-	sprite->Draw();
+
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -235,6 +235,11 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+
+	if (BoxColAABB(player_.worldTransform,ground.worldTransform_))
+	{
+		sprite->Draw();
+	}
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
