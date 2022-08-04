@@ -136,10 +136,11 @@ void GameScene::Update() {
 
 	ground.Update();
 
-	if (BoxColAABB(player_.worldTransform, ground.worldTransform_))
+	//地面との当たり判定
+	if (BoxColAABB(player_.worldTransform, ground.worldTransform_) == false)
 	{
-		player_.worldTransform.translation_.y = ground.worldTransform_.translation_.y + ground.worldTransform_.scale_.y;
-		player_.worldTransform.translation_.y += player_.worldTransform.scale_.y + 10;
+		//地面にいなかったら重力を適用
+		player_.worldTransform.translation_.y -= player_.glavitySpd;
 	}
 
 	////FOV変更処理
@@ -241,10 +242,10 @@ void GameScene::Draw() {
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 
-	if (BoxColAABB(player_.worldTransform,ground.worldTransform_))
+	/*if (BoxColAABB(player_.worldTransform,ground.worldTransform_))
 	{
 		sprite->Draw();
-	}
+	}*/
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);

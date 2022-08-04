@@ -23,6 +23,8 @@ void Player::Update()
 	oldmouse = mouse;
 	mouse = input_->GetMousePosition();
 
+	prevPos = worldTransform.translation_;
+
 	Move();
 
 	PlayerUpdateMatrix();
@@ -41,12 +43,27 @@ void Player::Move()
 		move.x += AxisZVec.x;
 		move.x *= moveSpeed;
 
-		move.y += AxisZVec.y;
-		move.y *= moveSpeed;
+		//move.y += AxisZVec.y;
+		//move.y *= moveSpeed;
 
 		move.z += AxisZVec.z;
 		move.z *= moveSpeed;
 	}
+
+	if (input_->TriggerKey(DIK_SPACE))
+	{
+		jumpSpd = 10;
+	
+		Vector3 tempPos;
+
+		tempPos = worldTransform.translation_;
+		move.y += (worldTransform.translation_.y - prevPos.y) + jumpSpd;
+		prevPos.y = tempPos.y;
+
+		jumpSpd = 1.0f;
+	}
+
+	//move.y += -glavitySpd;
 	//if (input_->PushKey(DIK_S))
 	//{
 	//	move.z -= moveSpeed;

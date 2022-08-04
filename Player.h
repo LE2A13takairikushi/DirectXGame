@@ -31,6 +31,12 @@ public:
 	Vector2 oldmouse;
 	Vector2 mouse;
 
+	Vector3 prevPos;
+
+	float glavitySpd = 0.1f;
+
+	float jumpSpd = 1.0f;
+
 	void Initialize(Model* model_, TextureHandle textureHandle_);
 	void Update();
 	void Draw(ViewProjection viewProjection_);
