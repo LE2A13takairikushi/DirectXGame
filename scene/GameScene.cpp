@@ -46,42 +46,24 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
 
-	textureHandle_ = TextureManager::Load("waito.jpg");
 	groundTexture = TextureManager::Load("hogeta_white.png");
 	model_ = Model::Create();
 
-	skydome = Model::CreateFromOBJ("skydome");
-	
+	textureHandle_ = TextureManager::Load("waito.jpg");
 	player_.Initialize(model_,textureHandle_);
 
-	sprite = Sprite::Create(textureHandle_,{0,0});
+	enemyTexture = TextureManager::Load("enemy.png");
+	enemy.Initialize(model_, enemyTexture);
 
-	//大元
-	//worldTransform_.Initialize();
+	sprite = Sprite::Create(textureHandle_, { 0,0 });
+
+
 	viewProjection_.Initialize();
-
 	viewProjection_.eye = { 0,50,100 };
-	//viewProjection_.target = { 0,0,0 };
-	//viewProjection_.up = { cosf(XM_PM / 4.0f),sinf(XM_PM / 4.0f),0.0f };
-	//viewProjection_.up = {0.0f,0.0f,0.0f };
-
 	viewProjection_.fovAngleY = FreqConversionRad(90.0f);
 
 	//アスペクト比
 	viewProjection_.aspectRatio = 1.0f;
-
-	/*if (false)
-	{
-		//ニアクリップ距離を設定
-		viewProjection_.nearZ = 52.0f;
-
-		//ファークリップ距離を設定
-		viewProjection_.farZ = 53.0f;
-
-		//↑こいつらなーにー？
-		// カメラに近い側(ニア)と遠い側	(ファー)の表示限界
-		// これの間に挟まれた部分しか描画されなくなる
-	}*/
 
 	winApp_;
 	debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
@@ -99,11 +81,14 @@ void GameScene::Initialize() {
 		//AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 	}
 
+	skydome = Model::CreateFromOBJ("skydome");
+
 	skydomeTrans.Initialize();
 	skydomeTrans.translation_ = { 0,0,0 };
 	skydomeTrans.scale_ = { 1,1,1 };
 
 	ground.Initialize(model_,groundTexture);
+
 }
 
 void GameScene::Update() {
@@ -112,6 +97,7 @@ void GameScene::Update() {
 	//Vector2 mouse = input_->GetMousePosition();
 
 	player_.Update();
+	enemy.Update();
 
 	if (true)
 	{
@@ -221,6 +207,8 @@ void GameScene::Draw() {
 	ground.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
+
+	enemy.Draw(viewProjection_);
 
 	//model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 	//model_->Draw(worldTransform_[1], viewProjection_, textureHandle_);

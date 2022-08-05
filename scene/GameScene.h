@@ -15,6 +15,7 @@
 #include "Player.h"
 #include "Ground.h"
 #include "Utill.h"
+#include "Enemy.h"
 
 /// <summary>
 /// ゲームシーン
@@ -55,6 +56,7 @@ private: // メンバ変数
 
 	TextureHandle textureHandle_ = 0;
 	TextureHandle groundTexture = 0;
+	TextureHandle enemyTexture = 0;
 
 	Model* model_ = nullptr;
 
@@ -68,6 +70,8 @@ private: // メンバ変数
 
 	Player player_;
 
+	Enemy enemy;
+	
 	WorldTransform skydomeTrans;
 
 	Ground ground;
@@ -78,6 +82,7 @@ private: // メンバ変数
 	float viewAngle = 0.0f;
 
 	bool debugCameraMode = false;
+
 
 	/// <summary>
 	/// ゲームシーン用
