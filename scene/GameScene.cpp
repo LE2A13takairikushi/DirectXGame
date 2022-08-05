@@ -127,7 +127,7 @@ void GameScene::Update() {
 			//マウスでカメラを動かす処理
 			const float length = 10.0f;
 
-			viewProjection_.eye = player_.worldTransform.translation_ + (-player_.AxisZVec.normalize() * length);
+			viewProjection_.eye = player_.worldTransform.translation_ + (-player_.centerVec.normalize() * length);
 
 
 			viewProjection_.UpdateMatrix();
@@ -137,10 +137,10 @@ void GameScene::Update() {
 	ground.Update();
 
 	//地面との当たり判定
-	if (BoxColAABB(player_.worldTransform, ground.worldTransform_) == false)
+	if (BoxColAABB(player_.worldTransform, ground.worldTransform_))
 	{
 		//地面にいなかったら重力を適用
-		player_.worldTransform.translation_.y -= player_.glavitySpd;
+		player_.Gravity();
 	}
 
 	////FOV変更処理
@@ -172,9 +172,9 @@ void GameScene::Update() {
 		player_.worldTransform.translation_.y,
 		player_.worldTransform.translation_.z);
 
-	debugText_->SetPos(50, 70);
+	/*debugText_->SetPos(50, 70);
 	debugText_->Printf(" player_.rot.(x:%f),(y:%f)",
-		player_.horizontalRotation, player_.verticalRotation);
+		player_.horizontalRotation, player_.verticalRotation);*/
 
 	debugText_->SetPos(50, 90);
 	debugText_->Printf(" ground.worldTransform_.translation_.(x:%f),(y:%f),(z:%f)",
