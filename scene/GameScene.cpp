@@ -5,6 +5,7 @@
 #include <random>
 #include "MyMath.h"
 
+using namespace std;
 //#include "AxisIndicator.h"
 
 const float XM_PM = 3.14;
@@ -93,51 +94,33 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 	debugCamera_->Update();
+	
+	ground.Update();
 
-	//Vector2 mouse = input_->GetMousePosition();
+	//地面との当たり判定
+	player_.isGroundCol = BoxColAABB(player_.GetWorldTrans(), ground.worldTransform_);
 
 	player_.Update();
 	enemy.Update();
 
-	if (true)
+	CheckAllCollision();
+
+	if (debugCameraMode == false)
 	{
-		if (debugCameraMode == false)
-		{
 
-			//クォータニオンでは、注視点のオブジェクトの回転量がわかる
-			//これをカメラに入れるには、注視点オブジェクトの正面ベクトルをカメラのベクトルに代入する
-			//
+		//クォータニオンでは、注視点のオブジェクトの回転量がわかる
+		//これをカメラに入れるには、注視点オブジェクトの正面ベクトルをカメラのベクトルに代入する
 
-			viewProjection_.target = player_.worldTransform.translation_;
+		viewProjection_.target = player_.GetWorldTrans().translation_;
 
-			//マウスでカメラを動かす処理
-			const float length = 10.0f;
+		//マウスでカメラを動かす処理
+		const float length = 10.0f;
 
-			viewProjection_.eye = player_.worldTransform.translation_ + (-player_.centerVec.normalize() * length);
+		viewProjection_.eye = player_.GetWorldTrans().translation_ + (-player_.centerVec.normalize() * length);
 
 
-			viewProjection_.UpdateMatrix();
-		}
+		viewProjection_.UpdateMatrix();
 	}
-
-	ground.Update();
-
-	//地面との当たり判定
-	if (BoxColAABB(player_.worldTransform, ground.worldTransform_))
-	{
-		//地面にいなかったら重力を適用
-		player_.Gravity();
-	}
-
-	////FOV変更処理
-	//if (input_->PushKey(DIK_UP)) {
-	//	viewProjection_.fovAngleY += 0.01f;
-	//	viewProjection_.fovAngleY = Max(viewProjection_.fovAngleY, XM_PM);
-	//}
-	//if (input_->PushKey(DIK_DOWN)) {
-	//	viewProjection_.fovAngleY -= 0.01f;
-	//	viewProjection_.fovAngleY = Min(viewProjection_.fovAngleY, 0.01f);
-	//}
 
 	//ニアクリップ、ファークリップの更新の名残
 	if (false)
@@ -152,25 +135,11 @@ void GameScene::Update() {
 
 	viewProjection_.UpdateMatrix();
 
-	debugText_->SetPos(50, 50);
+	/*debugText_->SetPos(50, 50);
 	debugText_->Printf(" worldTransform_[0].translation_.(x:%f),(y:%f),(z:%f)", 
 		player_.worldTransform.translation_.x,
 		player_.worldTransform.translation_.y,
-		player_.worldTransform.translation_.z);
-
-	/*debugText_->SetPos(50, 70);
-	debugText_->Printf(" player_.rot.(x:%f),(y:%f)",
-		player_.horizontalRotation, player_.verticalRotation);*/
-
-	debugText_->SetPos(50, 90);
-	debugText_->Printf(" ground.worldTransform_.translation_.(x:%f),(y:%f),(z:%f)",
-		ground.worldTransform_.translation_.x,
-		ground.worldTransform_.translation_.y,
-		ground.worldTransform_.translation_.z);
-
-	debugText_->SetPos(50, 110);
-	debugText_->Printf(" viewProjection_.target.(x:%f),(y:%f),(z:%f)",
-		viewProjection_.target.x, viewProjection_.target.y, viewProjection_.target.z);
+		player_.worldTransform.translation_.z);*/
 }
 
 void GameScene::Draw() {
@@ -242,4 +211,26 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+void GameScene::CheckAllCollision()
+{
+	WorldTransform posA;
+	WorldTransform posB;
+
+	const list<unique_ptr<PlayerBullet>>& playerBullets = player_.GetBullets();
+
+	posA = enemy.GetWorldTrans();
+
+	for (const unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		posB = bullet->GetWorldTrans();
+
+		if (BoxColAABB(posA, posB))
+		{
+			enemy.OnCollision();
+			
+			bullet->OnCollision();
+		}
+	}
 }

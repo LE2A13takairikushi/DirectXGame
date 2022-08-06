@@ -1,22 +1,17 @@
 #pragma once
-#include "WorldTransform.h"
+#include "object.h"
 #include "ViewProjection.h"
-#include "Model.h"
 #include "Input.h"
 #include "Utill.h"
 #include "PlayerBullet.h"
 #include <memory>
 #include <list>
 
-class Player
+class Player : public object
 {
 public:
 	Player();
 	~Player();
-
-	WorldTransform worldTransform;
-	Model* model_ = nullptr;
-	TextureHandle textureHandle_ = 0;
 
 	Input* input_ = Input::GetInstance();
 
@@ -31,9 +26,11 @@ public:
 	void Update();
 	void Draw(ViewProjection viewProjection_);
 
-	void PlayerUpdateMatrix();
-
 	void Gravity();
+
+	bool isGroundCol = false;
+
+	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 
 private:
 	Vector2 oldmouse;
@@ -57,5 +54,7 @@ private:
 	void Move();
 	void InputMove();
 	void Attack();
+
+	void PlayerUpdateMatrix();
 };
 

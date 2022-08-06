@@ -5,7 +5,7 @@ using namespace std;
 
 Player::Player()
 {
-	worldTransform.Initialize();
+	worldTransform_.Initialize();
 }
 
 Player::~Player()
@@ -17,7 +17,7 @@ void Player::Initialize(Model *model_, TextureHandle textureHandle_)
 {
 	assert(model_);
 
-	worldTransform.Initialize();
+	worldTransform_.Initialize();
 	this->model_ = model_;
 	this->textureHandle_ = textureHandle_;
 }
@@ -25,17 +25,25 @@ void Player::Initialize(Model *model_, TextureHandle textureHandle_)
 void Player::Update()
 {
 	//弾の削除
+	//弾の方でisDeadが呼ばれたらこっちのリストから消す設計
+	//(ちょっと直感的じゃないけどまあ一番きれい)
 	bullets_.remove_if([](std::unique_ptr<PlayerBullet>& bullet) {
 		return bullet->IsDead();
 		});
 
+	//前回のフレームの座標を保存
 	oldmouse = mouse;
 	mouse = input_->GetMousePosition();
+	prevPos = worldTransform_.translation_;
 
-	prevPos = worldTransform.translation_;
+	//
+	if (isGroundCol)
+	{
+		Gravity();
+	}
 
+	//移動とか攻撃とかの入力系
 	Move();
-
 	if (input_->IsTriggerMouse(0))
 	{
 		Attack();
@@ -47,7 +55,9 @@ void Player::Update()
 	}
 
 	PlayerUpdateMatrix();
-	worldTransform.TransferMatrix();
+	worldTransform_.TransferMatrix();
+
+
 }
 
 void Player::InputMove()
@@ -103,7 +113,7 @@ void Player::Move()
 	if (verticalRotation < -PIf / 2 + FreqConversionRad(1.0f)) verticalRotation = -PIf / 2 + FreqConversionRad(1.0f);
 	
 	//移動した値を足す処理
-	worldTransform.translation_ += move;
+	worldTransform_.translation_ += move;
 
 }
 
@@ -118,7 +128,7 @@ void Player::Attack()
 	velocity *= bulletSpd;
 
 	unique_ptr<PlayerBullet> newBullet = make_unique<PlayerBullet>();
-	newBullet->Initialize(model_, worldTransform.translation_,velocity);
+	newBullet->Initialize(model_, worldTransform_.translation_,velocity);
 
 	//弾を登録する
 	bullets_.push_back(std::move(newBullet));
@@ -126,7 +136,7 @@ void Player::Attack()
 
 void Player::Draw(ViewProjection viewProjection_)
 {
-	model_->Draw(worldTransform, viewProjection_, textureHandle_);
+	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
@@ -136,27 +146,27 @@ void Player::Draw(ViewProjection viewProjection_)
 
 void Player::PlayerUpdateMatrix()
 {
-	worldTransform.CreateScale();
+	worldTransform_.CreateScale();
 	
-	worldTransform.rotation_.y = horizontalRotation;
-	worldTransform.CreateRot();
+	worldTransform_.rotation_.y = horizontalRotation;
+	worldTransform_.CreateRot();
 
-	sideVec = worldTransform.matRot.ExtractAxisX();
+	sideVec = worldTransform_.matRot.ExtractAxisX();
 
-	worldTransform.CreateTrans();
+	worldTransform_.CreateTrans();
 
-	worldTransform.matWorld_.MatrixUint();
+	worldTransform_.matWorld_.MatrixUint();
 	//スケーリング行列
-	worldTransform.matWorld_ *= worldTransform.matScale;
+	worldTransform_.matWorld_ *= worldTransform_.matScale;
 	//回転行列
 	//worldTransform.matWorld_ *= Matrix4::RotArbitrary(AxisYVec, horizontalRotation);
-	worldTransform.matWorld_ *= worldTransform.matRot;
-	worldTransform.matWorld_ *= Matrix4::RotArbitrary(sideVec, verticalRotation);
+	worldTransform_.matWorld_ *= worldTransform_.matRot;
+	worldTransform_.matWorld_ *= Matrix4::RotArbitrary(sideVec, verticalRotation);
 
 	//平行移動行列
-	worldTransform.matWorld_ *= worldTransform.matTrans;
+	worldTransform_.matWorld_ *= worldTransform_.matTrans;
 
-	centerVec = worldTransform.matWorld_.ExtractAxisZ();
+	centerVec = worldTransform_.matWorld_.ExtractAxisZ();
 }
 
 void Player::Gravity()

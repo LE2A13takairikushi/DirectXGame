@@ -53,40 +53,39 @@ private: // メンバ変数
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 	DebugText* debugText_ = nullptr;
+	WinApp winApp_;
 
+	//テクスチャハンドル
 	TextureHandle textureHandle_ = 0;
 	TextureHandle groundTexture = 0;
 	TextureHandle enemyTexture = 0;
 
+	//モデル
 	Model* model_ = nullptr;
-
 	Model* skydome = nullptr;
 
-	//WorldTransform worldTransform_;
+	//カメラ
 	ViewProjection viewProjection_;
-
-	WinApp winApp_;
 	DebugCamera* debugCamera_ = nullptr;
 
+	//キャラクター
 	Player player_;
-
 	Enemy enemy;
 	
+	//オブジェクト
+	Ground ground;
 	WorldTransform skydomeTrans;
 
-	Ground ground;
-
+	//描画系
 	Sprite *sprite = nullptr;
 
-	//カメラ上方向の角度
-	float viewAngle = 0.0f;
-
 	bool debugCameraMode = false;
-
 
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	
+	void CheckAllCollision();
 };
 
 bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB);

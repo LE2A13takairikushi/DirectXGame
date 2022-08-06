@@ -18,3 +18,8 @@ void PlayerBullet::	Update()
 	worldTransform_.translation_ += velocity_;
 	Bullet::Update();
 }
+
+void PlayerBullet::OnCollision()
+{
+	isDead = true;
+}

@@ -2,20 +2,25 @@
 
 void Enemy::Initialize(Model* model_, TextureHandle textureHandle_)
 {
-	worldTransform.Initialize();
-	model = model_;
+	worldTransform_.Initialize();
+	this->model_ = model_;
 	this->textureHandle_ = textureHandle_;
 
-	worldTransform.translation_ = { 10,10,0 };
+	worldTransform_.translation_ = { 10,10,0 };
 }
 
 void Enemy::Update()
 {
-	worldTransform.UpdateMatrix();
-	worldTransform.TransferMatrix();
+	worldTransform_.UpdateMatrix();
+	worldTransform_.TransferMatrix();
 }
 
 void Enemy::Draw(ViewProjection viewProjection_)
 {
-	model->Draw(worldTransform, viewProjection_, textureHandle_);
+	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
+}
+
+void Enemy::OnCollision()
+{
+	
 }

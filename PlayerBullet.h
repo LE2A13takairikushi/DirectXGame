@@ -9,6 +9,8 @@ public:
 
 	bool IsDead() const { return isDead; };
 
+	void OnCollision();
+
 private:
 	Vector3 velocity_;
 	int deathTimer = 0;
