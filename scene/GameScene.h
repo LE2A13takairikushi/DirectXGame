@@ -4,7 +4,6 @@
 #include "DirectXCommon.h"
 #include "DebugText.h"
 #include "Input.h"
-#include "Model.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
 #include "ViewProjection.h"
@@ -15,7 +14,12 @@
 #include "Player.h"
 #include "Ground.h"
 #include "Utill.h"
-#include "Enemy.h"
+
+#include "EnemyManager.h"
+
+#include "ModelManager.h"
+#include "Skydome.h"
+#include "FPSfix.h"
 
 /// <summary>
 /// ゲームシーン
@@ -58,11 +62,9 @@ private: // メンバ変数
 	//テクスチャハンドル
 	TextureHandle textureHandle_ = 0;
 	TextureHandle groundTexture = 0;
-	TextureHandle enemyTexture = 0;
 
 	//モデル
-	Model* model_ = nullptr;
-	Model* skydome = nullptr;
+	ModelManager *modelManager;
 
 	//カメラ
 	ViewProjection viewProjection_;
@@ -70,14 +72,16 @@ private: // メンバ変数
 
 	//キャラクター
 	Player player_;
-	Enemy enemy;
+	EnemyManager* enemyManager;
 	
 	//オブジェクト
 	Ground ground;
-	WorldTransform skydomeTrans;
+	Skydome skydome;
 
 	//描画系
 	Sprite *sprite = nullptr;
+
+	FPSfix fpsFix;
 
 	bool debugCameraMode = false;
 
@@ -89,3 +93,7 @@ private: // メンバ変数
 };
 
 bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB);
+
+bool SphereCol(WorldTransform worldTransformA, WorldTransform worldTransformB);
+
+bool SphereCol(Vector3 posA, Vector3 posB,float rA, float rB );

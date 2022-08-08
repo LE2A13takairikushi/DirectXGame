@@ -26,15 +26,13 @@ public:
 	void Update();
 	void Draw(ViewProjection viewProjection_);
 
-	void Gravity();
+	void NotGravity();
 
 	bool isGroundCol = false;
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 
 private:
-	Vector2 oldmouse;
-	Vector2 mouse;
 
 	Vector3 prevPos;
 
@@ -44,6 +42,9 @@ private:
 	//縦方向の回転角度
 	float verticalRotation = 0;
 	float horizontalRotation = 0;
+
+	//マウスの感度
+	float mouseSpd = 0.01f;
 
 	//ジャンプ関係
 	float jumpSpd = 1.0f;

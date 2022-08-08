@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "MyMath.h"
 #include <cassert>
+
 using namespace std;
 
 Player::Player()
@@ -32,14 +33,13 @@ void Player::Update()
 		});
 
 	//前回のフレームの座標を保存
-	oldmouse = mouse;
-	mouse = input_->GetMousePosition();
+
 	prevPos = worldTransform_.translation_;
 
-	//
+	//地面と当たってたら重力をかけない
 	if (isGroundCol)
 	{
-		Gravity();
+		NotGravity();
 	}
 
 	//移動とか攻撃とかの入力系
@@ -93,7 +93,7 @@ void Player::Move()
 
 	//ジャンプする処理
 	//気に入ってないのでタスクが落ち着いたら変更したい
-	if (input_->TriggerKey(DIK_SPACE))
+	if (input_->TriggerKey(DIK_SPACE) && isGroundCol)
 	{
 		jumpSpd = 1.0f;
 		gravity = 0.01f;
@@ -106,8 +106,17 @@ void Player::Move()
 	move.y += jumpSpd;
 
 	//マウスでカメラを動かす処理
-	horizontalRotation += (mouse.x - oldmouse.x) * 0.01f;
-	verticalRotation += (mouse.y - oldmouse.y) * 0.01f;
+	Vector2 temp = { 1920 / 2, 1080 / 2 };
+
+	//マウスの現在位置を取得する処理
+	POINT point;
+	GetCursorPos(&point);
+	//マウスを固定する処理
+	SetCursorPos(temp.x, temp.y);
+
+	//マウスの移動量に応じてカメラを動かす処理
+	horizontalRotation += (point.x - temp.x) * mouseSpd;
+	verticalRotation += (point.y - temp.y) * mouseSpd;
 
 	if (verticalRotation > PIf / 2 - FreqConversionRad(1.0f)) verticalRotation = PIf / 2 - FreqConversionRad(1.0f);
 	if (verticalRotation < -PIf / 2 + FreqConversionRad(1.0f)) verticalRotation = -PIf / 2 + FreqConversionRad(1.0f);
@@ -169,7 +178,7 @@ void Player::PlayerUpdateMatrix()
 	centerVec = worldTransform_.matWorld_.ExtractAxisZ();
 }
 
-void Player::Gravity()
+void Player::NotGravity()
 {
 	jumpSpd = 0;
 	gravity = 0;

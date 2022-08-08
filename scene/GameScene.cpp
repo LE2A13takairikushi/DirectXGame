@@ -12,6 +12,8 @@ const float XM_PM = 3.14;
 
 //winAppを使う際は、winApp.h内のwinAppコンストラクタがprivateになっているため注意
 
+//なんか見た目より当たり判定が広そうに感じる
+//多分スケールを半径として扱っているから？
 bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB)
 {
 	int DistanceX = worldTransformA.translation_.x - worldTransformB.translation_.x;
@@ -31,12 +33,45 @@ bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB)
 	return false;
 }
 
+bool SphereCol(WorldTransform worldTransformA, WorldTransform worldTransformB)
+{
+	Vector3 posA = worldTransformA.translation_;
+	Vector3 posB = worldTransformB.translation_;
+
+	//スケールのXを横幅として扱っている
+	//多分ちゃんと半径を作った方がいい
+	float rA = worldTransformA.scale_.x;
+	float rB = worldTransformB.scale_.x;
+
+	if ((posB.x - posA.x) * (posB.x - posA.x) +
+		(posB.y - posA.y) * (posB.y - posA.y) +
+		(posB.z - posA.z) * (posB.z - posA.z) <=
+		(rA + rB) * (rA + rB))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool SphereCol(Vector3 posA, Vector3 posB, float rA, float rB)
+{
+	if ((posB.x - posA.x) * (posB.x - posA.x) +
+		(posB.y - posA.y) * (posB.y - posA.y) +
+		(posB.z - posA.z) * (posB.z - posA.z) <=
+		(rA + rB) * (rA + rB))
+	{
+		return true;
+	}
+	return false;
+}
+
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
-	delete model_;
+	delete modelManager;
+	delete enemyManager;
+
 	delete debugCamera_;
-	delete skydome;
 	delete sprite;
 }
 
@@ -47,17 +82,20 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
 
+	//マウスを非表示に
+	ShowCursor(false);
+
 	groundTexture = TextureManager::Load("hogeta_white.png");
-	model_ = Model::Create();
+
+	modelManager = new ModelManager();
 
 	textureHandle_ = TextureManager::Load("waito.jpg");
-	player_.Initialize(model_,textureHandle_);
+	player_.Initialize(modelManager->model_,textureHandle_);
 
-	enemyTexture = TextureManager::Load("enemy.png");
-	enemy.Initialize(model_, enemyTexture);
+	//enemyManager->Initialize(modelManager->model_);
+	enemyManager = new EnemyManager(modelManager->model_);
 
 	sprite = Sprite::Create(textureHandle_, { 0,0 });
-
 
 	viewProjection_.Initialize();
 	viewProjection_.eye = { 0,50,100 };
@@ -82,26 +120,28 @@ void GameScene::Initialize() {
 		//AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 	}
 
-	skydome = Model::CreateFromOBJ("skydome");
+	//skydome = Model::CreateFromOBJ("skydome");
 
-	skydomeTrans.Initialize();
-	skydomeTrans.translation_ = { 0,0,0 };
-	skydomeTrans.scale_ = { 1,1,1 };
+	skydome.Initialize(modelManager->skydome);
 
-	ground.Initialize(model_,groundTexture);
+	ground.Initialize(modelManager->model_,groundTexture);
+
+	fpsFix.Initialize();
 
 }
 
 void GameScene::Update() {
 	debugCamera_->Update();
+
+	fpsFix.Update();
 	
 	ground.Update();
 
 	//地面との当たり判定
-	player_.isGroundCol = BoxColAABB(player_.GetWorldTrans(), ground.worldTransform_);
+	player_.isGroundCol = BoxColAABB(player_.GetWorldTrans(), ground.GetWorldTrans());
 
 	player_.Update();
-	enemy.Update();
+	enemyManager->Update(player_.GetWorldTrans().translation_);
 
 	CheckAllCollision();
 
@@ -135,11 +175,10 @@ void GameScene::Update() {
 
 	viewProjection_.UpdateMatrix();
 
-	/*debugText_->SetPos(50, 50);
-	debugText_->Printf(" worldTransform_[0].translation_.(x:%f),(y:%f),(z:%f)", 
-		player_.worldTransform.translation_.x,
-		player_.worldTransform.translation_.y,
-		player_.worldTransform.translation_.z);*/
+	debugText_->SetPos(50, 50);
+	debugText_->Printf("fps:%f",fpsFix.fps);
+	debugText_->SetPos(50, 70);
+	debugText_->Printf("frameTime:%f",fpsFix.frameTime);
 }
 
 void GameScene::Draw() {
@@ -170,23 +209,19 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-
-	skydome->Draw(skydomeTrans, viewProjection_);
+	
+	skydome.Draw(viewProjection_);
 
 	ground.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
-	enemy.Draw(viewProjection_);
-
-	//model_->Draw(worldTransform_, viewProjection_, textureHandle_);
-	//model_->Draw(worldTransform_[1], viewProjection_, textureHandle_);
+	enemyManager->Draw(viewProjection_);
 
 	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(-100, 0, 0), Vector3(100, 0, 0), Vector4(255, 0, 0, 255));
 	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(0, -100, 0), Vector3(0, 100, 0), Vector4(0, 255, 0, 255));
 	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(0, 0, -100), Vector3(0, 0, 100), Vector4(0,0, 255, 255));
 
-	
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -220,17 +255,50 @@ void GameScene::CheckAllCollision()
 
 	const list<unique_ptr<PlayerBullet>>& playerBullets = player_.GetBullets();
 
-	posA = enemy.GetWorldTrans();
+	const list<unique_ptr<Enemy>>& enemys = enemyManager->enemys;
 
+	//敵と自分の弾の当たり判定
+	for (const unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		for (const unique_ptr<Enemy>& enemy : enemys)
+		{
+			posA = enemy->GetWorldTrans();
+			posB = bullet->GetWorldTrans();
+
+			if (BoxColAABB(posA, posB))
+			{
+				enemy->OnCollision();
+
+				bullet->OnCollision();
+			}
+		}
+	}
+
+	//地面と自分の弾の当たり判定
+	posA = ground.GetWorldTrans();
 	for (const unique_ptr<PlayerBullet>& bullet : playerBullets)
 	{
 		posB = bullet->GetWorldTrans();
 
 		if (BoxColAABB(posA, posB))
 		{
-			enemy.OnCollision();
-			
 			bullet->OnCollision();
+		}
+	}
+
+	//敵がちょっと当たり判定
+	for (const unique_ptr<Enemy>& enemy : enemys)
+	{
+		posA = enemy->GetWorldTrans();
+		posB = player_.GetWorldTrans();
+
+		if (SphereCol(posA.translation_, posB.translation_, 30.0f, posB.scale_.x))
+		{
+			enemy->PhaseChange(Phase::Leave);
+		}
+		else
+		{
+			enemy->PhaseChange(Phase::Approach);
 		}
 	}
 }

@@ -2,10 +2,7 @@
 
 void Ground::Initialize()
 {
-	/*Object::Initialize(model_->Create(), TextureManager::Load("hogeta_white.png"));
 
-	worldTransform_.scale_ = { 100.0f,100.0f,100.0f };
-	worldTransform_.translation_ = { 0,-10.0f,0 };*/
 }
 
 void Ground::Initialize(Model* model_, TextureHandle textureHandle_)

@@ -1,16 +1,10 @@
 #pragma once
-#include "WorldTransform.h"
-#include "Model.h"
-#include "TextureManager.h"
-#include "Utill.h"
+#include "object.h"
 #include "ViewProjection.h"
 
-class Ground
+class Ground : public object
 {
 public:
-	WorldTransform worldTransform_;
-	Model* model_ = nullptr;
-	TextureHandle textureHandle_;
 
 	void Initialize();
 	void Initialize(Model* model_, TextureHandle textureHandle_);

@@ -6,6 +6,8 @@
 #include "AxisIndicator.h"
 #include "PrimitiveDrawer.h"
 
+#include "FPSfix.h"
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinApp* win = nullptr;
@@ -85,6 +87,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		primitiveDrawer->Reset();
 		// 描画終了
 		dxCommon->PostDraw();
+
+		if (input->PushKey(DIK_ESCAPE)) {
+			break;
+		}
 	}
 
 	// 各種解放
