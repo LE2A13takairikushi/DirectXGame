@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "Utill.h"
 #include "PlayerBullet.h"
+#include "DebugText.h"
 #include <memory>
 #include <list>
 
@@ -14,6 +15,7 @@ public:
 	~Player();
 
 	Input* input_ = Input::GetInstance();
+	DebugText* debugText = DebugText::GetInstance();
 
 	//横ベクトル
 	Vector3 sideVec = {0,0,0};
@@ -24,17 +26,20 @@ public:
 
 	void Initialize(Model* model_, TextureHandle textureHandle_);
 	void Update();
+	void UpdateMatrixAndMove();
 	void Draw(ViewProjection viewProjection_);
 
-	void NotGravity();
+	void JumpReady();
 
-	bool isGroundCol = false;
+	void CheckHitBox(WorldTransform box);
+
+	bool isJumpCheck = false;
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 
 private:
 
-	Vector3 prevPos;
+	WorldTransform prevPos;
 
 	//移動した値
 	Vector3 move = {0,0,0};
@@ -46,7 +51,8 @@ private:
 	//マウスの感度
 	float mouseSpd = 0.01f;
 
-	//ジャンプ関係
+	//移動関係
+	float moveSpeed = 0.1f;
 	float jumpSpd = 1.0f;
 	float gravity = 0.1f;
 

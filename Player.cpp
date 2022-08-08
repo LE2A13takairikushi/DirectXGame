@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "MyMath.h"
+#include "Collsion.h"
 #include <cassert>
 
 using namespace std;
@@ -7,6 +8,7 @@ using namespace std;
 Player::Player()
 {
 	worldTransform_.Initialize();
+	//moveCollisionBox.Initialize();
 }
 
 Player::~Player()
@@ -33,14 +35,7 @@ void Player::Update()
 		});
 
 	//前回のフレームの座標を保存
-
-	prevPos = worldTransform_.translation_;
-
-	//地面と当たってたら重力をかけない
-	if (isGroundCol)
-	{
-		NotGravity();
-	}
+	prevPos = worldTransform_;
 
 	//移動とか攻撃とかの入力系
 	Move();
@@ -54,16 +49,20 @@ void Player::Update()
 		bullet->Update();
 	}
 
+
+}
+
+void Player::UpdateMatrixAndMove()
+{
+	//移動した値を足す処理
+	worldTransform_.translation_ += move;
+
 	PlayerUpdateMatrix();
 	worldTransform_.TransferMatrix();
-
-
 }
 
 void Player::InputMove()
 {
-	float moveSpeed = 0.1f;
-
 	//正面に移動する処理
 	centerVec.normalize();
 	move.x += (centerVec.x * moveSpeed) * input_->PushKey(DIK_W);
@@ -93,10 +92,11 @@ void Player::Move()
 
 	//ジャンプする処理
 	//気に入ってないのでタスクが落ち着いたら変更したい
-	if (input_->TriggerKey(DIK_SPACE) && isGroundCol)
+	if (input_->TriggerKey(DIK_SPACE) && isJumpCheck)
 	{
 		jumpSpd = 1.0f;
 		gravity = 0.01f;
+		isJumpCheck = false;
 	}
 	//重力をかける処理
 	if (jumpSpd > -1.0f)
@@ -104,6 +104,8 @@ void Player::Move()
 		jumpSpd -= gravity;
 	}
 	move.y += jumpSpd;
+
+
 
 	//マウスでカメラを動かす処理
 	Vector2 temp = { 1920 / 2, 1080 / 2 };
@@ -120,10 +122,6 @@ void Player::Move()
 
 	if (verticalRotation > PIf / 2 - FreqConversionRad(1.0f)) verticalRotation = PIf / 2 - FreqConversionRad(1.0f);
 	if (verticalRotation < -PIf / 2 + FreqConversionRad(1.0f)) verticalRotation = -PIf / 2 + FreqConversionRad(1.0f);
-	
-	//移動した値を足す処理
-	worldTransform_.translation_ += move;
-
 }
 
 void Player::Attack()
@@ -145,6 +143,21 @@ void Player::Attack()
 
 void Player::Draw(ViewProjection viewProjection_)
 {
+	debugText->SetPos(50, 50);
+	debugText->Printf("isJumpCheck %d", isJumpCheck);
+	debugText->SetPos(50, 70);
+	debugText->Printf("gravity %f", gravity);
+	debugText->SetPos(50, 90);
+	debugText->Printf("jumpSpd %f", jumpSpd);
+	debugText->SetPos(50, 110);
+	debugText->Printf("move %f %f %f", move.x,move.y,move.z);
+	debugText->SetPos(50, 130);
+	debugText->Printf("translation_ %f %f %f", 
+		worldTransform_.translation_.x,
+		worldTransform_.translation_.y,
+		worldTransform_.translation_.z
+	);
+
 	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
@@ -178,8 +191,89 @@ void Player::PlayerUpdateMatrix()
 	centerVec = worldTransform_.matWorld_.ExtractAxisZ();
 }
 
-void Player::NotGravity()
+void Player::JumpReady()
 {
-	jumpSpd = 0;
-	gravity = 0;
+	//jumpSpd = 0;
+	//gravity = 0;
+	isJumpCheck = true;
+}
+
+void Player::CheckHitBox(WorldTransform box)
+{
+
+	//if文のボックスコリジョンの後ろにつけてる
+	//y座標の比較がうまくいってない
+	//明日ちゃんと考える
+	if (input_->PushKey(DIK_W))
+	{
+		WorldTransform tempTrans = worldTransform_;
+		tempTrans.translation_ += move;
+		if (BoxColAABB(tempTrans, box) &&
+			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 >
+			box.translation_.y + box.scale_.y * 2)
+		{
+			centerVec.normalize();
+			move.x -= (centerVec.x * moveSpeed);
+			move.z -= (centerVec.z * moveSpeed);
+		}
+	}
+
+	if (input_->PushKey(DIK_S))
+	{
+		WorldTransform tempTrans = worldTransform_;
+		tempTrans.translation_ += move;
+		if (BoxColAABB(tempTrans, box) &&
+			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 >
+			box.translation_.y + box.scale_.y * 2)
+		{
+			centerVec.normalize();
+			move.x -= (centerVec.x * moveSpeed) * -1;
+			move.z -= (centerVec.z * moveSpeed) * -1;
+		}
+	}
+	if (input_->PushKey(DIK_D))
+	{
+		WorldTransform tempTrans = worldTransform_;
+		tempTrans.translation_ += move;
+		if (BoxColAABB(tempTrans, box) &&
+			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 >
+			box.translation_.y + box.scale_.y * 2)
+		{
+			sideVec.normalize();
+			move.x -= (sideVec.x * moveSpeed);
+			move.z -= (sideVec.z * moveSpeed);
+		}
+	}
+	if (input_->PushKey(DIK_A))
+	{
+		WorldTransform tempTrans = worldTransform_;
+		tempTrans.translation_ += move;
+		if (BoxColAABB(tempTrans, box) &&
+			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 >
+			box.translation_.y + box.scale_.y * 2)
+		{
+			sideVec.normalize();
+			move.x -= (sideVec.x * moveSpeed) * -1;
+			move.z -= (sideVec.z * moveSpeed) * -1;
+		}
+	}
+
+	if (true)
+	{
+		WorldTransform tempTrans = worldTransform_;
+		tempTrans.translation_ += move;
+		if (BoxColAABB(tempTrans, box) &&
+			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 <
+			box.translation_.y + box.scale_.y * 2)
+		{
+			
+			move.y -= jumpSpd;
+			if (input_->TriggerKey(DIK_SPACE))
+			{
+				move.y += (jumpSpd + gravity);
+			}
+
+			JumpReady();
+		}
+	}
 }

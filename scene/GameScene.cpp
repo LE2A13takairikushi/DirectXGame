@@ -4,6 +4,7 @@
 #include "PrimitiveDrawer.h"
 #include <random>
 #include "MyMath.h"
+#include "Collsion.h"
 
 using namespace std;
 //#include "AxisIndicator.h"
@@ -11,59 +12,6 @@ using namespace std;
 const float XM_PM = 3.14;
 
 //winAppを使う際は、winApp.h内のwinAppコンストラクタがprivateになっているため注意
-
-//なんか見た目より当たり判定が広そうに感じる
-//多分スケールを半径として扱っているから？
-bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB)
-{
-	int DistanceX = worldTransformA.translation_.x - worldTransformB.translation_.x;
-	int DistanceY = worldTransformA.translation_.y - worldTransformB.translation_.y;
-	int DistanceZ = worldTransformA.translation_.z - worldTransformB.translation_.z;
-
-	DistanceX = Abs(DistanceX);
-	DistanceY = Abs(DistanceY);
-	DistanceZ = Abs(DistanceZ);
-
-	if (DistanceX <= worldTransformA.scale_.x + worldTransformB.scale_.x &&
-		DistanceY <= worldTransformA.scale_.y + worldTransformB.scale_.y &&
-		DistanceZ <= worldTransformA.scale_.z + worldTransformB.scale_.z)
-	{
-		return true;
-	}
-	return false;
-}
-
-bool SphereCol(WorldTransform worldTransformA, WorldTransform worldTransformB)
-{
-	Vector3 posA = worldTransformA.translation_;
-	Vector3 posB = worldTransformB.translation_;
-
-	//スケールのXを横幅として扱っている
-	//多分ちゃんと半径を作った方がいい
-	float rA = worldTransformA.scale_.x;
-	float rB = worldTransformB.scale_.x;
-
-	if ((posB.x - posA.x) * (posB.x - posA.x) +
-		(posB.y - posA.y) * (posB.y - posA.y) +
-		(posB.z - posA.z) * (posB.z - posA.z) <=
-		(rA + rB) * (rA + rB))
-	{
-		return true;
-	}
-	return false;
-}
-
-bool SphereCol(Vector3 posA, Vector3 posB, float rA, float rB)
-{
-	if ((posB.x - posA.x) * (posB.x - posA.x) +
-		(posB.y - posA.y) * (posB.y - posA.y) +
-		(posB.z - posA.z) * (posB.z - posA.z) <=
-		(rA + rB) * (rA + rB))
-	{
-		return true;
-	}
-	return false;
-}
 
 GameScene::GameScene() {}
 
@@ -126,6 +74,8 @@ void GameScene::Initialize() {
 
 	ground.Initialize(modelManager->model_,groundTexture);
 
+	boxObject.Initialize(modelManager->model_, groundTexture);
+
 	fpsFix.Initialize();
 
 }
@@ -137,10 +87,16 @@ void GameScene::Update() {
 	
 	ground.Update();
 
+	boxObject.Update();
+
 	//地面との当たり判定
-	player_.isGroundCol = BoxColAABB(player_.GetWorldTrans(), ground.GetWorldTrans());
+	
+	//player_.isJumpCheck = BoxColAABB(player_.GetWorldTrans(), ground.GetWorldTrans());
 
 	player_.Update();
+	CheckPlayerAllCollision();
+	player_.UpdateMatrixAndMove();
+
 	enemyManager->Update(player_.GetWorldTrans().translation_);
 
 	CheckAllCollision();
@@ -175,10 +131,10 @@ void GameScene::Update() {
 
 	viewProjection_.UpdateMatrix();
 
-	debugText_->SetPos(50, 50);
+	/*debugText_->SetPos(50, 50);
 	debugText_->Printf("fps:%f",fpsFix.fps);
 	debugText_->SetPos(50, 70);
-	debugText_->Printf("frameTime:%f",fpsFix.frameTime);
+	debugText_->Printf("frameTime:%f",fpsFix.frameTime);*/
 }
 
 void GameScene::Draw() {
@@ -213,6 +169,8 @@ void GameScene::Draw() {
 	skydome.Draw(viewProjection_);
 
 	ground.Draw(viewProjection_);
+
+	boxObject.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
@@ -286,7 +244,9 @@ void GameScene::CheckAllCollision()
 		}
 	}
 
-	//敵がちょっと当たり判定
+	//敵の移動制御
+	//プレイヤーの周りに透明な球を配置して、それに当たるまで
+	//プレイヤーに前進し、そうでなければ後退する
 	for (const unique_ptr<Enemy>& enemy : enemys)
 	{
 		posA = enemy->GetWorldTrans();
@@ -300,5 +260,27 @@ void GameScene::CheckAllCollision()
 		{
 			enemy->PhaseChange(Phase::Approach);
 		}
+	}
+}
+
+void GameScene::CheckPlayerAllCollision()
+{
+	WorldTransform posA;
+	WorldTransform posB;
+
+	posA = player_.GetWorldTrans();
+	posB = boxObject.GetWorldTrans();
+	if (BoxColAABB(posA, posB))
+	{
+		//プレイヤーと当たり判定を取りたいボックスを代入
+		player_.CheckHitBox(posB);
+	}
+
+	posA = player_.GetWorldTrans();
+	posB = ground.GetWorldTrans();
+	if (BoxColAABB(posA, posB))
+	{
+		//プレイヤーと当たり判定を取りたいボックスを代入
+		player_.CheckHitBox(posB);
 	}
 }

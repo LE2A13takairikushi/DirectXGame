@@ -14,7 +14,10 @@ public:
 	float frameTime = 0;
 
 private:
-	const float MIN_FREAM_TIME = 1.0f / 144;
+	//å≈íËÇµÇΩÇ¢ç≈ëÂfps
+	const float maxfps = 144;
+
+	const float MIN_FREAM_TIME = 1.0f / maxfps;
 
 	LARGE_INTEGER timeStart;
 	LARGE_INTEGER timeEnd;

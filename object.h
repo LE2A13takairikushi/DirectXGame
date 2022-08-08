@@ -8,6 +8,10 @@ class object
 {
 public:
 	WorldTransform GetWorldTrans();
+	void LoadModel(Model* model_);
+	void LoadTexture(TextureHandle textureHandle_);
+
+	void MatUpdate();
 
 protected:
 
