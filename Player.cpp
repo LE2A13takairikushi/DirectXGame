@@ -49,12 +49,13 @@ void Player::Update()
 		bullet->Update();
 	}
 
+	//移動した値を足す処理
+
 
 }
 
 void Player::UpdateMatrixAndMove()
 {
-	//移動した値を足す処理
 	worldTransform_.translation_ += move;
 
 	PlayerUpdateMatrix();
@@ -95,16 +96,15 @@ void Player::Move()
 	if (input_->TriggerKey(DIK_SPACE) && isJumpCheck)
 	{
 		jumpSpd = 1.0f;
-		gravity = 0.01f;
 		isJumpCheck = false;
 	}
 	//重力をかける処理
 	if (jumpSpd > -1.0f)
 	{
 		jumpSpd -= gravity;
+		isJumpCheck = false;
 	}
 	move.y += jumpSpd;
-
 
 
 	//マウスでカメラを動かす処理
@@ -122,6 +122,8 @@ void Player::Move()
 
 	if (verticalRotation > PIf / 2 - FreqConversionRad(1.0f)) verticalRotation = PIf / 2 - FreqConversionRad(1.0f);
 	if (verticalRotation < -PIf / 2 + FreqConversionRad(1.0f)) verticalRotation = -PIf / 2 + FreqConversionRad(1.0f);
+
+
 }
 
 void Player::Attack()
@@ -144,9 +146,9 @@ void Player::Attack()
 void Player::Draw(ViewProjection viewProjection_)
 {
 	debugText->SetPos(50, 50);
-	debugText->Printf("isJumpCheck %d", isJumpCheck);
+	debugText->Printf("onGround %d", onGround);
 	debugText->SetPos(50, 70);
-	debugText->Printf("gravity %f", gravity);
+	debugText->Printf("isJumpCheck %d", isJumpCheck);
 	debugText->SetPos(50, 90);
 	debugText->Printf("jumpSpd %f", jumpSpd);
 	debugText->SetPos(50, 110);
@@ -193,87 +195,56 @@ void Player::PlayerUpdateMatrix()
 
 void Player::JumpReady()
 {
-	//jumpSpd = 0;
-	//gravity = 0;
+	jumpSpd = 0;
 	isJumpCheck = true;
 }
 
 void Player::CheckHitBox(WorldTransform box)
 {
 
-	//if文のボックスコリジョンの後ろにつけてる
-	//y座標の比較がうまくいってない
-	//明日ちゃんと考える
-	if (input_->PushKey(DIK_W))
+	//ここに次のフレームの移動値を図れる場所
+	WorldTransform tempBox;
+	tempBox = worldTransform_;
+	tempBox.translation_ += move;
+
+	onGround = BoxColAABB(tempBox, box) && 
+		tempBox.translation_.y - tempBox.scale_.y > 
+		box.translation_.y + box.scale_.y;
+
+	hitWall = BoxColAABB(tempBox, box) &&
+		tempBox.translation_.y + tempBox.scale_.y >
+		box.translation_.y - box.scale_.y;
+
+	// && jumpSpd < 0
+
+	if (LineFloarCol(upVec * -1, worldTransform_.translation_,
+		{ box.translation_.x, box.translation_.y + box.scale_.y, box.translation_.z },
+		{ 0,1,0 }))
 	{
-		WorldTransform tempTrans = worldTransform_;
-		tempTrans.translation_ += move;
-		if (BoxColAABB(tempTrans, box) &&
-			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 >
-			box.translation_.y + box.scale_.y * 2)
-		{
-			centerVec.normalize();
-			move.x -= (centerVec.x * moveSpeed);
-			move.z -= (centerVec.z * moveSpeed);
-		}
+		worldTransform_.translation_.y -= move.y;
+		JumpReady();
 	}
 
-	if (input_->PushKey(DIK_S))
-	{
-		WorldTransform tempTrans = worldTransform_;
-		tempTrans.translation_ += move;
-		if (BoxColAABB(tempTrans, box) &&
-			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 >
-			box.translation_.y + box.scale_.y * 2)
-		{
-			centerVec.normalize();
-			move.x -= (centerVec.x * moveSpeed) * -1;
-			move.z -= (centerVec.z * moveSpeed) * -1;
-		}
-	}
-	if (input_->PushKey(DIK_D))
-	{
-		WorldTransform tempTrans = worldTransform_;
-		tempTrans.translation_ += move;
-		if (BoxColAABB(tempTrans, box) &&
-			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 >
-			box.translation_.y + box.scale_.y * 2)
-		{
-			sideVec.normalize();
-			move.x -= (sideVec.x * moveSpeed);
-			move.z -= (sideVec.z * moveSpeed);
-		}
-	}
-	if (input_->PushKey(DIK_A))
-	{
-		WorldTransform tempTrans = worldTransform_;
-		tempTrans.translation_ += move;
-		if (BoxColAABB(tempTrans, box) &&
-			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 >
-			box.translation_.y + box.scale_.y * 2)
-		{
-			sideVec.normalize();
-			move.x -= (sideVec.x * moveSpeed) * -1;
-			move.z -= (sideVec.z * moveSpeed) * -1;
-		}
-	}
-
-	if (true)
-	{
-		WorldTransform tempTrans = worldTransform_;
-		tempTrans.translation_ += move;
-		if (BoxColAABB(tempTrans, box) &&
-			worldTransform_.translation_.y - worldTransform_.scale_.y * 2 <
-			box.translation_.y + box.scale_.y * 2)
-		{
-			
-			move.y -= jumpSpd;
-			if (input_->TriggerKey(DIK_SPACE))
-			{
-				move.y += (jumpSpd + gravity);
-			}
-
-			JumpReady();
-		}
-	}
+	//if (onGround && hitWall)
+	//{
+	//	//worldTransform_.translation_.y -= move.y;
+	//	//JumpReady();
+	//}
+	//else if(BoxColAABB(tempBox, box))
+	//{
+	//	if (hitWall)
+	//	{
+	//		if (tempBox.translation_.x + tempBox.scale_.x > box.translation_.x - box.scale_.x)
+	//		{
+	//			worldTransform_.translation_.x -= move.x;
+	//		}
+	//		if (tempBox.translation_.z + tempBox.scale_.z > box.translation_.z - box.scale_.z)
+	//		{
+	//			worldTransform_.translation_.z -= move.z;
+	//		}
+	//		//worldTransform_.translation_.y -= move.y;
+	//		//JumpReady();
+	//	}
+	//}
+	
 }

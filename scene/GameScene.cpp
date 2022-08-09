@@ -94,7 +94,9 @@ void GameScene::Update() {
 	//player_.isJumpCheck = BoxColAABB(player_.GetWorldTrans(), ground.GetWorldTrans());
 
 	player_.Update();
+	
 	CheckPlayerAllCollision();
+
 	player_.UpdateMatrixAndMove();
 
 	enemyManager->Update(player_.GetWorldTrans().translation_);
@@ -265,22 +267,14 @@ void GameScene::CheckAllCollision()
 
 void GameScene::CheckPlayerAllCollision()
 {
-	WorldTransform posA;
+
 	WorldTransform posB;
 
-	posA = player_.GetWorldTrans();
 	posB = boxObject.GetWorldTrans();
-	if (BoxColAABB(posA, posB))
-	{
-		//プレイヤーと当たり判定を取りたいボックスを代入
-		player_.CheckHitBox(posB);
-	}
 
-	posA = player_.GetWorldTrans();
+	player_.CheckHitBox(posB);
+
 	posB = ground.GetWorldTrans();
-	if (BoxColAABB(posA, posB))
-	{
-		//プレイヤーと当たり判定を取りたいボックスを代入
-		player_.CheckHitBox(posB);
-	}
+
+	player_.CheckHitBox(posB);
 }
