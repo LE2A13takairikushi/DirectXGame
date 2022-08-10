@@ -243,6 +243,21 @@ void GameScene::CheckAllCollision()
 		}
 	}
 
+	//自分と敵の弾の当たり判定
+	for (const unique_ptr<Enemy>& enemy : enemys)
+	{	
+		posA = player_.GetWorldTrans();
+		const list<unique_ptr<EnemyBullet>>& enemyBullet = enemy->GetBullets();
+		for (const unique_ptr<EnemyBullet>& bullet : enemyBullet)
+		{
+			posB = bullet->GetWorldTrans();
+			if (BoxColAABB(posA, posB))
+			{
+				bullet->OnCollision();
+			}
+		}
+	}
+
 	//地面と自分の弾の当たり判定
 	posA = ground.GetWorldTrans();
 	for (const unique_ptr<PlayerBullet>& bullet : playerBullets)
@@ -253,7 +268,41 @@ void GameScene::CheckAllCollision()
 		{
 			bullet->OnCollision();
 		}
+		posA = boxObject.GetWorldTrans();
+		if (BoxColAABB(posA, posB))
+		{
+			bullet->OnCollision();
+		}
+		posA = boxObject2.GetWorldTrans();
+		if (BoxColAABB(posA, posB))
+		{
+			bullet->OnCollision();
+		}
 	}
+	posA = ground.GetWorldTrans();
+	//地面と敵の弾の当たり判定
+	for (const unique_ptr<Enemy>& enemy : enemys)
+	{
+		const list<unique_ptr<EnemyBullet>>& enemyBullet = enemy->GetBullets();
+		for (const unique_ptr<EnemyBullet>& bullet : enemyBullet)
+		{
+			if (BoxColAABB(posA, posB))
+			{
+				bullet->OnCollision();
+			}
+			posA = boxObject.GetWorldTrans();
+			if (BoxColAABB(posA, posB))
+			{
+				bullet->OnCollision();
+			}
+			posA = boxObject2.GetWorldTrans();
+			if (BoxColAABB(posA, posB))
+			{
+				bullet->OnCollision();
+			}
+		}
+	}
+
 
 	//敵の移動制御
 	//プレイヤーの周りに透明な球を配置して、それに当たるまで

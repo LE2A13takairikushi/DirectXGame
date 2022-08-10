@@ -20,11 +20,13 @@ public:
 
 	bool IsDead() { return isDead; }
 
-	std::list<std::unique_ptr<EnemyBullet>> bullets_;
+	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 
 private:
 	bool isDead = false;
 	float moveSpd = 0.3f;
+
+	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 
 	Phase phase_ = Phase::Approach;
 
