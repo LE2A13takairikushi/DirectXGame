@@ -75,6 +75,10 @@ void GameScene::Initialize() {
 	ground.Initialize(modelManager->model_,groundTexture);
 
 	boxObject.Initialize(modelManager->model_, groundTexture);
+	boxObject.SetPos({ 50.0f, 20.0f, 0.0f });
+
+	boxObject2.Initialize(modelManager->model_, groundTexture);
+	boxObject2.SetPos({ -50.0f, 00.0f, 0.0f });
 
 	fpsFix.Initialize();
 
@@ -88,6 +92,7 @@ void GameScene::Update() {
 	ground.Update();
 
 	boxObject.Update();
+	boxObject2.Update();
 
 	//地面との当たり判定
 	
@@ -173,14 +178,18 @@ void GameScene::Draw() {
 	ground.Draw(viewProjection_);
 
 	boxObject.Draw(viewProjection_);
+	boxObject2.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
 	enemyManager->Draw(viewProjection_);
 
-	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(-100, 0, 0), Vector3(100, 0, 0), Vector4(255, 0, 0, 255));
-	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(0, -100, 0), Vector3(0, 100, 0), Vector4(0, 255, 0, 255));
-	PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(0, 0, -100), Vector3(0, 0, 100), Vector4(0,0, 255, 255));
+	if (false)
+	{
+		PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(-100, 0, 0), Vector3(100, 0, 0), Vector4(255, 0, 0, 255));
+		PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(0, -100, 0), Vector3(0, 100, 0), Vector4(0, 255, 0, 255));
+		PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(0, 0, -100), Vector3(0, 0, 100), Vector4(0,0, 255, 255));
+	}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -267,14 +276,15 @@ void GameScene::CheckAllCollision()
 
 void GameScene::CheckPlayerAllCollision()
 {
-
 	WorldTransform posB;
 
 	posB = boxObject.GetWorldTrans();
+	player_.CheckHitBox(posB);
 
+	posB = boxObject2.GetWorldTrans();
 	player_.CheckHitBox(posB);
 
 	posB = ground.GetWorldTrans();
-
 	player_.CheckHitBox(posB);
+
 }

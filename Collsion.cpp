@@ -22,15 +22,15 @@ bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB)
 	return false;
 }
 
-bool LineFloarCol(Vector3 dVec,Vector3 senbunPos, Vector3 heimenPos,Vector3 normalVec)
+bool LineFloarCol(Vector3 senbunPos1,Vector3 senbunPos2, Vector3 heimenPos,Vector3 normalVec)
 {
 	//ジャンプの方向ベクトル
 	//Vector3 v = line.upVec;
-	Vector3 v = dVec;
+	Vector3 p1 = senbunPos1;
 
 	//線分上の点
 	//Vector3 p1 = line.GetWorldTrans().translation_;
-	Vector3 p1 = senbunPos;
+	Vector3 p2 = senbunPos2;
 
 	//平面上の点
 	Vector3 p0 = heimenPos;
@@ -38,9 +38,10 @@ bool LineFloarCol(Vector3 dVec,Vector3 senbunPos, Vector3 heimenPos,Vector3 norm
 	//平面の法線ベクトル
 	Vector3 n = normalVec;
 
-	Vector3 v1 = v - n;
+	Vector3 v1 = p0 - p1;
+	Vector3 v2 = p0 - p2;
 
-	if (v1.dot(n) == 0 ||v.dot(n) != 0)
+	if ((v1.dot(n))*(v2.dot(n))<=0)
 	{
 		return true;
 	}

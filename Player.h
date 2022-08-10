@@ -34,8 +34,8 @@ public:
 	void CheckHitBox(WorldTransform box);
 
 	bool isJumpCheck = false;
-	bool onGround = false;
-	bool hitWall = false;
+	bool hitGround = false;
+	bool hitCeiling = false;
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 

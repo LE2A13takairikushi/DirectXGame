@@ -79,6 +79,7 @@ private: // メンバ変数
 	Ground ground;
 	Skydome skydome;
 	BoxObj boxObject;
+	BoxObj boxObject2;
 
 	//描画系
 	Sprite *sprite = nullptr;

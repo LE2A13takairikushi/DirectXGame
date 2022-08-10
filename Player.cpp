@@ -146,7 +146,7 @@ void Player::Attack()
 void Player::Draw(ViewProjection viewProjection_)
 {
 	debugText->SetPos(50, 50);
-	debugText->Printf("onGround %d", onGround);
+	debugText->Printf("onGround %d", hitGround);
 	debugText->SetPos(50, 70);
 	debugText->Printf("isJumpCheck %d", isJumpCheck);
 	debugText->SetPos(50, 90);
@@ -202,28 +202,83 @@ void Player::JumpReady()
 void Player::CheckHitBox(WorldTransform box)
 {
 
-	//‚±‚±‚ÉŽŸ‚ÌƒtƒŒ[ƒ€‚ÌˆÚ“®’l‚ð}‚ê‚éêŠ
+	//yhan
 	WorldTransform tempBox;
 	tempBox = worldTransform_;
 	tempBox.translation_ += move;
 
-	onGround = BoxColAABB(tempBox, box) && 
+	hitGround = 
 		tempBox.translation_.y - tempBox.scale_.y > 
 		box.translation_.y + box.scale_.y;
 
-	hitWall = BoxColAABB(tempBox, box) &&
-		tempBox.translation_.y + tempBox.scale_.y >
+	hitCeiling = 
+		tempBox.translation_.y + tempBox.scale_.y <
 		box.translation_.y - box.scale_.y;
+	
+	if (BoxColAABB(tempBox, box))
+	{
+		if ((hitGround && jumpSpd < 0)|| (hitCeiling && jumpSpd > 0))
+		{
+			move.y -= jumpSpd;
+			JumpReady();
+		}
+		if (input_->PushKey(DIK_W))
+		{
+			WorldTransform moveBox;
+			moveBox = worldTransform_;
+			moveBox.translation_ += move;
+			if (BoxColAABB(moveBox, box))
+			{
+				move.x -= (centerVec.x * moveSpeed);
+				move.z -= (centerVec.z * moveSpeed);
+			}
+		}
+		if (input_->PushKey(DIK_S))
+		{
+			WorldTransform moveBox;
+			moveBox = worldTransform_;
+			moveBox.translation_ += move;
+			if (BoxColAABB(moveBox, box))
+			{
+				move.x -= (-centerVec.x * moveSpeed);
+				move.z -= (-centerVec.z * moveSpeed);
+			}
+		}
+		if (input_->PushKey(DIK_D))
+		{
+			WorldTransform moveBox;
+			moveBox = worldTransform_;
+			moveBox.translation_ += move;
+			if (BoxColAABB(moveBox, box))
+			{
+				move.x -= (sideVec.x * moveSpeed);
+				move.z -= (sideVec.z * moveSpeed);
+			}
+		}
+		if (input_->PushKey(DIK_A))
+		{
+			WorldTransform moveBox;
+			moveBox = worldTransform_;
+			moveBox.translation_ += move;
+			if (BoxColAABB(moveBox, box))
+			{
+				move.x -= (-sideVec.x * moveSpeed);
+				move.z -= (-sideVec.z * moveSpeed);
+			}
+		}
+	}
 
 	// && jumpSpd < 0
 
-	if (LineFloarCol(upVec * -1, worldTransform_.translation_,
-		{ box.translation_.x, box.translation_.y + box.scale_.y, box.translation_.z },
+	/*if (LineFloarCol(
+		{ worldTransform_.translation_.x,worldTransform_.translation_.y - worldTransform_.scale_.y,worldTransform_.translation_.z },
+		{ worldTransform_.translation_.x,worldTransform_.translation_.y + worldTransform_.scale_.y,worldTransform_.translation_.z },
+		{ box.translation_.x, box.translation_.y + box.scale_.y * 2, box.translation_.z },
 		{ 0,1,0 }))
 	{
-		worldTransform_.translation_.y -= move.y;
+		move.y -= jumpSpd;
 		JumpReady();
-	}
+	}*/
 
 	//if (onGround && hitWall)
 	//{

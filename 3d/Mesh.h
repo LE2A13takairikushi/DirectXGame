@@ -142,8 +142,10 @@ class Mesh {
 	D3D12_VERTEX_BUFFER_VIEW vbView_ = {};
 	// インデックスバッファビュー
 	D3D12_INDEX_BUFFER_VIEW ibView_ = {};
+
 	// 頂点データ配列
 	std::vector<VertexPosNormalUv> vertices_;
+	
 	// 頂点インデックス配列
 	std::vector<unsigned short> indices_;
 	// 頂点法線スムージング用データ
