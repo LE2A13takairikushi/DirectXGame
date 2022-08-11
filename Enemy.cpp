@@ -19,6 +19,8 @@ void Enemy::Update(Vector3 pPos)
 	shotVec = pPos - worldTransform_.translation_;
 	shotVec.normalize();
 
+	moveVec = shotVec * moveSpd;
+
 	switch (phase_)
 	{
 	case Phase::Approach:
@@ -28,6 +30,8 @@ void Enemy::Update(Vector3 pPos)
 		MoveOpp();
 		break;
 	}
+
+	worldTransform_.translation_ += moveVec;
 
 	Attack();
 
@@ -55,15 +59,6 @@ void Enemy::OnCollision()
 	isDead = true;
 }
 
-void Enemy::MoveCenter()
-{
-	Vector3 centerVec;
-	
-	centerVec = shotVec * moveSpd;
-	worldTransform_.translation_ += centerVec;
-	centerVec = { 0,0,0 };
-}
-
 void Enemy::Attack()
 {
 	//tempVec‚ª’e‚ÌƒxƒNƒgƒ‹‚É‚È‚é
@@ -83,7 +78,6 @@ void Enemy::Attack()
 		
 		attackCount = 0;
 	}
-
 }
 
 void Enemy::PhaseChange(Phase phase_)
@@ -91,12 +85,34 @@ void Enemy::PhaseChange(Phase phase_)
 	this->phase_ = phase_;
 }
 
+void Enemy::Back(WorldTransform box)
+{
+	bool hitGround =
+		worldTransform_.translation_.y - worldTransform_.scale_.y >
+		box.translation_.y + box.scale_.y;
+
+	bool hitCeiling =
+		worldTransform_.translation_.y + worldTransform_.scale_.y <
+		box.translation_.y - box.scale_.y;
+
+	if(hitGround||hitCeiling)
+	{
+		
+	}
+
+	moveVec.x = 0;
+	moveVec.z = 0;
+
+	worldTransform_.translation_ -= moveVec;
+}
+
+void Enemy::MoveCenter()
+{
+	moveVec *= 1;
+}
+
 void Enemy::MoveOpp()
 {
-	Vector3 oppVec;
-
-	oppVec = -shotVec * moveSpd;
-	worldTransform_.translation_ += oppVec;
-	oppVec = { 0,0,0 };
+	moveVec *= -1;
 }
 

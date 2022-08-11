@@ -303,6 +303,22 @@ void GameScene::CheckAllCollision()
 		}
 	}
 
+	for (const unique_ptr<Enemy>& enemy : enemys)
+	{
+		posA = enemy->GetWorldTrans();
+
+		posB = boxObject.GetWorldTrans();
+		if (BoxColAABB(posA, posB))
+		{
+			enemy->Back(posB);
+		}
+
+		posB = boxObject2.GetWorldTrans();
+		if (BoxColAABB(posA, posB))
+		{
+			enemy->Back(posB);
+		}
+	}
 
 	//敵の移動制御
 	//プレイヤーの周りに透明な球を配置して、それに当たるまで

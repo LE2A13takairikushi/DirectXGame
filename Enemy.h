@@ -20,6 +20,8 @@ public:
 
 	bool IsDead() { return isDead; }
 
+	void Back(WorldTransform box);
+
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 
 private:
@@ -34,6 +36,8 @@ private:
 	static const int MAX_ATTACK_COUNT = 300;
 
 	Vector3 shotVec = {0,0,0};
+
+	Vector3 moveVec = { 0,0,0 };
 
 	void MoveOpp();
 	void MoveCenter();
