@@ -4,8 +4,7 @@
 class BoxObj : public object
 {
 public:
-	void Initialize(Model* model_, TextureHandle textureHandle);
-	void SetPos(Vector3 pos);
+	void Initialize(Model* model_);
 	void Update();
 	void Draw(ViewProjection viewProjection);
 };

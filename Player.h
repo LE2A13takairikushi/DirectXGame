@@ -14,6 +14,7 @@ public:
 	Player();
 	~Player();
 
+	//なまぽでdeleteできないので危ない
 	Input* input_ = Input::GetInstance();
 	DebugText* debugText = DebugText::GetInstance();
 
@@ -24,7 +25,8 @@ public:
 	//上方向ベクトル
 	Vector3 upVec = { 0,1,0 };
 
-	void Initialize(Model* model_, TextureHandle textureHandle_);
+	void Initialize(Model* model_);
+	void SetSpawnPos(Vector3 pos);
 	void Update();
 	void UpdateMatrixAndMove();
 	void Draw(ViewProjection viewProjection_);
@@ -32,6 +34,8 @@ public:
 	void JumpReady();
 
 	void CheckHitBox(WorldTransform box);
+
+	void StockPlus();
 
 	bool isJumpCheck = false;
 	bool hitGround = false;
@@ -43,8 +47,14 @@ private:
 
 	WorldTransform prevPos;
 
+	WorldTransform modelTransform;
+
 	//移動した値
 	Vector3 move = {0,0,0};
+
+	Vector3 moveVec;
+
+	Vector3 respawnPos;
 
 	//縦方向の回転角度
 	float verticalRotation = 0;
@@ -52,6 +62,9 @@ private:
 
 	//マウスの感度
 	float mouseSpd = 0.01f;
+
+	//残基
+	int stock = 3;
 
 	//移動関係
 	float moveSpeed = 0.1f;

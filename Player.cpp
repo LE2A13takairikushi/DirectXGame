@@ -13,16 +13,28 @@ Player::Player()
 
 Player::~Player()
 {
-
+	/*delete debugText;
+	delete input_;*/
 }
 
-void Player::Initialize(Model *model_, TextureHandle textureHandle_)
+void Player::Initialize(Model *model_)
 {
 	assert(model_);
 
 	worldTransform_.Initialize();
 	this->model_ = model_;
-	this->textureHandle_ = textureHandle_;
+	//this->textureHandle_ = textureHandle_;
+
+	//スケールをこっちでいじると計算にいろいろ問題がおこる
+	//モデル色々するのめんどくさいしプレイヤーをどうするか問題になりそう
+	//あとはモデル用のワールドトランスフォームを作るべきとか？
+
+}
+
+void Player::SetSpawnPos(Vector3 pos)
+{
+	worldTransform_.translation_ = pos;
+	respawnPos = pos;
 }
 
 void Player::Update()
@@ -34,11 +46,21 @@ void Player::Update()
 		return bullet->IsDead();
 		});
 
+	modelTransform = worldTransform_;
+	
+
 	//前回のフレームの座標を保存
 	prevPos = worldTransform_;
 
 	//移動とか攻撃とかの入力系
 	Move();
+
+	//視点を正面に向ける
+	if (input_->PushKey(DIK_R))
+	{
+		verticalRotation = 0;
+	}
+
 	if (input_->IsTriggerMouse(0))
 	{
 		Attack();
@@ -65,13 +87,13 @@ void Player::UpdateMatrixAndMove()
 void Player::InputMove()
 {
 	//正面に移動する処理
-	centerVec.normalize();
-	move.x += (centerVec.x * moveSpeed) * input_->PushKey(DIK_W);
-	move.z += (centerVec.z * moveSpeed) * input_->PushKey(DIK_W);
+	moveVec.normalize();
+	move.x += (moveVec.x * moveSpeed) * input_->PushKey(DIK_W);
+	move.z += (moveVec.z * moveSpeed) * input_->PushKey(DIK_W);
 
-	centerVec.normalize();
-	move.x += (centerVec.x * moveSpeed) * -input_->PushKey(DIK_S);
-	move.z += (centerVec.z * moveSpeed) * -input_->PushKey(DIK_S);
+	moveVec.normalize();
+	move.x += (moveVec.x * moveSpeed) * -input_->PushKey(DIK_S);
+	move.z += (moveVec.z * moveSpeed) * -input_->PushKey(DIK_S);
 
 	sideVec.normalize();
 	move.x += (sideVec.x * moveSpeed) * input_->PushKey(DIK_D);
@@ -92,7 +114,6 @@ void Player::Move()
 	InputMove();
 
 	//ジャンプする処理
-	//気に入ってないのでタスクが落ち着いたら変更したい
 	if (input_->TriggerKey(DIK_SPACE) && isJumpCheck)
 	{
 		jumpSpd = 1.0f;
@@ -105,7 +126,6 @@ void Player::Move()
 		isJumpCheck = false;
 	}
 	move.y += jumpSpd;
-
 
 	//マウスでカメラを動かす処理
 	Vector2 temp = { 1920 / 2, 1080 / 2 };
@@ -120,10 +140,15 @@ void Player::Move()
 	horizontalRotation += (point.x - temp.x) * mouseSpd;
 	verticalRotation += (point.y - temp.y) * mouseSpd;
 
-	if (verticalRotation > PIf / 2 - FreqConversionRad(1.0f)) verticalRotation = PIf / 2 - FreqConversionRad(1.0f);
-	if (verticalRotation < -PIf / 2 + FreqConversionRad(1.0f)) verticalRotation = -PIf / 2 + FreqConversionRad(1.0f);
+	if (verticalRotation > PIf / 2 - DegreeConversionRad(1.0f)) verticalRotation = PIf / 2 - DegreeConversionRad(1.0f);
+	if (verticalRotation < -PIf / 2 + DegreeConversionRad(1.0f)) verticalRotation = -PIf / 2 + DegreeConversionRad(1.0f);
 
-
+	//落下した時に真ん中に戻る
+	if (worldTransform_.translation_.y <= -100)
+	{
+		worldTransform_.translation_ = respawnPos;
+		stock -= 1;
+	}
 }
 
 void Player::Attack()
@@ -146,21 +171,21 @@ void Player::Attack()
 void Player::Draw(ViewProjection viewProjection_)
 {
 	debugText->SetPos(50, 50);
-	debugText->Printf("onGround %d", hitGround);
-	debugText->SetPos(50, 70);
-	debugText->Printf("isJumpCheck %d", isJumpCheck);
-	debugText->SetPos(50, 90);
-	debugText->Printf("jumpSpd %f", jumpSpd);
-	debugText->SetPos(50, 110);
 	debugText->Printf("move %f %f %f", move.x,move.y,move.z);
-	debugText->SetPos(50, 130);
+	debugText->SetPos(50, 70);
 	debugText->Printf("translation_ %f %f %f", 
 		worldTransform_.translation_.x,
 		worldTransform_.translation_.y,
 		worldTransform_.translation_.z
 	);
+	debugText->SetPos(50, 90);
+	debugText->Printf("left %d",stock);
 
-	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
+	//worldTransform_.scale_ = { 0.3f,0.3f, 0.3f };
+	//PlayerUpdateMatrix();
+	//worldTransform_.TransferMatrix();
+	model_->Draw(modelTransform, viewProjection_);
+	//worldTransform_.scale_ = { 1.0f,1.0f, 1.0f };
 
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
@@ -175,6 +200,7 @@ void Player::PlayerUpdateMatrix()
 	worldTransform_.rotation_.y = horizontalRotation;
 	worldTransform_.CreateRot();
 
+	moveVec = worldTransform_.matRot.ExtractAxisZ();
 	sideVec = worldTransform_.matRot.ExtractAxisX();
 
 	worldTransform_.CreateTrans();
@@ -229,8 +255,8 @@ void Player::CheckHitBox(WorldTransform box)
 			moveBox.translation_ += move;
 			if (BoxColAABB(moveBox, box))
 			{
-				move.x -= (centerVec.x * moveSpeed);
-				move.z -= (centerVec.z * moveSpeed);
+				move.x -= (moveVec.x * moveSpeed);
+				move.z -= (moveVec.z * moveSpeed);
 			}
 		}
 		if (input_->PushKey(DIK_S))
@@ -240,8 +266,8 @@ void Player::CheckHitBox(WorldTransform box)
 			moveBox.translation_ += move;
 			if (BoxColAABB(moveBox, box))
 			{
-				move.x -= (-centerVec.x * moveSpeed);
-				move.z -= (-centerVec.z * moveSpeed);
+				move.x -= (-moveVec.x * moveSpeed);
+				move.z -= (-moveVec.z * moveSpeed);
 			}
 		}
 		if (input_->PushKey(DIK_D))
@@ -267,39 +293,9 @@ void Player::CheckHitBox(WorldTransform box)
 			}
 		}
 	}
+}
 
-	// && jumpSpd < 0
-
-	/*if (LineFloarCol(
-		{ worldTransform_.translation_.x,worldTransform_.translation_.y - worldTransform_.scale_.y,worldTransform_.translation_.z },
-		{ worldTransform_.translation_.x,worldTransform_.translation_.y + worldTransform_.scale_.y,worldTransform_.translation_.z },
-		{ box.translation_.x, box.translation_.y + box.scale_.y * 2, box.translation_.z },
-		{ 0,1,0 }))
-	{
-		move.y -= jumpSpd;
-		JumpReady();
-	}*/
-
-	//if (onGround && hitWall)
-	//{
-	//	//worldTransform_.translation_.y -= move.y;
-	//	//JumpReady();
-	//}
-	//else if(BoxColAABB(tempBox, box))
-	//{
-	//	if (hitWall)
-	//	{
-	//		if (tempBox.translation_.x + tempBox.scale_.x > box.translation_.x - box.scale_.x)
-	//		{
-	//			worldTransform_.translation_.x -= move.x;
-	//		}
-	//		if (tempBox.translation_.z + tempBox.scale_.z > box.translation_.z - box.scale_.z)
-	//		{
-	//			worldTransform_.translation_.z -= move.z;
-	//		}
-	//		//worldTransform_.translation_.y -= move.y;
-	//		//JumpReady();
-	//	}
-	//}
-	
+void Player::StockPlus()
+{
+	stock += 1;
 }

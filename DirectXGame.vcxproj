@@ -81,6 +81,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)2d;$(ProjectDir)3d;$(ProjectDir)audio;$(ProjectDir)base;$(ProjectDir)input;$(ProjectDir)scene;$(ProjectDir)math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>MinSpace</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -105,6 +106,9 @@
     <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="FPSfix.cpp" />
     <ClCompile Include="Ground.cpp" />
+    <ClCompile Include="GroundManager.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Vector3.cpp" />
     <ClCompile Include="Matrix4.cpp" />
@@ -147,7 +151,10 @@
     <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="FPSfix.h" />
     <ClInclude Include="Ground.h" />
+    <ClInclude Include="GroundManager.h" />
     <ClInclude Include="input\Input.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="ItemManager.h" />
     <ClInclude Include="math\MathUtility.h" />
     <ClInclude Include="math\Matrix4.h" />
     <ClInclude Include="math\Vector2.h" />

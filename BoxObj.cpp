@@ -1,18 +1,10 @@
 #include "BoxObj.h"
 
-void BoxObj::Initialize(Model* model_,TextureHandle textureHandle_)
+void BoxObj::Initialize(Model* model_)
 {
 	LoadModel(model_);
-	LoadTexture(TextureManager::Load("green.png"));
+	LoadTexture(TextureManager::Load("hogeta_white.png"));
 	worldTransform_.Initialize();
-
-	worldTransform_.scale_ = { 10.0f,10.0f,10.0f };
-
-}
-
-void BoxObj::SetPos(Vector3 pos)
-{
-	worldTransform_.translation_ = pos;
 }
 
 void BoxObj::Update()

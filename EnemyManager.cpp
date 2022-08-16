@@ -11,13 +11,13 @@ EnemyManager::EnemyManager(Model* model_)
 
 EnemyManager::~EnemyManager()
 {
-	delete model_;
+	
 }
 
 void EnemyManager::Initialize(Model* model_)
 {
 	//assert(model_);
-	this->model_ = Model::Create();
+	this->model_ = model_;
 	EnemyPop();
 }
 

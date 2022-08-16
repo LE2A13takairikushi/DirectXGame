@@ -22,7 +22,7 @@ private:
 
 	//パソコンが壊れたら嫌なので一応エネミー発生数の上限をつけておく
 	int maxEnemyCount = 0;
-	static const int MAX_ENEMY = 30;
+	static const int MAX_ENEMY = 1;
 
 	Model* model_ = nullptr;
 

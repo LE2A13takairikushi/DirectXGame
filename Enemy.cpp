@@ -1,11 +1,14 @@
 #include "Enemy.h"
+#include "MyMath.h"
+#include "Collsion.h"
+
 using namespace std;
 
 void Enemy::Initialize(Model* model_,Vector3 popPos)
 {
 	worldTransform_.Initialize();
 	this->model_ = model_;
-	this->textureHandle_ = TextureManager::Load("enemy.png");;
+	//this->textureHandle_ = TextureManager::Load("enemy.png");;
 
 	worldTransform_.translation_ = popPos;
 }
@@ -16,10 +19,24 @@ void Enemy::Update(Vector3 pPos)
 		return bullet->IsDead();
 		});
 
-	shotVec = pPos - worldTransform_.translation_;
-	shotVec.normalize();
+	Attack();
 
-	moveVec = shotVec * moveSpd;
+	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
+	{
+		bullet->Update();
+	}
+
+	pCenterVec = pPos - worldTransform_.translation_;
+	pCenterVec.normalize();
+
+	moveVec = pCenterVec * moveSpd;
+
+	sideVec = worldTransform_.matWorld_.ExtractAxisX();
+	sideVec.normalize();
+
+	sideVec *= moveSpd;
+
+	pdegree = InterpointGetDegree(moveVec, sideVec);
 
 	switch (phase_)
 	{
@@ -29,16 +46,12 @@ void Enemy::Update(Vector3 pPos)
 	case Phase::Leave:
 		MoveOpp();
 		break;
+	case Phase::OnWall:
+		OnWallMove();
+		break;
 	}
 
 	worldTransform_.translation_ += moveVec;
-
-	Attack();
-
-	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
-	{
-		bullet->Update();
-	}
 
 	worldTransform_.UpdateMatrix();
 	worldTransform_.TransferMatrix();
@@ -46,12 +59,18 @@ void Enemy::Update(Vector3 pPos)
 
 void Enemy::Draw(ViewProjection viewProjection_)
 {
-	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
+	model_->Draw(worldTransform_, viewProjection_);
+
 
 	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
 	{
 		bullet->Draw(viewProjection_);
 	}
+
+	debugText->SetPos(50, 200);
+	debugText->Printf("kakudo %f", pdegree);
+	debugText->SetPos(50, 230);
+	debugText->Printf("moveVec %f %f %f", moveVec.x, moveVec.y, moveVec.z);
 }
 
 void Enemy::OnCollision()
@@ -68,10 +87,10 @@ void Enemy::Attack()
 	//’e‚ÌˆÊ’u‚ðŒˆ’è
 	if (attackCount == MAX_ATTACK_COUNT)
 	{
-		tempVec = shotVec;
+		tempVec = pCenterVec;
 		
 		unique_ptr<EnemyBullet> newBullet = make_unique<EnemyBullet>();
-		newBullet->Initialize(model_, worldTransform_.translation_, tempVec);
+		newBullet->Initialize(Model::Create(), worldTransform_.translation_, tempVec);
 
 		//’e‚ð“o˜^‚·‚é
 		bullets_.push_back(std::move(newBullet));
@@ -85,25 +104,47 @@ void Enemy::PhaseChange(Phase phase_)
 	this->phase_ = phase_;
 }
 
-void Enemy::Back(WorldTransform box)
+void Enemy::CheckHitBox(WorldTransform box)
 {
-	bool hitGround =
-		worldTransform_.translation_.y - worldTransform_.scale_.y >
+	WorldTransform tempBox;
+	tempBox = worldTransform_;
+	tempBox.translation_ += moveVec;
+
+	hitGround =
+		tempBox.translation_.y - tempBox.scale_.y >
 		box.translation_.y + box.scale_.y;
 
-	bool hitCeiling =
-		worldTransform_.translation_.y + worldTransform_.scale_.y <
+	hitCeiling =
+		tempBox.translation_.y + tempBox.scale_.y <
 		box.translation_.y - box.scale_.y;
 
-	if(hitGround||hitCeiling)
+	isBoxCol = BoxColAABB(tempBox, box);
+
+	PhaseChange(Phase::OnWall);
+}
+
+void Enemy::OnWallMove()
+{
+	if (isBoxCol && (hitGround != 0 || hitCeiling != 0))
 	{
-		
+		if (pdegree < -1)
+		{
+			moveVec.x = sideVec.x;
+			moveVec.z = sideVec.z;
+		}
+		if (pdegree > 1)
+		{
+			moveVec.x = -sideVec.x;
+			moveVec.z = -sideVec.z;
+		}
+		if (pdegree >= -1 && pdegree <= 1)
+		{
+			moveVec.x = 0;
+			moveVec.z = 0;
+
+			moveVec.y = moveSpd;
+		}
 	}
-
-	moveVec.x = 0;
-	moveVec.z = 0;
-
-	worldTransform_.translation_ -= moveVec;
 }
 
 void Enemy::MoveCenter()
@@ -113,6 +154,6 @@ void Enemy::MoveCenter()
 
 void Enemy::MoveOpp()
 {
-	moveVec *= -1;
+	moveVec *= 0;
 }
 

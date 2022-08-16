@@ -38,16 +38,15 @@ void GameScene::Initialize() {
 	modelManager = new ModelManager();
 
 	textureHandle_ = TextureManager::Load("waito.jpg");
-	player_.Initialize(modelManager->model_,textureHandle_);
+	player_.Initialize(modelManager->model_);
 
-	//enemyManager->Initialize(modelManager->model_);
-	enemyManager = new EnemyManager(modelManager->model_);
+	enemyManager = new EnemyManager(modelManager->firewisp);
 
 	sprite = Sprite::Create(textureHandle_, { 0,0 });
 
 	viewProjection_.Initialize();
 	viewProjection_.eye = { 0,50,100 };
-	viewProjection_.fovAngleY = FreqConversionRad(90.0f);
+	viewProjection_.fovAngleY = DegreeConversionRad(90.0f);
 
 	//アスペクト比
 	viewProjection_.aspectRatio = 1.0f;
@@ -72,15 +71,23 @@ void GameScene::Initialize() {
 
 	skydome.Initialize(modelManager->skydome);
 
-	ground.Initialize(modelManager->model_,groundTexture);
+	gManager.Initialize(modelManager->model_);
 
-	boxObject.Initialize(modelManager->model_, groundTexture);
+	iManager.Initialize(modelManager->model_);
+
+	/*ground.Initialize(modelManager->model_);
+	ground.SetPos({ 100.0f,10.0f,100.0f });
+	ground.SetScale({ 0,-20.0f,0 });
+
+	boxObject.Initialize(modelManager->model_);
 	boxObject.SetPos({ 50.0f, 20.0f, 0.0f });
 
-	boxObject2.Initialize(modelManager->model_, groundTexture);
-	boxObject2.SetPos({ -50.0f, 00.0f, 0.0f });
+	boxObject2.Initialize(modelManager->model_);
+	boxObject2.SetPos({ -50.0f, 00.0f, 0.0f });*/
 
 	fpsFix.Initialize();
+
+	player_.SetSpawnPos(gManager.GetSpawnPos());
 
 }
 
@@ -89,10 +96,12 @@ void GameScene::Update() {
 
 	fpsFix.Update();
 	
-	ground.Update();
+	gManager.Update();
+	iManager.Update();
+	/*ground.Update();
 
 	boxObject.Update();
-	boxObject2.Update();
+	boxObject2.Update();*/
 
 	//地面との当たり判定
 	
@@ -103,6 +112,8 @@ void GameScene::Update() {
 	CheckPlayerAllCollision();
 
 	player_.UpdateMatrixAndMove();
+
+	CheckEnemyAllCollision();
 
 	enemyManager->Update(player_.GetWorldTrans().translation_);
 
@@ -175,10 +186,9 @@ void GameScene::Draw() {
 	
 	skydome.Draw(viewProjection_);
 
-	ground.Draw(viewProjection_);
-
-	boxObject.Draw(viewProjection_);
-	boxObject2.Draw(viewProjection_);
+	gManager.Draw(viewProjection_);
+	
+	iManager.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
@@ -245,7 +255,7 @@ void GameScene::CheckAllCollision()
 
 	//自分と敵の弾の当たり判定
 	for (const unique_ptr<Enemy>& enemy : enemys)
-	{	
+	{
 		posA = player_.GetWorldTrans();
 		const list<unique_ptr<EnemyBullet>>& enemyBullet = enemy->GetBullets();
 		for (const unique_ptr<EnemyBullet>& bullet : enemyBullet)
@@ -259,66 +269,60 @@ void GameScene::CheckAllCollision()
 	}
 
 	//地面と自分の弾の当たり判定
-	posA = ground.GetWorldTrans();
-	for (const unique_ptr<PlayerBullet>& bullet : playerBullets)
+	for (const unique_ptr<BoxObj>& object : gManager.GetObjects())
 	{
-		posB = bullet->GetWorldTrans();
+		posA = object->GetWorldTrans();
+		for (const unique_ptr<PlayerBullet>& bullet : playerBullets)
+		{
+			posB = bullet->GetWorldTrans();
 
-		if (BoxColAABB(posA, posB))
-		{
-			bullet->OnCollision();
-		}
-		posA = boxObject.GetWorldTrans();
-		if (BoxColAABB(posA, posB))
-		{
-			bullet->OnCollision();
-		}
-		posA = boxObject2.GetWorldTrans();
-		if (BoxColAABB(posA, posB))
-		{
-			bullet->OnCollision();
-		}
-	}
-	posA = ground.GetWorldTrans();
-	//地面と敵の弾の当たり判定
-	for (const unique_ptr<Enemy>& enemy : enemys)
-	{
-		const list<unique_ptr<EnemyBullet>>& enemyBullet = enemy->GetBullets();
-		for (const unique_ptr<EnemyBullet>& bullet : enemyBullet)
-		{
-			if (BoxColAABB(posA, posB))
-			{
-				bullet->OnCollision();
-			}
-			posA = boxObject.GetWorldTrans();
-			if (BoxColAABB(posA, posB))
-			{
-				bullet->OnCollision();
-			}
-			posA = boxObject2.GetWorldTrans();
 			if (BoxColAABB(posA, posB))
 			{
 				bullet->OnCollision();
 			}
 		}
+		//地面と敵の弾の当たり判定
+		for (const unique_ptr<Enemy>& enemy : enemys)
+		{
+			const list<unique_ptr<EnemyBullet>>& enemyBullet = enemy->GetBullets();
+			for (const unique_ptr<EnemyBullet>& bullet : enemyBullet)
+			{
+				if (BoxColAABB(posA, posB))
+				{
+					bullet->OnCollision();
+				}
+			}
+		}
 	}
+}
 
-	for (const unique_ptr<Enemy>& enemy : enemys)
+void GameScene::CheckPlayerAllCollision()
+{
+	WorldTransform posA;
+	WorldTransform posB;
+	for (const unique_ptr<BoxObj>& object : gManager.GetObjects())
 	{
-		posA = enemy->GetWorldTrans();
-
-		posB = boxObject.GetWorldTrans();
+		posB = object->GetWorldTrans();
+		player_.CheckHitBox(posB);
+	}
+	for (const unique_ptr<Item>& item : iManager.GetObjects())
+	{
+		posA = player_.GetWorldTrans();
+		posB = item->GetWorldTrans();
 		if (BoxColAABB(posA, posB))
 		{
-			enemy->Back(posB);
-		}
-
-		posB = boxObject2.GetWorldTrans();
-		if (BoxColAABB(posA, posB))
-		{
-			enemy->Back(posB);
+			player_.StockPlus();
+			item->Erase();
 		}
 	}
+}
+
+void GameScene::CheckEnemyAllCollision()
+{
+	WorldTransform posA;
+	WorldTransform posB;
+
+	const list<unique_ptr<Enemy>>& enemys = enemyManager->enemys;
 
 	//敵の移動制御
 	//プレイヤーの周りに透明な球を配置して、それに当たるまで
@@ -328,7 +332,7 @@ void GameScene::CheckAllCollision()
 		posA = enemy->GetWorldTrans();
 		posB = player_.GetWorldTrans();
 
-		if (SphereCol(posA.translation_, posB.translation_, 30.0f, posB.scale_.x))
+		if (SphereCol(posA.translation_, posB.translation_, 10.0f, posB.scale_.x))
 		{
 			enemy->PhaseChange(Phase::Leave);
 		}
@@ -337,19 +341,16 @@ void GameScene::CheckAllCollision()
 			enemy->PhaseChange(Phase::Approach);
 		}
 	}
-}
 
-void GameScene::CheckPlayerAllCollision()
-{
-	WorldTransform posB;
-
-	posB = boxObject.GetWorldTrans();
-	player_.CheckHitBox(posB);
-
-	posB = boxObject2.GetWorldTrans();
-	player_.CheckHitBox(posB);
-
-	posB = ground.GetWorldTrans();
-	player_.CheckHitBox(posB);
-
+	for (const unique_ptr<Enemy>& enemy : enemys)
+	{
+		posA = enemy->GetWorldTrans();
+		for (const unique_ptr<BoxObj>& object : gManager.GetObjects())
+		{
+			if (BoxColAABB(posA, posB))
+			{
+				enemy->CheckHitBox(posB);
+			}
+		}
+	}
 }

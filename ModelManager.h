@@ -9,4 +9,6 @@ public:
 
 	Model* model_ = nullptr;
 	Model* skydome = nullptr;
+	Model* firewisp = nullptr;
+	Model* player = nullptr;
 };

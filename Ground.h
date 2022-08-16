@@ -7,7 +7,7 @@ class Ground : public object
 public:
 
 	void Initialize();
-	void Initialize(Model* model_, TextureHandle textureHandle_);
+	void Initialize(Model* model_);
 	void Update();
 	void Draw(ViewProjection viewProjection_);
 };

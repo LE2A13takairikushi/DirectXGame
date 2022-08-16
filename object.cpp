@@ -1,6 +1,15 @@
 #include "object.h"
 #include <cassert>
 
+object::object()
+{
+}
+
+object::~object()
+{
+	//delete model_;
+}
+
 WorldTransform object::GetWorldTrans()
 {
 	return worldTransform_;
@@ -15,6 +24,16 @@ void object::LoadModel(Model* model_)
 void object::LoadTexture(TextureHandle textureHandle_)
 {
 	this->textureHandle_ = textureHandle_;
+}
+
+void object::SetPos(Vector3 pos)
+{
+	worldTransform_.translation_ = pos;
+}
+
+void object::SetScale(Vector3 scale)
+{
+	worldTransform_.scale_ = scale;
 }
 
 void object::MatUpdate()

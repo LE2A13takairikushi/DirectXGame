@@ -28,8 +28,11 @@ class Matrix4 {
 	//これを使う際は専用のインスタンスを作った方がいい)
 	Matrix4 MatrixUint();
 
+	//横ベクトルを抽出する
 	Vector3 ExtractAxisX();
+	//上方向ベクトルを抽出する
 	Vector3 ExtractAxisY();
+	//正面ベクトルを抽出する
 	Vector3 ExtractAxisZ();
 
 	Matrix4& operator *=(const Matrix4& m2);

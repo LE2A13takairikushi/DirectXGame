@@ -12,7 +12,6 @@
 #include "WinApp.h"
 #include "Vector3.h"
 #include "Player.h"
-#include "Ground.h"
 #include "Utill.h"
 
 #include "EnemyManager.h"
@@ -21,7 +20,9 @@
 #include "Skydome.h"
 #include "FPSfix.h"
 
-#include "BoxObj.h"
+#include "GroundManager.h"
+#include "ItemManager.h"
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -76,10 +77,9 @@ private: // メンバ変数
 	EnemyManager* enemyManager;
 	
 	//オブジェクト
-	Ground ground;
 	Skydome skydome;
-	BoxObj boxObject;
-	BoxObj boxObject2;
+	GroundManager gManager;
+	ItemManager iManager;
 
 	//描画系
 	Sprite *sprite = nullptr;
@@ -94,4 +94,5 @@ private: // メンバ変数
 	
 	void CheckAllCollision();
 	void CheckPlayerAllCollision();
+	void CheckEnemyAllCollision();
 };
