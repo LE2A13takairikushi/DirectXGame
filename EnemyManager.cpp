@@ -16,20 +16,20 @@ EnemyManager::~EnemyManager()
 
 void EnemyManager::Initialize(Model* model_)
 {
-	//assert(model_);
+	assert(model_);
 	this->model_ = model_;
 	EnemyPop();
 }
 
 void EnemyManager::EnemyPop()
 {
-	Vector3 popPos;
-	popPos.x = RNG(-30, 30);
-	popPos.y = 10;
-	popPos.z = RNG(-30, 30);
+	Vector3 tempPopPos = popPos;
+	tempPopPos.x += RNG(-30, 30);
+	tempPopPos.y += RNG(0,10);
+	tempPopPos.z += RNG(-30, 30);
 
 	unique_ptr<Enemy> newEnemy = make_unique<Enemy>();
-	newEnemy->Initialize(model_, popPos);
+	newEnemy->Initialize(model_, tempPopPos);
 
 	//“G‚ð“o˜^‚·‚é
 	enemys.push_back(std::move(newEnemy));
@@ -37,11 +37,8 @@ void EnemyManager::EnemyPop()
 
 void EnemyManager::Update(Vector3 PPos)
 {
-	enemys.remove_if([](std::unique_ptr<Enemy>& enemy) {
-		return enemy->IsDead();
-		});
-
 	maxEnemyCount = enemys.size();
+	popPos = PPos;
 
 	popCount++;
 	if (popCount > 120 && maxEnemyCount < MAX_ENEMY)
@@ -53,7 +50,18 @@ void EnemyManager::Update(Vector3 PPos)
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		enemy->Update(PPos);
+		if (enemy->IsDead())
+		{
+			if (eventSlayCount > 0)
+			{
+				eventSlayCount--;
+			}
+		}
 	}
+
+	enemys.remove_if([](std::unique_ptr<Enemy>& enemy) {
+		return enemy->IsDead();
+		});
 }
 
 void EnemyManager::Draw(ViewProjection viewProjection_)
@@ -61,5 +69,14 @@ void EnemyManager::Draw(ViewProjection viewProjection_)
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		enemy->Draw(viewProjection_);
+	}
+}
+
+void EnemyManager::EventStart()
+{
+	for (int i = 0; i < 10; i++)
+	{
+		EnemyPop();
+		eventSlayCount++;
 	}
 }

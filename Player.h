@@ -31,15 +31,13 @@ public:
 	void UpdateMatrixAndMove();
 	void Draw(ViewProjection viewProjection_);
 
-	void JumpReady();
-
 	void CheckHitBox(WorldTransform box);
+
+	void JumpReady();
 
 	void StockPlus();
 
 	bool isJumpCheck = false;
-	bool hitGround = false;
-	bool hitCeiling = false;
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 
@@ -48,6 +46,9 @@ private:
 	WorldTransform prevPos;
 
 	WorldTransform modelTransform;
+
+	bool hitGround = false;
+	bool hitCeiling = false;
 
 	//ˆÚ“®‚µ‚½’l
 	Vector3 move = {0,0,0};

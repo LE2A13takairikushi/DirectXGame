@@ -7,5 +7,10 @@ public:
 	void Initialize(Model* model_);
 	void Update();
 	void Draw(ViewProjection viewProjection);
+
+	bool GetCheckUpdate();
+
+private:
+	bool isCheckPointUpdate = false;
 };
 

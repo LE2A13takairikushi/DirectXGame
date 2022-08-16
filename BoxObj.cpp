@@ -16,3 +16,8 @@ void BoxObj::Draw(ViewProjection viewProjection)
 {
 	model_->Draw(worldTransform_, viewProjection,textureHandle_);
 }
+
+bool BoxObj::GetCheckUpdate()
+{
+	return isCheckPointUpdate;
+}

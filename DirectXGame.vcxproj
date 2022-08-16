@@ -104,6 +104,8 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
     <ClCompile Include="EnemyManager.cpp" />
+    <ClCompile Include="EventManager.cpp" />
+    <ClCompile Include="EventObject.cpp" />
     <ClCompile Include="FPSfix.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="GroundManager.cpp" />
@@ -149,6 +151,8 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBullet.h" />
     <ClInclude Include="EnemyManager.h" />
+    <ClInclude Include="EventManager.h" />
+    <ClInclude Include="EventObject.h" />
     <ClInclude Include="FPSfix.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="GroundManager.h" />

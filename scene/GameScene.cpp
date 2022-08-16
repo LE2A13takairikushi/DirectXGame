@@ -75,6 +75,8 @@ void GameScene::Initialize() {
 
 	iManager.Initialize(modelManager->model_);
 
+	eventManager.Initialize(modelManager->model_);
+
 	/*ground.Initialize(modelManager->model_);
 	ground.SetPos({ 100.0f,10.0f,100.0f });
 	ground.SetScale({ 0,-20.0f,0 });
@@ -98,14 +100,7 @@ void GameScene::Update() {
 	
 	gManager.Update();
 	iManager.Update();
-	/*ground.Update();
-
-	boxObject.Update();
-	boxObject2.Update();*/
-
-	//地面との当たり判定
-	
-	//player_.isJumpCheck = BoxColAABB(player_.GetWorldTrans(), ground.GetWorldTrans());
+	eventManager.Update();
 
 	player_.Update();
 	
@@ -148,11 +143,6 @@ void GameScene::Update() {
 	}
 
 	viewProjection_.UpdateMatrix();
-
-	/*debugText_->SetPos(50, 50);
-	debugText_->Printf("fps:%f",fpsFix.fps);
-	debugText_->SetPos(50, 70);
-	debugText_->Printf("frameTime:%f",fpsFix.frameTime);*/
 }
 
 void GameScene::Draw() {
@@ -187,8 +177,8 @@ void GameScene::Draw() {
 	skydome.Draw(viewProjection_);
 
 	gManager.Draw(viewProjection_);
-	
 	iManager.Draw(viewProjection_);
+	eventManager.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
@@ -300,6 +290,9 @@ void GameScene::CheckPlayerAllCollision()
 {
 	WorldTransform posA;
 	WorldTransform posB;
+	
+	posA = player_.GetWorldTrans();
+	
 	for (const unique_ptr<BoxObj>& object : gManager.GetObjects())
 	{
 		posB = object->GetWorldTrans();
@@ -307,12 +300,34 @@ void GameScene::CheckPlayerAllCollision()
 	}
 	for (const unique_ptr<Item>& item : iManager.GetObjects())
 	{
-		posA = player_.GetWorldTrans();
 		posB = item->GetWorldTrans();
 		if (BoxColAABB(posA, posB))
 		{
 			player_.StockPlus();
 			item->Erase();
+		}
+	}
+	for (const unique_ptr<EventObject>& eventObj : eventManager.GetObjects())
+	{
+		posB = eventObj->GetWorldTrans();
+		//ボックスに当たったらイベントを開始する
+		if (BoxColAABB(posA, posB) && eventObj->IsEvent() == false)
+		{
+			enemyManager->EventStart();
+			gManager.EventStart(posA.translation_);
+			eventObj->Start();
+		}
+		//イベント中なら敵が倒したかをカウントする
+		if (eventObj->IsEvent())
+		{
+			eventObj->eventCount = enemyManager->GetEventCount();
+		}
+		//イベントが終了したら
+		if (eventObj->eventCount <= 0 && eventObj->IsEvent())
+		{
+			//周りの壁を消す
+			gManager.EventEnd();
+			eventObj->Erase();
 		}
 	}
 }

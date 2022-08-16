@@ -18,9 +18,16 @@ public:
 
 	Vector3 GetSpawnPos();
 	void SetSpawnPos(Vector3 pos,float yScale);
+	void SetBox(Vector3 pos, Vector3 scale);
+	void EventSetBox(Vector3 pos, Vector3 scale);
+	void EventStart(Vector3 playerPos);
+	void EventEnd();
 
 private:
 	std::list <std::unique_ptr<BoxObj>> Objects;
+
+	std::list <std::unique_ptr<BoxObj>> eventObjects;
+
 	Model* model_ = nullptr;
 	Vector3 spawnPos = { 0,20,0 };
 };
