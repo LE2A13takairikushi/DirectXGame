@@ -115,6 +115,7 @@
     <ClCompile Include="math\Vector3.cpp" />
     <ClCompile Include="Matrix4.cpp" />
     <ClCompile Include="ModelManager.cpp" />
+    <ClCompile Include="MoveBox.cpp" />
     <ClCompile Include="MyMath.cpp" />
     <ClCompile Include="MyWorldTransform.cpp" />
     <ClCompile Include="object.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="math\Vector4.h" />
     <ClInclude Include="ModelManager.h" />
+    <ClInclude Include="MoveBox.h" />
     <ClInclude Include="MyMath.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="Player.h" />

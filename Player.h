@@ -25,7 +25,7 @@ public:
 	//è„ï˚å¸ÉxÉNÉgÉã
 	Vector3 upVec = { 0,1,0 };
 
-	void Initialize(Model* model_);
+	void Initialize(Model* model_,Model* bodyModel, Model* taiyaModel);
 	void SetSpawnPos(Vector3 pos);
 	void Update();
 	void UpdateMatrixAndMove();
@@ -73,6 +73,9 @@ private:
 	float gravity = 0.01f;
 
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
+
+	Model* bodyModel = nullptr;
+	Model* taiyaModel = nullptr;
 
 	void Move();
 	void InputMove();

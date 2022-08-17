@@ -38,7 +38,7 @@ void GameScene::Initialize() {
 	modelManager = new ModelManager();
 
 	textureHandle_ = TextureManager::Load("waito.jpg");
-	player_.Initialize(modelManager->model_);
+	player_.Initialize(modelManager->player,modelManager->body,modelManager->taiya);
 
 	enemyManager = new EnemyManager(modelManager->firewisp);
 

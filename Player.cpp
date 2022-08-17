@@ -17,12 +17,15 @@ Player::~Player()
 	delete input_;*/
 }
 
-void Player::Initialize(Model *model_)
+void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 {
 	assert(model_);
+	assert(bodyModel);
 
 	worldTransform_.Initialize();
 	this->model_ = model_;
+	this->bodyModel = bodyModel;
+	this->taiyaModel = taiyaModel;
 	//this->textureHandle_ = textureHandle_;
 
 	//スケールをこっちでいじると計算にいろいろ問題がおこる
@@ -181,10 +184,20 @@ void Player::Draw(ViewProjection viewProjection_)
 	debugText->SetPos(50, 90);
 	debugText->Printf("left %d",stock);
 
+	debugText->SetPos(50, 110);
+	debugText->Printf("rotation_ %f %f %f",
+		worldTransform_.rotation_.x,
+		worldTransform_.rotation_.y,
+		worldTransform_.rotation_.z
+	);
+
 	//worldTransform_.scale_ = { 0.3f,0.3f, 0.3f };
 	//PlayerUpdateMatrix();
 	//worldTransform_.TransferMatrix();
+
 	model_->Draw(modelTransform, viewProjection_);
+	bodyModel->Draw(modelTransform, viewProjection_);
+	taiyaModel->Draw(modelTransform, viewProjection_);
 	//worldTransform_.scale_ = { 1.0f,1.0f, 1.0f };
 
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)

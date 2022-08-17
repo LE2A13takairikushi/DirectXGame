@@ -11,4 +11,6 @@ public:
 	Model* skydome = nullptr;
 	Model* firewisp = nullptr;
 	Model* player = nullptr;
+	Model* body = nullptr;
+	Model* taiya = nullptr;
 };
