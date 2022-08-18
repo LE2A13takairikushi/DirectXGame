@@ -103,6 +103,7 @@
     <ClCompile Include="Collsion.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
+    <ClCompile Include="enemyEventManager.cpp" />
     <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="EventObject.cpp" />
@@ -111,11 +112,11 @@
     <ClCompile Include="GroundManager.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemManager.cpp" />
+    <ClCompile Include="JumpEventManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Vector3.cpp" />
     <ClCompile Include="Matrix4.cpp" />
     <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="MoveBox.cpp" />
     <ClCompile Include="MyMath.cpp" />
     <ClCompile Include="MyWorldTransform.cpp" />
     <ClCompile Include="object.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="Collsion.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBullet.h" />
+    <ClInclude Include="enemyEventManager.h" />
     <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="EventManager.h" />
     <ClInclude Include="EventObject.h" />
@@ -160,13 +162,13 @@
     <ClInclude Include="input\Input.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemManager.h" />
+    <ClInclude Include="JumpEventManager.h" />
     <ClInclude Include="math\MathUtility.h" />
     <ClInclude Include="math\Matrix4.h" />
     <ClInclude Include="math\Vector2.h" />
     <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="math\Vector4.h" />
     <ClInclude Include="ModelManager.h" />
-    <ClInclude Include="MoveBox.h" />
     <ClInclude Include="MyMath.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="Player.h" />

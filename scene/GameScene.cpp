@@ -75,17 +75,8 @@ void GameScene::Initialize() {
 
 	iManager.Initialize(modelManager->model_);
 
-	eventManager.Initialize(modelManager->model_);
-
-	/*ground.Initialize(modelManager->model_);
-	ground.SetPos({ 100.0f,10.0f,100.0f });
-	ground.SetScale({ 0,-20.0f,0 });
-
-	boxObject.Initialize(modelManager->model_);
-	boxObject.SetPos({ 50.0f, 20.0f, 0.0f });
-
-	boxObject2.Initialize(modelManager->model_);
-	boxObject2.SetPos({ -50.0f, 00.0f, 0.0f });*/
+	enemyEManager.Initialize(modelManager->model_);
+	jEManager.Initialize(modelManager->model_);
 
 	fpsFix.Initialize();
 
@@ -100,7 +91,8 @@ void GameScene::Update() {
 	
 	gManager.Update();
 	iManager.Update();
-	eventManager.Update();
+	enemyEManager.Update();
+	jEManager.Update();
 
 	player_.Update();
 	
@@ -178,7 +170,8 @@ void GameScene::Draw() {
 
 	gManager.Draw(viewProjection_);
 	iManager.Draw(viewProjection_);
-	eventManager.Draw(viewProjection_);
+	enemyEManager.Draw(viewProjection_);
+	jEManager.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
@@ -307,7 +300,7 @@ void GameScene::CheckPlayerAllCollision()
 			item->Erase();
 		}
 	}
-	for (const unique_ptr<EventObject>& eventObj : eventManager.GetObjects())
+	for (const unique_ptr<EventObject>& eventObj : enemyEManager.GetObjects())
 	{
 		posB = eventObj->GetWorldTrans();
 		//ボックスに当たったらイベントを開始する
@@ -315,7 +308,7 @@ void GameScene::CheckPlayerAllCollision()
 		{
 			enemyManager->EventStart();
 			gManager.EventStart(posA.translation_);
-			eventObj->Start();
+			eventObj->EventStart();
 		}
 		//イベント中なら敵が倒したかをカウントする
 		if (eventObj->IsEvent())
@@ -328,6 +321,20 @@ void GameScene::CheckPlayerAllCollision()
 			//周りの壁を消す
 			gManager.EventEnd();
 			eventObj->Erase();
+		}
+	}
+
+	for (const unique_ptr<EventObject>& eventObj : jEManager.GetObjects())
+	{
+		posB = eventObj->GetWorldTrans();
+		if (BoxColAABB(posA, posB) && eventObj->IsEvent() == false)
+		{
+			player_.EnforceJumpOnCol();
+			eventObj->EventStart();
+		}
+		if (player_.isJumpCheck)
+		{
+			eventObj->EventEnd();
 		}
 	}
 }

@@ -23,7 +23,8 @@
 #include "GroundManager.h"
 #include "ItemManager.h"
 
-#include "EventManager.h"
+#include "enemyEventManager.h"
+#include "JumpEventManager.h"
 
 /// <summary>
 /// ゲームシーン
@@ -82,7 +83,9 @@ private: // メンバ変数
 	Skydome skydome;
 	GroundManager gManager;
 	ItemManager iManager;
-	EventManager eventManager;
+
+	enemyEventManager enemyEManager;
+	JumpEventManager jEManager;
 
 	//描画系
 	Sprite *sprite = nullptr;

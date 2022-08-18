@@ -37,6 +37,9 @@ public:
 
 	void StockPlus();
 
+	//強制ジャンプイベント用
+	void EnforceJumpOnCol();
+
 	bool isJumpCheck = false;
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }

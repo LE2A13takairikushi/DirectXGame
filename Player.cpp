@@ -26,12 +26,6 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	this->model_ = model_;
 	this->bodyModel = bodyModel;
 	this->taiyaModel = taiyaModel;
-	//this->textureHandle_ = textureHandle_;
-
-	//スケールをこっちでいじると計算にいろいろ問題がおこる
-	//モデル色々するのめんどくさいしプレイヤーをどうするか問題になりそう
-	//あとはモデル用のワールドトランスフォームを作るべきとか？
-
 }
 
 void Player::SetSpawnPos(Vector3 pos)
@@ -73,10 +67,6 @@ void Player::Update()
 	{
 		bullet->Update();
 	}
-
-	//移動した値を足す処理
-
-
 }
 
 void Player::UpdateMatrixAndMove()
@@ -191,14 +181,14 @@ void Player::Draw(ViewProjection viewProjection_)
 		worldTransform_.rotation_.z
 	);
 
-	//worldTransform_.scale_ = { 0.3f,0.3f, 0.3f };
-	//PlayerUpdateMatrix();
-	//worldTransform_.TransferMatrix();
+	debugText->SetPos(50, 130);
+	debugText->Printf("jumpSpd %f",
+		jumpSpd
+	);
 
 	model_->Draw(modelTransform, viewProjection_);
 	bodyModel->Draw(modelTransform, viewProjection_);
 	taiyaModel->Draw(modelTransform, viewProjection_);
-	//worldTransform_.scale_ = { 1.0f,1.0f, 1.0f };
 
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
@@ -311,4 +301,9 @@ void Player::CheckHitBox(WorldTransform box)
 void Player::StockPlus()
 {
 	stock += 1;
+}
+
+void Player::EnforceJumpOnCol()
+{
+	jumpSpd += 2.0f;
 }

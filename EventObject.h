@@ -9,16 +9,16 @@ public:
 	void Draw(ViewProjection view);
 
 	bool IsDead() const { return isDead; };
-	bool IsEvent() {return isEvent;	};
+	bool IsEvent() { return isEvent;	};
 
 	void Erase() { isDead = true; };
-	void Start() { isEvent = true; };
+	void EventStart() { isEvent = true; };
+	void EventEnd() { isEvent = false; };
 
 	int eventCount = 0;
 
 private:
 	bool isDead = false;
-
 	bool isEvent = false;
 
 };
