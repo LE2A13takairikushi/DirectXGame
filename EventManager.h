@@ -6,7 +6,7 @@
 class EventManager
 {
 public:
-	void Initialize(Model* model_);
+	void Initialize(Model* model_, TextureHandle tex = 0);
 	void Update();
 	void Draw(ViewProjection viewProjection_);
 
@@ -19,5 +19,6 @@ protected:
 	std::list <std::unique_ptr<EventObject>> Objects;
 
 	Model* model_ = nullptr;
+	TextureHandle tex = 0;
 };
 

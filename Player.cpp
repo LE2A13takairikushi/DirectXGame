@@ -228,10 +228,14 @@ void Player::JumpReady()
 	isJumpCheck = true;
 }
 
-void Player::CheckHitBox(WorldTransform box)
+bool Player::CheckHitBox(WorldTransform box)
 {
-
-	//yhan
+	//スケールが全て0なら判定をしない
+	if (box.scale_.x == 0 && box.scale_.y == 0 && box.scale_.z == 0)
+	{
+		return false;
+	}
+	//天井と地面の当たり判定用
 	WorldTransform tempBox;
 	tempBox = worldTransform_;
 	tempBox.translation_ += move;
@@ -296,6 +300,13 @@ void Player::CheckHitBox(WorldTransform box)
 			}
 		}
 	}
+
+	if (BoxColAABB(tempBox, box))
+	{
+		return hitGround;
+	}
+	return false;
+
 }
 
 void Player::StockPlus()

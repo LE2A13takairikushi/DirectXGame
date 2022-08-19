@@ -24,5 +24,8 @@ protected:
 	WorldTransform worldTransform_;
 	Model* model_ = nullptr;
 	TextureHandle textureHandle_;
+
+	Vector3 initScale = { 0,0,0 };
+	Vector3 initPos = { 0,0,0 };
 };
 

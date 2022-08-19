@@ -4,9 +4,11 @@
 class EventObject : public object
 {
 public:
-	void Initialize(Model* model_);
+	void Initialize(Model* model_,TextureHandle tex = 0);
 	void Update();
 	void Draw(ViewProjection view);
+
+	void LoadTexture(TextureHandle tex);
 
 	bool IsDead() const { return isDead; };
 	bool IsEvent() { return isEvent;	};
@@ -15,11 +17,22 @@ public:
 	void EventStart() { isEvent = true; };
 	void EventEnd() { isEvent = false; };
 
-	int eventCount = 0;
+	void CountUp();
+	void CountDown();
+
+	int GetEventCount() { return eventCount; };
+	void SetEventCount(int count) { eventCount = count; };
+
+	void NotCol();
+	void InitScale();
+	void InitPos();
+
+	void Vibration(float min, float max);
 
 private:
 	bool isDead = false;
 	bool isEvent = false;
 
+	int eventCount = 0;
 };
 

@@ -31,7 +31,7 @@ public:
 	void UpdateMatrixAndMove();
 	void Draw(ViewProjection viewProjection_);
 
-	void CheckHitBox(WorldTransform box);
+	bool CheckHitBox(WorldTransform box);
 
 	void JumpReady();
 

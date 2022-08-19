@@ -77,6 +77,7 @@ void GameScene::Initialize() {
 
 	enemyEManager.Initialize(modelManager->model_);
 	jEManager.Initialize(modelManager->model_);
+	vEManager.Initialize(modelManager->model_);
 
 	fpsFix.Initialize();
 
@@ -93,6 +94,7 @@ void GameScene::Update() {
 	iManager.Update();
 	enemyEManager.Update();
 	jEManager.Update();
+	vEManager.Update();
 
 	player_.Update();
 	
@@ -172,6 +174,7 @@ void GameScene::Draw() {
 	iManager.Draw(viewProjection_);
 	enemyEManager.Draw(viewProjection_);
 	jEManager.Draw(viewProjection_);
+	vEManager.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
@@ -313,10 +316,10 @@ void GameScene::CheckPlayerAllCollision()
 		//イベント中なら敵が倒したかをカウントする
 		if (eventObj->IsEvent())
 		{
-			eventObj->eventCount = enemyManager->GetEventCount();
+			eventObj->SetEventCount(enemyManager->GetEventCount());
 		}
 		//イベントが終了したら
-		if (eventObj->eventCount <= 0 && eventObj->IsEvent())
+		if (eventObj->GetEventCount() <= 0 && eventObj->IsEvent())
 		{
 			//周りの壁を消す
 			gManager.EventEnd();
@@ -335,6 +338,40 @@ void GameScene::CheckPlayerAllCollision()
 		if (player_.isJumpCheck)
 		{
 			eventObj->EventEnd();
+		}
+	}
+	for (const unique_ptr<EventObject>& eventObj : vEManager.GetObjects())
+	{
+		posB = eventObj->GetWorldTrans();
+
+		if (player_.CheckHitBox(posB))
+		{
+			if (eventObj->GetEventCount() <= 60)
+			{
+				eventObj->Vibration(-0.1f, 0.1f);
+			}
+			else
+			{
+				eventObj->Vibration(-0.5f, 0.5f);
+			}
+			eventObj->CountUp();
+			//二秒たったら消す
+			if (eventObj->GetEventCount() >= 120)
+			{
+				eventObj->NotCol();
+			}
+		}
+		else
+		{
+			eventObj->InitPos();
+			if (eventObj->GetEventCount() > 0)
+			{
+				eventObj->CountDown();
+			}
+			if (eventObj->GetEventCount() <= 0)
+			{
+				eventObj->InitScale();
+			}
 		}
 	}
 }

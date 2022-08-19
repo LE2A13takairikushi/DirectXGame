@@ -25,6 +25,7 @@
 
 #include "enemyEventManager.h"
 #include "JumpEventManager.h"
+#include "VanishEventManager.h"
 
 /// <summary>
 /// ゲームシーン
@@ -86,6 +87,7 @@ private: // メンバ変数
 
 	enemyEventManager enemyEManager;
 	JumpEventManager jEManager;
+	VanishEventManager vEManager;
 
 	//描画系
 	Sprite *sprite = nullptr;

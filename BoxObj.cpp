@@ -3,7 +3,7 @@
 void BoxObj::Initialize(Model* model_)
 {
 	LoadModel(model_);
-	LoadTexture(TextureManager::Load("hogeta_white.png"));
+	LoadTexture(TextureManager::Load("brick.png"));
 	worldTransform_.Initialize();
 }
 
@@ -20,4 +20,9 @@ void BoxObj::Draw(ViewProjection viewProjection)
 bool BoxObj::GetCheckUpdate()
 {
 	return isCheckPointUpdate;
+}
+
+void BoxObj::LoadTexture(TextureHandle tex)
+{
+	object::LoadTexture(tex);
 }

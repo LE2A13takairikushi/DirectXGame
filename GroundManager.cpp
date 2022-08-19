@@ -27,6 +27,9 @@ void GroundManager::Initialize(Model* model_)
 	//ŽŸ‚Ì‘ä’n
 	SetBox({ 0,50,200 }, { 100,100,100 });
 
+	SetBox({ 0,180,250 }, { 10,10,10 });
+	SetBox({ 0,200,280 }, { 10,10,10 });
+
 	//ŠK’i
 	SetBox( { 0,30,100 }, { 10,10,10 });
 	SetBox( { 30,50,100 }, { 10,10,10 });
@@ -36,11 +39,11 @@ void GroundManager::Initialize(Model* model_)
 	//‚¿‚å‚Á‚ÆŠë‚È‚¢ŠK’i
 	SetBox({ -120,30,80 }, { 10,10,10 });
 	SetBox({ -140,60,110 }, { 10,10,10 });
-	SetBox({ -140,90,145 }, { 10,10,10 });
+	//SetBox({ -140,90,145 }, { 10,10,10 });
 	SetBox({ -135,90,180 }, { 10,10,10 });
 	SetBox({ -120,120,210 }, { 10,10,10 });
 
-	SetSpawnPos({0,0,0 },10);
+	SetSpawnPos({ 0,300,200 },10);
 }
 
 void GroundManager::EventStart(Vector3 playerPos)

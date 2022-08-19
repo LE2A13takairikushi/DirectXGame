@@ -29,11 +29,13 @@ void object::LoadTexture(TextureHandle textureHandle_)
 void object::SetPos(Vector3 pos)
 {
 	worldTransform_.translation_ = pos;
+	initPos = pos;
 }
 
 void object::SetScale(Vector3 scale)
 {
 	worldTransform_.scale_ = scale;
+	initScale = scale;
 }
 
 void object::MatUpdate()

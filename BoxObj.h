@@ -10,6 +10,8 @@ public:
 
 	bool GetCheckUpdate();
 
+	void LoadTexture(TextureHandle tex);
+
 private:
 	bool isCheckPointUpdate = false;
 };

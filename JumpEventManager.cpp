@@ -2,11 +2,11 @@
 
 void JumpEventManager::Initialize(Model* model_)
 {
-	EventManager::Initialize(model_);
+	EventManager::Initialize(model_, TextureManager::Load("jumpBox.png"));
 	SetObjects();
 }
 
 void JumpEventManager::SetObjects()
 {
-	CreateEventBox({20,30,0},{2,2,2});
+	CreateEventBox({20,20,80},{2,2,2});
 }
