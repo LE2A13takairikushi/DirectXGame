@@ -18,7 +18,6 @@ void EnemyManager::Initialize(Model* model_)
 {
 	assert(model_);
 	this->model_ = model_;
-	EnemyPop();
 }
 
 void EnemyManager::EnemyPop()

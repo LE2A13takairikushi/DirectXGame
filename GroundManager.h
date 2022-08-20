@@ -16,6 +16,10 @@ public:
 		return Objects;
 	};
 
+	const std::list <std::unique_ptr<BoxObj>>& GetEventObjects() {
+		return eventObjects;
+	};
+
 	Vector3 GetSpawnPos();
 	void SetSpawnPos(Vector3 pos,float yScale);
 	void SetBox(Vector3 pos, Vector3 scale);

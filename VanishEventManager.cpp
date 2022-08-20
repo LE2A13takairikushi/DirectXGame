@@ -13,5 +13,11 @@ void VanishEventManager::SetObjects()
 	CreateEventBox({60,30,20},{5,5,5});
 	CreateEventBox({60,30,30},{5,5,5});
 
+	//^‚ñ’†
 	CreateEventBox({ -140,90,145 }, { 10,10,10 });
+
+	//
+	CreateEventBox({ 35,280,230 }, { 10,10,10 });
+	CreateEventBox({ 75,280,230 }, { 10,10,10 });
+	CreateEventBox({ 115,280,230 }, { 10,10,10 });
 }

@@ -82,12 +82,15 @@ private: // メンバ変数
 	
 	//オブジェクト
 	Skydome skydome;
+
+	//イベントを発生させるオブジェクト群
 	GroundManager gManager;
 	ItemManager iManager;
-
 	enemyEventManager enemyEManager;
 	JumpEventManager jEManager;
 	VanishEventManager vEManager;
+
+	EventObject Goal;
 
 	//描画系
 	Sprite *sprite = nullptr;

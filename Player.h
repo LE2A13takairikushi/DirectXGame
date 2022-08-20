@@ -30,12 +30,15 @@ public:
 	void Update();
 	void UpdateMatrixAndMove();
 	void Draw(ViewProjection viewProjection_);
+	void SpriteDraw();
 
 	bool CheckHitBox(WorldTransform box);
 
 	void JumpReady();
 
 	void StockPlus();
+
+	float GetJumpSpd() { return jumpSpd; };
 
 	//強制ジャンプイベント用
 	void EnforceJumpOnCol();
@@ -79,6 +82,8 @@ private:
 
 	Model* bodyModel = nullptr;
 	Model* taiyaModel = nullptr;
+
+	Sprite* newstocks[99] = { nullptr };
 
 	void Move();
 	void InputMove();

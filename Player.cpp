@@ -13,6 +13,7 @@ Player::Player()
 
 Player::~Player()
 {
+	//delete stocks;
 	/*delete debugText;
 	delete input_;*/
 }
@@ -26,6 +27,13 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	this->model_ = model_;
 	this->bodyModel = bodyModel;
 	this->taiyaModel = taiyaModel;
+
+	for (int i = 0; i < 99; i++)
+	{
+		newstocks[i] = Sprite::Create(TextureManager::Load("life.png"), {0,0});
+		newstocks[i]->SetSize({ 100,100 });
+		newstocks[i]->SetPosition({ 0 + (i * 100.0f), 0 });
+	}
 }
 
 void Player::SetSpawnPos(Vector3 pos)
@@ -163,28 +171,32 @@ void Player::Attack()
 
 void Player::Draw(ViewProjection viewProjection_)
 {
-	debugText->SetPos(50, 50);
-	debugText->Printf("move %f %f %f", move.x,move.y,move.z);
-	debugText->SetPos(50, 70);
-	debugText->Printf("translation_ %f %f %f", 
-		worldTransform_.translation_.x,
-		worldTransform_.translation_.y,
-		worldTransform_.translation_.z
-	);
-	debugText->SetPos(50, 90);
-	debugText->Printf("left %d",stock);
+	if (false)
+	{
+		debugText->SetPos(50, 50);
+		debugText->Printf("move %f %f %f", move.x, move.y, move.z);
+		debugText->SetPos(50, 70);
+		debugText->Printf("translation_ %f %f %f",
+			worldTransform_.translation_.x,
+			worldTransform_.translation_.y,
+			worldTransform_.translation_.z
+		);
+		debugText->SetPos(50, 90);
+		debugText->Printf("left %d", stock);
 
-	debugText->SetPos(50, 110);
-	debugText->Printf("rotation_ %f %f %f",
-		worldTransform_.rotation_.x,
-		worldTransform_.rotation_.y,
-		worldTransform_.rotation_.z
-	);
+		debugText->SetPos(50, 110);
+		debugText->Printf("rotation_ %f %f %f",
+			worldTransform_.rotation_.x,
+			worldTransform_.rotation_.y,
+			worldTransform_.rotation_.z
+		);
 
-	debugText->SetPos(50, 130);
-	debugText->Printf("jumpSpd %f",
-		jumpSpd
-	);
+		debugText->SetPos(50, 130);
+		debugText->Printf("jumpSpd %f",
+			jumpSpd
+		);
+
+	}
 
 	model_->Draw(modelTransform, viewProjection_);
 	bodyModel->Draw(modelTransform, viewProjection_);
@@ -193,6 +205,14 @@ void Player::Draw(ViewProjection viewProjection_)
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
 		bullet->Draw(viewProjection_);
+	}
+}
+
+void Player::SpriteDraw()
+{
+	for (int i = 0; i < stock; i++)
+	{
+		newstocks[i]->Draw();
 	}
 }
 
@@ -316,5 +336,6 @@ void Player::StockPlus()
 
 void Player::EnforceJumpOnCol()
 {
+	jumpSpd = 0;
 	jumpSpd += 2.0f;
 }

@@ -5,7 +5,7 @@ using namespace std;
 unique_ptr<Item> ItemCreate(Model* model_, Vector3 pos, Vector3 scale)
 {
 	unique_ptr<Item> newItem = make_unique<Item>();
-	newItem->Initialize(model_,TextureManager::Load("waito.jpg"));
+	newItem->Initialize(model_,TextureManager::Load("life.png"));
 	newItem->SetPos({ pos.x, pos.y, pos.z });
 	newItem->SetScale({ scale.x, scale.y, scale.z });
 	return newItem;
@@ -14,6 +14,7 @@ unique_ptr<Item> ItemCreate(Model* model_, Vector3 pos, Vector3 scale)
 void ItemManager::Initialize(Model* model_)
 {
 	Items.push_back(std::move(ItemCreate(model_, { -140,150,145 }, { 3,3,3 })));
+	Items.push_back(std::move(ItemCreate(model_, { 100,323,230 }, { 3,3,3 })));
 }
 
 void ItemManager::Update()

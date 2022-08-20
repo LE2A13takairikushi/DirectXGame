@@ -72,17 +72,18 @@ void GameScene::Initialize() {
 	skydome.Initialize(modelManager->skydome);
 
 	gManager.Initialize(modelManager->model_);
-
 	iManager.Initialize(modelManager->model_);
-
 	enemyEManager.Initialize(modelManager->model_);
 	jEManager.Initialize(modelManager->model_);
 	vEManager.Initialize(modelManager->model_);
 
+	Goal.Initialize(modelManager->model_,TextureManager::Load("goal.png"));
+	Goal.SetPos({ 200,300,200 });
+	Goal.SetScale({ 8, 8, 8 });
+
 	fpsFix.Initialize();
 
 	player_.SetSpawnPos(gManager.GetSpawnPos());
-
 }
 
 void GameScene::Update() {
@@ -95,6 +96,8 @@ void GameScene::Update() {
 	enemyEManager.Update();
 	jEManager.Update();
 	vEManager.Update();
+
+	Goal.Update();
 
 	player_.Update();
 	
@@ -152,7 +155,7 @@ void GameScene::Draw() {
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
 	
-
+	
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -175,6 +178,8 @@ void GameScene::Draw() {
 	enemyEManager.Draw(viewProjection_);
 	jEManager.Draw(viewProjection_);
 	vEManager.Draw(viewProjection_);
+
+	Goal.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
@@ -203,6 +208,7 @@ void GameScene::Draw() {
 	{
 		sprite->Draw();
 	}*/
+	player_.SpriteDraw();
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
@@ -294,6 +300,11 @@ void GameScene::CheckPlayerAllCollision()
 		posB = object->GetWorldTrans();
 		player_.CheckHitBox(posB);
 	}
+	for (const unique_ptr<BoxObj>& object : gManager.GetEventObjects())
+	{
+		posB = object->GetWorldTrans();
+		player_.CheckHitBox(posB);
+	}
 	for (const unique_ptr<Item>& item : iManager.GetObjects())
 	{
 		posB = item->GetWorldTrans();
@@ -373,6 +384,14 @@ void GameScene::CheckPlayerAllCollision()
 				eventObj->InitScale();
 			}
 		}
+	}
+
+	//ゴール時の処理
+	//ゴールしたらスタート地点に戻す
+	posB = Goal.GetWorldTrans();
+	if (BoxColAABB(posA, posB))
+	{
+		player_.SetSpawnPos(gManager.GetSpawnPos());
 	}
 }
 

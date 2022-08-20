@@ -8,6 +8,7 @@ void enemyEventManager::Initialize(Model* model_)
 
 void enemyEventManager::SetObjects()
 {
-	CreateEventBox( { 0, 15, 60 }, {2.0f,2.0f,2.0f});
-	CreateEventBox({ 0,155,200 }, { 2.0f,2.0f,2.0f });
+	CreateEventBox({ 100,160,160 }, {2.0f,2.0f,2.0f});
+	CreateEventBox({ -5,190,200 }, { 2.0f,2.0f,2.0f });
+	//CreateEventBox({ 0,155,200 }, { 2.0f,2.0f,2.0f });
 }
