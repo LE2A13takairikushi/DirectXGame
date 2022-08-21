@@ -4,13 +4,24 @@
 
 using namespace std;
 
-void Enemy::Initialize(Model* model_,Vector3 popPos)
+Enemy::Enemy()
+{
+}
+
+Enemy::~Enemy()
+{
+	
+}
+
+void Enemy::Initialize(Model* model_, Model* partModel,TextureHandle tex, Vector3 popPos)
 {
 	worldTransform_.Initialize();
 	this->model_ = model_;
 	//this->textureHandle_ = TextureManager::Load("enemy.png");;
 
 	worldTransform_.translation_ = popPos;
+	pManager.Initialize(partModel, tex);
+	
 }
 
 void Enemy::Update(Vector3 pPos)
@@ -20,6 +31,8 @@ void Enemy::Update(Vector3 pPos)
 		});
 
 	Attack();
+
+	pManager.Update(worldTransform_.translation_);
 
 	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
 	{
@@ -67,10 +80,15 @@ void Enemy::Draw(ViewProjection viewProjection_)
 		bullet->Draw(viewProjection_);
 	}
 
-	debugText->SetPos(50, 200);
-	debugText->Printf("kakudo %f", pdegree);
-	debugText->SetPos(50, 230);
-	debugText->Printf("moveVec %f %f %f", moveVec.x, moveVec.y, moveVec.z);
+	pManager.Draw(viewProjection_);
+
+	if (false)
+	{
+		debugText->SetPos(50, 200);
+		debugText->Printf("kakudo %f", pdegree);
+		debugText->SetPos(50, 230);
+		debugText->Printf("moveVec %f %f %f", moveVec.x, moveVec.y, moveVec.z);
+	}
 }
 
 void Enemy::OnCollision()

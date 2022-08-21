@@ -5,6 +5,8 @@
 
 using namespace std;
 
+static const float InitMoveSpd = 0.11f;
+
 Player::Player()
 {
 	worldTransform_.Initialize();
@@ -52,7 +54,7 @@ void Player::Update()
 		});
 
 	modelTransform = worldTransform_;
-	
+
 
 	//前回のフレームの座標を保存
 	prevPos = worldTransform_;
@@ -61,6 +63,7 @@ void Player::Update()
 	Move();
 
 	//視点を正面に向ける
+
 	if (input_->PushKey(DIK_R))
 	{
 		verticalRotation = 0;
@@ -92,7 +95,6 @@ void Player::InputMove()
 	move.x += (moveVec.x * moveSpeed) * input_->PushKey(DIK_W);
 	move.z += (moveVec.z * moveSpeed) * input_->PushKey(DIK_W);
 
-	moveVec.normalize();
 	move.x += (moveVec.x * moveSpeed) * -input_->PushKey(DIK_S);
 	move.z += (moveVec.z * moveSpeed) * -input_->PushKey(DIK_S);
 
@@ -100,7 +102,6 @@ void Player::InputMove()
 	move.x += (sideVec.x * moveSpeed) * input_->PushKey(DIK_D);
 	move.z += (sideVec.z * moveSpeed) * input_->PushKey(DIK_D);
 
-	sideVec.normalize();
 	move.x += (sideVec.x * moveSpeed) * -input_->PushKey(DIK_A);
 	move.z += (sideVec.z * moveSpeed) * -input_->PushKey(DIK_A);
 }
@@ -108,11 +109,38 @@ void Player::InputMove()
 void Player::Move()
 {
 	//操作は混同すると大変そうなので、移動、ジャンプ、座標更新くらいで関数にしたい
-
 	//移動値の初期化
+	
 	move = { 0,0,0 };
 
-	InputMove();
+	if (moveSpeed <= InitMoveSpd)
+	{
+		InputMove();
+		tempMoveVec = { 0,0,0 };
+	}
+	else
+	{
+		move.x += tempMoveVec.x * moveSpeed;
+		move.z += tempMoveVec.z * moveSpeed;
+	}
+
+	if (input_->TriggerKey(DIK_LSHIFT) && dashCoolTime <= 0)
+	{
+		moveSpeed = 1.0f;
+		tempMoveVec = moveVec;
+
+		dashCoolTime = 180;
+	}
+
+	oldMoveSpd = moveSpeed;
+	if (moveSpeed > InitMoveSpd)
+	{
+		moveSpeed -= 0.01f;
+	}
+	if (dashCoolTime > 0)
+	{
+		dashCoolTime--;
+	}
 
 	//ジャンプする処理
 	if (input_->TriggerKey(DIK_SPACE) && isJumpCheck)
@@ -185,16 +213,30 @@ void Player::Draw(ViewProjection viewProjection_)
 		debugText->Printf("left %d", stock);
 
 		debugText->SetPos(50, 110);
-		debugText->Printf("rotation_ %f %f %f",
-			worldTransform_.rotation_.x,
-			worldTransform_.rotation_.y,
-			worldTransform_.rotation_.z
-		);
-
+		debugText->Printf("movespd %f",
+			moveSpeed);
 		debugText->SetPos(50, 130);
-		debugText->Printf("jumpSpd %f",
-			jumpSpd
+		debugText->Printf("moveVec %f %f %f",
+			moveVec.x, moveVec.y, moveVec.z
 		);
+		debugText->SetPos(50, 150);
+		debugText->Printf("sideVec %f %f %f",
+			sideVec.x, sideVec.y, sideVec.z
+		);
+		debugText->SetPos(50, 170);
+		debugText->Printf("tempMoveVec %f %f %f",
+			tempMoveVec.x, tempMoveVec.y, tempMoveVec.z
+		);
+		debugText->SetPos(50, 190);
+		debugText->Printf("tempSideVec %f %f %f",
+			tempSideVec.x, tempSideVec.y, tempSideVec.z
+		);
+		
+
+	/*	debugText->SetPos(50, 130);
+		debugText->Printf("tempmove %f %f %f",
+			tempMove.x, tempMove.y, tempMove.z
+		);*/
 
 	}
 
@@ -212,7 +254,7 @@ void Player::SpriteDraw()
 {
 	for (int i = 0; i < stock; i++)
 	{
-		newstocks[i]->Draw();
+		//newstocks[i]->Draw();
 	}
 }
 
@@ -275,6 +317,13 @@ bool Player::CheckHitBox(WorldTransform box)
 			move.y -= jumpSpd;
 			JumpReady();
 		}
+
+		if ((tempMoveVec.x != 0 && tempMoveVec.z != 0) && hitGround == 0)
+		{
+			move.x -= (tempMoveVec.x * oldMoveSpd);
+			move.z -= (tempMoveVec.z * oldMoveSpd);
+		}
+
 		if (input_->PushKey(DIK_W))
 		{
 			WorldTransform moveBox;
@@ -282,8 +331,8 @@ bool Player::CheckHitBox(WorldTransform box)
 			moveBox.translation_ += move;
 			if (BoxColAABB(moveBox, box))
 			{
-				move.x -= (moveVec.x * moveSpeed);
-				move.z -= (moveVec.z * moveSpeed);
+				move.x -= (moveVec.x * oldMoveSpd);
+				move.z -= (moveVec.z * oldMoveSpd);
 			}
 		}
 		if (input_->PushKey(DIK_S))
@@ -293,8 +342,8 @@ bool Player::CheckHitBox(WorldTransform box)
 			moveBox.translation_ += move;
 			if (BoxColAABB(moveBox, box))
 			{
-				move.x -= (-moveVec.x * moveSpeed);
-				move.z -= (-moveVec.z * moveSpeed);
+				move.x -= (-moveVec.x * oldMoveSpd);
+				move.z -= (-moveVec.z * oldMoveSpd);
 			}
 		}
 		if (input_->PushKey(DIK_D))
@@ -304,8 +353,8 @@ bool Player::CheckHitBox(WorldTransform box)
 			moveBox.translation_ += move;
 			if (BoxColAABB(moveBox, box))
 			{
-				move.x -= (sideVec.x * moveSpeed);
-				move.z -= (sideVec.z * moveSpeed);
+				move.x -= (sideVec.x * oldMoveSpd);
+				move.z -= (sideVec.z * oldMoveSpd);
 			}
 		}
 		if (input_->PushKey(DIK_A))
@@ -315,8 +364,8 @@ bool Player::CheckHitBox(WorldTransform box)
 			moveBox.translation_ += move;
 			if (BoxColAABB(moveBox, box))
 			{
-				move.x -= (-sideVec.x * moveSpeed);
-				move.z -= (-sideVec.z * moveSpeed);
+				move.x -= (-sideVec.x * oldMoveSpd);
+				move.z -= (-sideVec.z * oldMoveSpd);
 			}
 		}
 	}

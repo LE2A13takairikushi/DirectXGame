@@ -4,6 +4,8 @@
 #include "EnemyBullet.h"
 #include "DebugText.h"
 
+#include "ParticleManager.h"
+
 enum class Phase {
 	Approach,
 	Leave,
@@ -13,7 +15,9 @@ enum class Phase {
 class Enemy : public object
 {
 public:
-	void Initialize(Model* model_, Vector3 popPos);
+	Enemy();
+	~Enemy();
+	void Initialize(Model* model_, Model* partModel, TextureHandle tex, Vector3 popPos);
 	void Update(Vector3 pPos);
 	void Draw(ViewProjection viewProjection_);
 	void OnCollision();
@@ -55,6 +59,8 @@ private:
 	Vector3 moveVec = { 0,0,0 };
 
 	float pdegree = 0;
+
+	ParticleManager pManager;
 
 	void MoveOpp();
 	void MoveCenter();

@@ -40,7 +40,13 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("waito.jpg");
 	player_.Initialize(modelManager->player,modelManager->body,modelManager->taiya);
 
-	enemyManager = new EnemyManager(modelManager->firewisp);
+	TextureHandle tex = TextureManager::Load("bullet.png");
+
+	enemyManager = new EnemyManager(
+		modelManager->firewisp,
+		modelManager->model_,
+		tex
+	);
 
 	sprite = Sprite::Create(textureHandle_, { 0,0 });
 
@@ -84,6 +90,8 @@ void GameScene::Initialize() {
 	fpsFix.Initialize();
 
 	player_.SetSpawnPos(gManager.GetSpawnPos());
+
+	//particleManager.Initialize();
 }
 
 void GameScene::Update() {
@@ -110,6 +118,12 @@ void GameScene::Update() {
 	enemyManager->Update(player_.GetWorldTrans().translation_);
 
 	CheckAllCollision();
+
+	debugText_->SetPos(50, 50);
+	debugText_->Printf("fps %f", fpsFix.fps);
+
+	//particleManager.Update(player_.GetWorldTrans().translation_);
+
 
 	if (debugCameraMode == false)
 	{
@@ -185,6 +199,8 @@ void GameScene::Draw() {
 
 	enemyManager->Draw(viewProjection_);
 
+	//particleManager.Draw(viewProjection_);
+
 	if (false)
 	{
 		PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(-100, 0, 0), Vector3(100, 0, 0), Vector4(255, 0, 0, 255));
@@ -203,11 +219,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-
-	/*if (BoxColAABB(player_.worldTransform,ground.worldTransform_))
-	{
-		sprite->Draw();
-	}*/
+	
 	player_.SpriteDraw();
 
 	// デバッグテキストの描画
@@ -410,7 +422,7 @@ void GameScene::CheckEnemyAllCollision()
 		posA = enemy->GetWorldTrans();
 		posB = player_.GetWorldTrans();
 
-		if (SphereCol(posA.translation_, posB.translation_, 10.0f, posB.scale_.x))
+		if (SphereCol(posA.translation_, posB.translation_, 30.0f, posB.scale_.x))
 		{
 			enemy->PhaseChange(Phase::Leave);
 		}

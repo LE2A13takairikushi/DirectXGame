@@ -9,7 +9,7 @@ class EnemyManager
 public:
 	std::list<std::unique_ptr<Enemy>> enemys;
 
-	void Initialize(Model *model_);
+	void Initialize(Model *model_, Model* partModel, TextureHandle tex);
 	void EnemyPop();
 	void Update(Vector3 PPos);
 	void Draw(ViewProjection viewProjection_);
@@ -18,7 +18,7 @@ public:
 
 	int GetEventCount() { return eventSlayCount; };
 
-	EnemyManager(Model* model_);
+	EnemyManager(Model* model_, Model* partModel, TextureHandle tex);
 	~EnemyManager();
 
 private:
@@ -30,9 +30,10 @@ private:
 
 	//パソコンが壊れたら嫌なので一応エネミー発生数の上限をつけておく
 	int maxEnemyCount = 0;
-	static const int MAX_ENEMY = 0;
+	static const int MAX_ENEMY = 20;
 
 	Model* model_ = nullptr;
-
+	Model* partModel_ = nullptr;
+	TextureHandle tex = 0;
 };
 

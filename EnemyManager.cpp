@@ -4,9 +4,9 @@
 
 using namespace std;
 
-EnemyManager::EnemyManager(Model* model_)
+EnemyManager::EnemyManager(Model* model_, Model* partModel, TextureHandle tex)
 {
-	Initialize(model_);
+	Initialize(model_, partModel, tex);
 }
 
 EnemyManager::~EnemyManager()
@@ -14,10 +14,12 @@ EnemyManager::~EnemyManager()
 	
 }
 
-void EnemyManager::Initialize(Model* model_)
+void EnemyManager::Initialize(Model* model_, Model* partModel, TextureHandle tex)
 {
 	assert(model_);
 	this->model_ = model_;
+	this->partModel_ = partModel;
+	this->tex = tex;
 }
 
 void EnemyManager::EnemyPop()
@@ -28,7 +30,7 @@ void EnemyManager::EnemyPop()
 	tempPopPos.z += RNG(-30, 30);
 
 	unique_ptr<Enemy> newEnemy = make_unique<Enemy>();
-	newEnemy->Initialize(model_, tempPopPos);
+	newEnemy->Initialize(model_, partModel_,tex,tempPopPos);
 
 	//“G‚ð“o˜^‚·‚é
 	enemys.push_back(std::move(newEnemy));

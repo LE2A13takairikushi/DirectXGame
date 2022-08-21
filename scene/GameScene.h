@@ -27,6 +27,8 @@
 #include "JumpEventManager.h"
 #include "VanishEventManager.h"
 
+//#include "ParticleManager.h"
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -91,6 +93,9 @@ private: // メンバ変数
 	VanishEventManager vEManager;
 
 	EventObject Goal;
+
+	//演出
+	//ParticleManager particleManager;
 
 	//描画系
 	Sprite *sprite = nullptr;

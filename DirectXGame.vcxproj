@@ -120,12 +120,15 @@
     <ClCompile Include="MyMath.cpp" />
     <ClCompile Include="MyWorldTransform.cpp" />
     <ClCompile Include="object.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="Utill.cpp" />
     <ClCompile Include="VanishEventManager.cpp" />
+    <ClCompile Include="WalkEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2d\DebugText.h" />
@@ -172,12 +175,15 @@
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="MyMath.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="Utill.h" />
     <ClInclude Include="VanishEventManager.h" />
+    <ClInclude Include="WalkEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Obj.hlsli" />

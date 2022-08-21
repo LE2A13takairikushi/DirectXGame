@@ -59,8 +59,12 @@ private:
 	//移動した値
 	Vector3 move = {0,0,0};
 
+	//移動方向のベクトル
 	Vector3 moveVec;
 
+	Vector3 tempMoveVec;
+	Vector3 tempSideVec;
+	 
 	Vector3 respawnPos;
 
 	//縦方向の回転角度
@@ -77,6 +81,9 @@ private:
 	float moveSpeed = 0.1f;
 	float jumpSpd = 0.0f;
 	float gravity = 0.01f;
+
+	float oldMoveSpd = 0;
+	int dashCoolTime = 0;
 
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 

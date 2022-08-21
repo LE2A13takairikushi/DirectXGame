@@ -2,7 +2,7 @@
 
 void PlayerBullet::Initialize(Model* model, Vector3 pos,Vector3 velocity)
 {
-	Bullet::Initialize(model, pos);
+	Bullet::Initialize(Model::Create(), pos);
 	velocity_ = velocity;
 	deathTimer = 180;
 }
