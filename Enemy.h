@@ -6,6 +6,7 @@
 
 #include "ParticleManager.h"
 
+
 enum class Phase {
 	Approach,
 	Leave,

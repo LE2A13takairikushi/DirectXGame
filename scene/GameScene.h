@@ -27,7 +27,7 @@
 #include "JumpEventManager.h"
 #include "VanishEventManager.h"
 
-//#include "ParticleManager.h"
+#include "VanishParticleManager.h"
 
 /// <summary>
 /// ゲームシーン
@@ -69,7 +69,6 @@ private: // メンバ変数
 
 	//テクスチャハンドル
 	TextureHandle textureHandle_ = 0;
-	TextureHandle groundTexture = 0;
 
 	//モデル
 	ModelManager *modelManager;
@@ -95,7 +94,7 @@ private: // メンバ変数
 	EventObject Goal;
 
 	//演出
-	//ParticleManager particleManager;
+	VanishParticleManager vpManager;
 
 	//描画系
 	Sprite *sprite = nullptr;

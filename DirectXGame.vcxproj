@@ -128,6 +128,8 @@
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="Utill.cpp" />
     <ClCompile Include="VanishEventManager.cpp" />
+    <ClCompile Include="VanishParticle.cpp" />
+    <ClCompile Include="VanishParticleManager.cpp" />
     <ClCompile Include="WalkEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +185,8 @@
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="Utill.h" />
     <ClInclude Include="VanishEventManager.h" />
+    <ClInclude Include="VanishParticle.h" />
+    <ClInclude Include="VanishParticleManager.h" />
     <ClInclude Include="WalkEnemy.h" />
   </ItemGroup>
   <ItemGroup>

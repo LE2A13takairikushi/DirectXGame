@@ -20,6 +20,7 @@ void EnemyManager::Initialize(Model* model_, Model* partModel, TextureHandle tex
 	this->model_ = model_;
 	this->partModel_ = partModel;
 	this->tex = tex;
+	//vpManager.Initialize(partModel, tex);
 }
 
 void EnemyManager::EnemyPop()
@@ -36,7 +37,7 @@ void EnemyManager::EnemyPop()
 	enemys.push_back(std::move(newEnemy));
 }
 
-void EnemyManager::Update(Vector3 PPos)
+void EnemyManager::Update(Vector3 PPos, VanishParticleManager &vpmanager)
 {
 	maxEnemyCount = enemys.size();
 	popPos = PPos;
@@ -48,6 +49,8 @@ void EnemyManager::Update(Vector3 PPos)
 		popCount = 0;
 	}
 
+	//vpManager.Update();
+
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		enemy->Update(PPos);
@@ -57,6 +60,10 @@ void EnemyManager::Update(Vector3 PPos)
 			{
 				eventSlayCount--;
 			}
+		}
+		if (enemy->IsDead())
+		{
+			vpmanager.CreateParticle(enemy->GetWorldTrans().translation_,{0.5f,0.5f ,0.5f },0.01f);
 		}
 	}
 
@@ -71,6 +78,7 @@ void EnemyManager::Draw(ViewProjection viewProjection_)
 	{
 		enemy->Draw(viewProjection_);
 	}
+	//vpManager.Draw(viewProjection_);
 }
 
 void EnemyManager::EventStart()

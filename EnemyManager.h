@@ -3,6 +3,7 @@
 #include "Model.h"
 #include <memory>
 #include <list>
+#include "VanishParticleManager.h"
 
 class EnemyManager
 {
@@ -11,7 +12,7 @@ public:
 
 	void Initialize(Model *model_, Model* partModel, TextureHandle tex);
 	void EnemyPop();
-	void Update(Vector3 PPos);
+	void Update(Vector3 PPos,VanishParticleManager &vpmanager);
 	void Draw(ViewProjection viewProjection_);
 
 	void EventStart();
@@ -27,6 +28,8 @@ private:
 	int eventSlayCount = 0;
 
 	Vector3 popPos = { 0,0,0 };
+
+	//VanishParticleManager vpManager;
 
 	//パソコンが壊れたら嫌なので一応エネミー発生数の上限をつけておく
 	int maxEnemyCount = 0;

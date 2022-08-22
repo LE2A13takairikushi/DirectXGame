@@ -190,8 +190,13 @@ void Player::Attack()
 
 	velocity *= bulletSpd;
 
+	//”­ËÀ•W‚ğ“ª‚ÌˆÊ’u‚­‚ç‚¢‚É’²®
+	//(è“®‚È‚Ì‚Åƒ‚ƒfƒ‹•Ï‚í‚Á‚½‚ç‡‚í‚È‚­‚È‚é)
+	Vector3 initPos = worldTransform_.translation_;
+	initPos.y += 3;
+
 	unique_ptr<PlayerBullet> newBullet = make_unique<PlayerBullet>();
-	newBullet->Initialize(model_, worldTransform_.translation_,velocity);
+	newBullet->Initialize(model_, initPos,velocity);
 
 	//’e‚ğ“o˜^‚·‚é
 	bullets_.push_back(std::move(newBullet));

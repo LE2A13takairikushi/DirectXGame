@@ -17,7 +17,7 @@ void Bullet::Initialize(Model* model, Vector3 pos)
 
 	worldTransform_.translation_ = pos;
 
-	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
+	worldTransform_.scale_ = { 0.5f, 0.5f, 0.5f };
 	
 }
 

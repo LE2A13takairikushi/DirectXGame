@@ -33,14 +33,12 @@ void GameScene::Initialize() {
 	//マウスを非表示に
 	ShowCursor(false);
 
-	groundTexture = TextureManager::Load("hogeta_white.png");
-
 	modelManager = new ModelManager();
 
 	textureHandle_ = TextureManager::Load("waito.jpg");
 	player_.Initialize(modelManager->player,modelManager->body,modelManager->taiya);
 
-	TextureHandle tex = TextureManager::Load("bullet.png");
+	TextureHandle tex = TextureManager::Load("white.png");
 
 	enemyManager = new EnemyManager(
 		modelManager->firewisp,
@@ -89,9 +87,9 @@ void GameScene::Initialize() {
 
 	fpsFix.Initialize();
 
-	player_.SetSpawnPos(gManager.GetSpawnPos());
+	vpManager.Initialize(modelManager->model_,tex);
 
-	//particleManager.Initialize();
+	player_.SetSpawnPos(gManager.GetSpawnPos());
 }
 
 void GameScene::Update() {
@@ -115,13 +113,14 @@ void GameScene::Update() {
 
 	CheckEnemyAllCollision();
 
-	enemyManager->Update(player_.GetWorldTrans().translation_);
+	vpManager.Update();
+
+	enemyManager->Update(player_.GetWorldTrans().translation_, vpManager);
 
 	CheckAllCollision();
 
 	debugText_->SetPos(50, 50);
 	debugText_->Printf("fps %f", fpsFix.fps);
-
 	//particleManager.Update(player_.GetWorldTrans().translation_);
 
 
@@ -199,6 +198,7 @@ void GameScene::Draw() {
 
 	enemyManager->Draw(viewProjection_);
 
+	vpManager.Draw(viewProjection_);
 	//particleManager.Draw(viewProjection_);
 
 	if (false)
@@ -344,6 +344,11 @@ void GameScene::CheckPlayerAllCollision()
 		//イベントが終了したら
 		if (eventObj->GetEventCount() <= 0 && eventObj->IsEvent())
 		{
+			vpManager.CreateParticle(eventObj->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
+			for (const unique_ptr<BoxObj>& object : gManager.GetEventObjects())
+			{
+				vpManager.CreateParticle(object->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
+			}
 			//周りの壁を消す
 			gManager.EventEnd();
 			eventObj->Erase();
@@ -382,6 +387,7 @@ void GameScene::CheckPlayerAllCollision()
 			if (eventObj->GetEventCount() >= 120)
 			{
 				eventObj->NotCol();
+				vpManager.CreateParticle(eventObj->GetWorldTrans().translation_,{ 3.0f ,3.0f ,3.0f },0.03f);
 			}
 		}
 		else

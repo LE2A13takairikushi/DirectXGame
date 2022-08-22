@@ -21,7 +21,6 @@ void Enemy::Initialize(Model* model_, Model* partModel,TextureHandle tex, Vector
 
 	worldTransform_.translation_ = popPos;
 	pManager.Initialize(partModel, tex);
-	
 }
 
 void Enemy::Update(Vector3 pPos)

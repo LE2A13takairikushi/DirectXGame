@@ -32,10 +32,6 @@ void Particle::Update()
 	{
 		move.y += moveVec.y;
 
-		/*move.x += moveVec.x;
-		
-		move.z += moveVec.z;*/
-
 		if (worldTransform_.scale_.x >= 0)
 		{
 			worldTransform_.scale_.x -= 0.01f;
