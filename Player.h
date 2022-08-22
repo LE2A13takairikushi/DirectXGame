@@ -8,6 +8,8 @@
 #include <memory>
 #include <list>
 
+#include "VanishParticleManager.h"
+
 class Player : public object
 {
 public:
@@ -27,7 +29,7 @@ public:
 
 	void Initialize(Model* model_,Model* bodyModel, Model* taiyaModel);
 	void SetSpawnPos(Vector3 pos);
-	void Update();
+	void Update(VanishParticleManager& vpmanager);
 	void UpdateMatrixAndMove();
 	void Draw(ViewProjection viewProjection_);
 	void SpriteDraw();
@@ -35,8 +37,8 @@ public:
 	bool CheckHitBox(WorldTransform box);
 
 	void JumpReady();
-
 	void StockPlus();
+
 
 	float GetJumpSpd() { return jumpSpd; };
 
@@ -92,7 +94,8 @@ private:
 
 	Sprite* newstocks[99] = { nullptr };
 
-	void Move();
+	void Move(VanishParticleManager& vpmanager);
+	void Dash(VanishParticleManager& vpmanager);
 	void InputMove();
 	void Attack();
 

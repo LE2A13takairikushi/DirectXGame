@@ -9,7 +9,7 @@ public:
 	void Initialize(Model* model, TextureHandle tex);
 	void Update();
 	void Draw(ViewProjection view);
-	void CreateParticle(Vector3 beginPos, Vector3 scale, float scaleSpd);
+	void CreateParticle(Vector3 beginPos, Vector3 initScale, float scaleSpd);
 
 	const std::list<std::unique_ptr<VanishParticle>>& GetParticle() {
 		return particles;

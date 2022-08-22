@@ -44,7 +44,7 @@ void Player::SetSpawnPos(Vector3 pos)
 	respawnPos = pos;
 }
 
-void Player::Update()
+void Player::Update(VanishParticleManager &vpmanager)
 {
 	//弾の削除
 	//弾の方でisDeadが呼ばれたらこっちのリストから消す設計
@@ -60,14 +60,14 @@ void Player::Update()
 	prevPos = worldTransform_;
 
 	//移動とか攻撃とかの入力系
-	Move();
+	Move(vpmanager);
 
 	//視点を正面に向ける
 
-	if (input_->PushKey(DIK_R))
+	/*if (input_->PushKey(DIK_R))
 	{
 		verticalRotation = 0;
-	}
+	}*/
 
 	if (input_->IsTriggerMouse(0))
 	{
@@ -106,7 +106,29 @@ void Player::InputMove()
 	move.z += (sideVec.z * moveSpeed) * -input_->PushKey(DIK_A);
 }
 
-void Player::Move()
+void Player::Dash(VanishParticleManager& vpmanager)
+{
+	if (input_->TriggerKey(DIK_LSHIFT) && dashCoolTime <= 0)
+	{
+		moveSpeed = 1.0f;
+		tempMoveVec = moveVec;
+		vpmanager.CreateParticle(worldTransform_.translation_,
+			{1.5f,1.5f ,1.5f },0.01f);
+		dashCoolTime = 180;
+	}
+
+	oldMoveSpd = moveSpeed;
+	if (moveSpeed > InitMoveSpd)
+	{
+		moveSpeed -= 0.01f;
+	}
+	if (dashCoolTime > 0)
+	{
+		dashCoolTime--;
+	}
+}
+
+void Player::Move(VanishParticleManager& vpmanager)
 {
 	//操作は混同すると大変そうなので、移動、ジャンプ、座標更新くらいで関数にしたい
 	//移動値の初期化
@@ -124,23 +146,8 @@ void Player::Move()
 		move.z += tempMoveVec.z * moveSpeed;
 	}
 
-	if (input_->TriggerKey(DIK_LSHIFT) && dashCoolTime <= 0)
-	{
-		moveSpeed = 1.0f;
-		tempMoveVec = moveVec;
-
-		dashCoolTime = 180;
-	}
-
-	oldMoveSpd = moveSpeed;
-	if (moveSpeed > InitMoveSpd)
-	{
-		moveSpeed -= 0.01f;
-	}
-	if (dashCoolTime > 0)
-	{
-		dashCoolTime--;
-	}
+	//ダッシュ
+	Dash(vpmanager);
 
 	//ジャンプする処理
 	if (input_->TriggerKey(DIK_SPACE) && isJumpCheck)

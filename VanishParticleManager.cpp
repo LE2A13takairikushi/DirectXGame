@@ -30,11 +30,11 @@ void VanishParticleManager::Draw(ViewProjection view)
 	}
 }
 
-void VanishParticleManager::CreateParticle(Vector3 beginPos, Vector3 scale,float scaleSpd)
+void VanishParticleManager::CreateParticle(Vector3 beginPos, Vector3 initScale,float scaleSpd)
 {
 	for (int i = 0; i < Max; i++)
 	{
 		particles.emplace_back(new VanishParticle);
-		particles.back()->Initialize(beginPos, scale, scaleSpd, model_);
+		particles.back()->Initialize(beginPos, initScale, scaleSpd, model_);
 	}
 }

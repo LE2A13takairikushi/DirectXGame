@@ -105,7 +105,7 @@ void GameScene::Update() {
 
 	Goal.Update();
 
-	player_.Update();
+	player_.Update(vpManager);
 	
 	CheckPlayerAllCollision();
 
@@ -344,11 +344,13 @@ void GameScene::CheckPlayerAllCollision()
 		//イベントが終了したら
 		if (eventObj->GetEventCount() <= 0 && eventObj->IsEvent())
 		{
+			//パーティクルを発生
 			vpManager.CreateParticle(eventObj->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
 			for (const unique_ptr<BoxObj>& object : gManager.GetEventObjects())
 			{
 				vpManager.CreateParticle(object->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
 			}
+
 			//周りの壁を消す
 			gManager.EventEnd();
 			eventObj->Erase();

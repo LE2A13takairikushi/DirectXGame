@@ -130,7 +130,6 @@
     <ClCompile Include="VanishEventManager.cpp" />
     <ClCompile Include="VanishParticle.cpp" />
     <ClCompile Include="VanishParticleManager.cpp" />
-    <ClCompile Include="WalkEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2d\DebugText.h" />
@@ -187,7 +186,6 @@
     <ClInclude Include="VanishEventManager.h" />
     <ClInclude Include="VanishParticle.h" />
     <ClInclude Include="VanishParticleManager.h" />
-    <ClInclude Include="WalkEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Obj.hlsli" />

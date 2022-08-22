@@ -76,6 +76,12 @@
     <Filter Include="ヘッダー ファイル\Manager">
       <UniqueIdentifier>{63dfa9fc-65a1-49be-8bed-1f767f38e2f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Particle">
+      <UniqueIdentifier>{658b8623-d0dc-415e-b44a-c2f296c3bb36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Particle">
+      <UniqueIdentifier>{895a59f1-796d-4824-bb76-1baf4a427cd1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -171,20 +177,17 @@
     <ClCompile Include="VanishEventManager.cpp">
       <Filter>ソース ファイル\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="WalkEnemy.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="ParticleManager.cpp">
+      <Filter>ソース ファイル\Particle</Filter>
     </ClCompile>
     <ClCompile Include="Particle.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Particle</Filter>
     </ClCompile>
     <ClCompile Include="VanishParticle.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Particle</Filter>
     </ClCompile>
     <ClCompile Include="VanishParticleManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -338,20 +341,17 @@
     <ClInclude Include="VanishEventManager.h">
       <Filter>ヘッダー ファイル\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="WalkEnemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Particle.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Particle</Filter>
     </ClInclude>
     <ClInclude Include="ParticleManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Particle</Filter>
     </ClInclude>
     <ClInclude Include="VanishParticle.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Particle</Filter>
     </ClInclude>
     <ClInclude Include="VanishParticleManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
