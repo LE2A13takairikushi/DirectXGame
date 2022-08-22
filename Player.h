@@ -13,8 +13,6 @@
 class Player : public object
 {
 public:
-	Player();
-	~Player();
 
 	//‚È‚Ü‚Û‚Ådelete‚Å‚«‚È‚¢‚Ì‚ÅŠë‚È‚¢
 	Input* input_ = Input::GetInstance();
@@ -26,6 +24,8 @@ public:
 	Vector3 centerVec = {0,0,0};
 	//ã•ûŒüƒxƒNƒgƒ‹
 	Vector3 upVec = { 0,1,0 };
+
+	void End();
 
 	void Initialize(Model* model_,Model* bodyModel, Model* taiyaModel);
 	void SetSpawnPos(Vector3 pos);
@@ -46,6 +46,7 @@ public:
 	void EnforceJumpOnCol();
 
 	bool isJumpCheck = false;
+	bool IsDash() { return isDash; };
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 
@@ -86,6 +87,7 @@ private:
 
 	float oldMoveSpd = 0;
 	int dashCoolTime = 0;
+	bool isDash = false;
 
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 

@@ -88,7 +88,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 描画終了
 		dxCommon->PostDraw();
 
-		if (input->PushKey(DIK_ESCAPE)) {
+		if (input->TriggerKey(DIK_TAB)) {
 			break;
 		}
 	}

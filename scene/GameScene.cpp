@@ -21,6 +21,8 @@ GameScene::~GameScene() {
 
 	delete debugCamera_;
 	delete sprite;
+	pause.End();
+	player_.End();
 }
 
 void GameScene::Initialize() {
@@ -29,9 +31,6 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
-
-	//マウスを非表示に
-	ShowCursor(false);
 
 	modelManager = new ModelManager();
 
@@ -88,45 +87,49 @@ void GameScene::Initialize() {
 	fpsFix.Initialize();
 
 	vpManager.Initialize(modelManager->model_,tex);
+	pause.Initialize();
 
 	player_.SetSpawnPos(gManager.GetSpawnPos());
 }
 
 void GameScene::Update() {
-	debugCamera_->Update();
-
 	fpsFix.Update();
-	
-	gManager.Update();
-	iManager.Update();
-	enemyEManager.Update();
-	jEManager.Update();
-	vEManager.Update();
 
-	Goal.Update();
+	if (pause.IsMenuOpen() == false)
+	{
+		debugCamera_->Update();
 
-	player_.Update(vpManager);
-	
-	CheckPlayerAllCollision();
+		gManager.Update();
+		iManager.Update();
+		enemyEManager.Update();
+		jEManager.Update();
+		vEManager.Update();
 
-	player_.UpdateMatrixAndMove();
+		Goal.Update();
 
-	CheckEnemyAllCollision();
+		player_.Update(vpManager);
 
-	vpManager.Update();
+		CheckPlayerAllCollision();
 
-	enemyManager->Update(player_.GetWorldTrans().translation_, vpManager);
+		player_.UpdateMatrixAndMove();
 
-	CheckAllCollision();
+		CheckEnemyAllCollision();
+
+		vpManager.Update();
+
+		enemyManager->Update(player_.GetWorldTrans().translation_, vpManager);
+
+		CheckAllCollision();
+
+	}
 
 	debugText_->SetPos(50, 50);
 	debugText_->Printf("fps %f", fpsFix.fps);
-	//particleManager.Update(player_.GetWorldTrans().translation_);
 
+	pause.Update();
 
 	if (debugCameraMode == false)
 	{
-
 		//クォータニオンでは、注視点のオブジェクトの回転量がわかる
 		//これをカメラに入れるには、注視点オブジェクトの正面ベクトルをカメラのベクトルに代入する
 
@@ -137,21 +140,8 @@ void GameScene::Update() {
 
 		viewProjection_.eye = player_.GetWorldTrans().translation_ + (-player_.centerVec.normalize() * length);
 
-
 		viewProjection_.UpdateMatrix();
 	}
-
-	//ニアクリップ、ファークリップの更新の名残
-	if (false)
-	{
-		if (input_->PushKey(DIK_UP)) {
-			viewProjection_.nearZ += 0.1f;
-		}
-		if (input_->PushKey(DIK_DOWN)) {
-			viewProjection_.nearZ -= 0.1f;
-		}
-	}
-
 	viewProjection_.UpdateMatrix();
 }
 
@@ -221,6 +211,7 @@ void GameScene::Draw() {
 	/// </summary>
 	
 	player_.SpriteDraw();
+	pause.MenuDraw();
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
@@ -437,6 +428,10 @@ void GameScene::CheckEnemyAllCollision()
 		else
 		{
 			enemy->PhaseChange(Phase::Approach);
+		}
+		if (BoxColAABB(posA, posB) && player_.IsDash())
+		{
+			enemy->OnCollision();
 		}
 	}
 

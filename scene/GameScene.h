@@ -29,6 +29,8 @@
 
 #include "VanishParticleManager.h"
 
+#include "Pause.h"
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -98,6 +100,7 @@ private: // メンバ変数
 
 	//描画系
 	Sprite *sprite = nullptr;
+	Pause pause;
 
 	FPSfix fpsFix;
 

@@ -7,17 +7,12 @@ using namespace std;
 
 static const float InitMoveSpd = 0.11f;
 
-Player::Player()
+void Player::End()
 {
-	worldTransform_.Initialize();
-	//moveCollisionBox.Initialize();
-}
-
-Player::~Player()
-{
-	//delete stocks;
-	/*delete debugText;
-	delete input_;*/
+	for (int i = 0; i < 99; i++)
+	{
+		delete newstocks[i];
+	}
 }
 
 void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
@@ -108,6 +103,8 @@ void Player::InputMove()
 
 void Player::Dash(VanishParticleManager& vpmanager)
 {
+	//毎フレームダッシュ中か確認する
+	isDash = false;
 	if (input_->TriggerKey(DIK_LSHIFT) && dashCoolTime <= 0)
 	{
 		moveSpeed = 1.0f;
@@ -115,12 +112,21 @@ void Player::Dash(VanishParticleManager& vpmanager)
 		vpmanager.CreateParticle(worldTransform_.translation_,
 			{1.5f,1.5f ,1.5f },0.01f);
 		dashCoolTime = 180;
+		isDash = true;
 	}
 
 	oldMoveSpd = moveSpeed;
 	if (moveSpeed > InitMoveSpd)
 	{
 		moveSpeed -= 0.01f;
+		isDash = true;
+
+		//ダッシュ中にパーティクルを発生させる
+		if (dashCoolTime % 6 == 0)
+		{
+			vpmanager.CreateParticle(worldTransform_.translation_,
+				{ 1.5f,1.5f ,1.5f }, 0.02f);
+		}
 	}
 	if (dashCoolTime > 0)
 	{
@@ -163,14 +169,14 @@ void Player::Move(VanishParticleManager& vpmanager)
 	}
 	move.y += jumpSpd;
 
-	//マウスでカメラを動かす処理
-	Vector2 temp = { 1920 / 2, 1080 / 2 };
-
 	//マウスの現在位置を取得する処理
 	POINT point;
 	GetCursorPos(&point);
-	//マウスを固定する処理
-	SetCursorPos(temp.x, temp.y);
+
+	//マウスでカメラを動かす処理
+	Vector2 temp = { 1920 / 2, 1080 / 2 };
+	////マウスを固定する処理
+	//SetCursorPos(temp.x, temp.y);
 
 	//マウスの移動量に応じてカメラを動かす処理
 	horizontalRotation += (point.x - temp.x) * mouseSpd;
@@ -197,13 +203,8 @@ void Player::Attack()
 
 	velocity *= bulletSpd;
 
-	//発射座標を頭の位置くらいに調整
-	//(手動なのでモデル変わったら合わなくなる)
-	Vector3 initPos = worldTransform_.translation_;
-	initPos.y += 3;
-
 	unique_ptr<PlayerBullet> newBullet = make_unique<PlayerBullet>();
-	newBullet->Initialize(model_, initPos,velocity);
+	newBullet->Initialize(model_, worldTransform_.translation_,velocity);
 
 	//弾を登録する
 	bullets_.push_back(std::move(newBullet));

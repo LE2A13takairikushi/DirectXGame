@@ -79,3 +79,18 @@ bool SphereCol(Vector3 posA, Vector3 posB, float rA, float rB)
 	}
 	return false;
 }
+
+bool BoxCollsion(Vector2 posA, Vector2 posB, Vector2 rA, Vector2 rB)
+{
+	int DistanceX = posA.x - posB.x;
+	int DistanceY = posA.y - posB.y;
+
+	DistanceX = Abs(DistanceX);
+	DistanceY = Abs(DistanceY);
+
+	if (DistanceX <= rA.x + rB.x and DistanceY <= rA.y + rB.y)
+	{
+		return true;
+	}
+	return false;
+}
