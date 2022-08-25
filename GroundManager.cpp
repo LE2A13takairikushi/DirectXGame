@@ -71,8 +71,10 @@ void GroundManager::Initialize(Model* model_)
 		SetBox({ 40 + (i * 20.0f),270,130 }, { 10,10,10 });
 	}
 
+	//ƒ{ƒX‚Ì‘ä’n
+	SetBox({ 0,400,250 }, { 100,10,100 });
 
-	SetSpawnPos({ 0,0,50 },10);
+	SetSpawnPos({ 200,200,200 },50);
 }
 
 void GroundManager::EventStart(Vector3 playerPos)

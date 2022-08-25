@@ -45,7 +45,11 @@ public:
 	//強制ジャンプイベント用
 	void EnforceJumpOnCol();
 
+	//ゴール用
+	void EnforceGoalOnCol();
+
 	bool isJumpCheck = false;
+	
 	bool IsDash() { return isDash; };
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
@@ -58,6 +62,10 @@ private:
 
 	bool hitGround = false;
 	bool hitCeiling = false;
+
+	bool oldIsJumpCheck = false;
+
+	bool isBossMove = false;
 
 	//移動した値
 	Vector3 move = {0,0,0};
@@ -95,6 +103,13 @@ private:
 	Model* taiyaModel = nullptr;
 
 	Sprite* newstocks[99] = { nullptr };
+
+	Sprite* skillIconSp = nullptr;
+	Sprite* skillCoolAlpha = nullptr;
+	Sprite* backWhite = nullptr;
+	Sprite* backWhite2 = nullptr;
+	Sprite* lShift = nullptr;
+	Sprite* shotIconSp = nullptr;
 
 	void Move(VanishParticleManager& vpmanager);
 	void Dash(VanishParticleManager& vpmanager);

@@ -11,11 +11,11 @@ public:
 	std::list<std::unique_ptr<Enemy>> enemys;
 
 	void Initialize(Model *model_, Model* partModel, TextureHandle tex);
-	void EnemyPop();
+	void EnemyPop(VanishParticleManager& vpmanager);
 	void Update(Vector3 PPos,VanishParticleManager &vpmanager);
 	void Draw(ViewProjection viewProjection_);
 
-	void EventStart();
+	void EventStart(VanishParticleManager& vpmanager);
 
 	int GetEventCount() { return eventSlayCount; };
 

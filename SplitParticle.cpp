@@ -1,6 +1,6 @@
-#include "VanishParticle.h"
+#include "SplitParticle.h"
 
-void VanishParticle::Initialize(Vector3 initPos,Vector3 initScale,float scaleSpd,Model* model)
+void SplitParticle::Initialize(Vector2 moveVecXZ,Vector3 initPos, Vector3 initScale, float scaleSpd, Model* model)
 {
 	BoxObj::Initialize(model);
 	worldTransform_.translation_ = initPos;
@@ -8,19 +8,17 @@ void VanishParticle::Initialize(Vector3 initPos,Vector3 initScale,float scaleSpd
 	this->scaleSpd = scaleSpd;
 
 	//‰ŠúˆÊ’uŒˆ’è
-	//-0.1‚©‚ç0.1‚Ü‚Å‚Ì”ÍˆÍ
-	moveVec.x = RNG(-10, 10) * 0.01f;
-	moveVec.y = RNG(-10, 10) * 0.01f;
-	moveVec.z = RNG(-10, 10) * 0.01f;
+	moveVec.x = moveVecXZ.x;
+	moveVec.z = moveVecXZ.y;
 
 	worldTransform_.scale_ = initScale;
 }
 
-void VanishParticle::Update()
+void SplitParticle::Update()
 {
 	move = { 0,0,0 };
 
-	--timer;
+	//--timer;
 	//if (timer <= 0)
 	if (worldTransform_.scale_.x <= 0)
 	{
@@ -45,7 +43,7 @@ void VanishParticle::Update()
 	MatUpdate();
 }
 
-void VanishParticle::Draw(ViewProjection view, TextureHandle tex)
+void SplitParticle::Draw(ViewProjection view, TextureHandle tex)
 {
 	model_->Draw(worldTransform_, view, tex);
 }

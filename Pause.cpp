@@ -43,17 +43,6 @@ void Pause::Update()
 		}
 	}
 
-	debugText->SetPos(50, 70);
-	debugText->Printf("menupos %f %f",
-		menu[PAUSE_CONTINUE]->GetPosition().x,menu[PAUSE_CONTINUE]->GetPosition().y);
-	debugText->SetPos(50, 90);
-	debugText->Printf("menupos2 %f %f",
-		menu[PAUSE_END]->GetPosition().x, menu[PAUSE_END]->GetPosition().y);
-	debugText->SetPos(50, 110);
-	debugText->Printf("mousePos %f %f",
-		mousePos.x, mousePos.y);
-
-
 
 	if (input->TriggerKey(DIK_ESCAPE)) {
 		openMenu = !openMenu;

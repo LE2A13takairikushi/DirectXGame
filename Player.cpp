@@ -2,6 +2,7 @@
 #include "MyMath.h"
 #include "Collsion.h"
 #include <cassert>
+#include "WinApp.h"
 
 using namespace std;
 
@@ -31,6 +32,36 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 		newstocks[i]->SetSize({ 100,100 });
 		newstocks[i]->SetPosition({ 0 + (i * 100.0f), 0 });
 	}
+
+	skillIconSp = Sprite::Create(TextureManager::Load("dash_skill_icon.png"), { 0,0 });
+	shotIconSp = Sprite::Create(TextureManager::Load("shot_skill_icon.png"), { 0,0 });
+	skillCoolAlpha = Sprite::Create(TextureManager::Load("alpha.png"), { 0,0 },{1,1,1,0.9f});
+	backWhite = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
+	backWhite2 = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
+	lShift = Sprite::Create(TextureManager::Load("Lshift.png"), { 0,0 });
+
+	Vector2 dashSkillPos = {
+		WinApp::kWindowWidth - 160,
+		WinApp::kWindowHeight - 160
+	};
+
+	shotIconSp->SetSize({ 80,80 });
+	shotIconSp->SetPosition({ dashSkillPos.x - 120 ,dashSkillPos.y});
+
+	skillIconSp->SetSize({ 80,80 });
+	skillIconSp->SetPosition(dashSkillPos);
+
+	skillCoolAlpha->SetSize({ 80,80 });
+	skillCoolAlpha->SetPosition(dashSkillPos);
+
+	backWhite->SetSize({ 90,90 });
+	backWhite->SetPosition({ dashSkillPos.x - 5,dashSkillPos.y - 5 });
+
+	backWhite2->SetSize({ 90,90 });
+	backWhite2->SetPosition({ dashSkillPos.x - 125,dashSkillPos.y - 5 });
+
+	lShift->SetSize({ 120,30 });
+	lShift->SetPosition({ dashSkillPos.x - 15,dashSkillPos.y + 75 });
 }
 
 void Player::SetSpawnPos(Vector3 pos)
@@ -41,6 +72,13 @@ void Player::SetSpawnPos(Vector3 pos)
 
 void Player::Update(VanishParticleManager &vpmanager)
 {
+	if (oldIsJumpCheck == false && isJumpCheck)
+	{
+		vpmanager.CreateSplitParticle(worldTransform_.translation_,
+			{ 0.5f,0.5f,0.5f }, 0.01f);
+	}
+	oldIsJumpCheck = isJumpCheck;
+
 	//弾の削除
 	//弾の方でisDeadが呼ばれたらこっちのリストから消す設計
 	//(ちょっと直感的じゃないけどまあ一番きれい)
@@ -57,8 +95,13 @@ void Player::Update(VanishParticleManager &vpmanager)
 	//移動とか攻撃とかの入力系
 	Move(vpmanager);
 
-	//視点を正面に向ける
+	if (jumpSpd > 1.01f)
+	{
+		vpmanager.CreateParticle(worldTransform_.translation_,
+			{ 0.5f,0.5f,0.5f }, 0.01f);
+	}
 
+	//視点を正面に向ける
 	/*if (input_->PushKey(DIK_R))
 	{
 		verticalRotation = 0;
@@ -141,15 +184,24 @@ void Player::Move(VanishParticleManager& vpmanager)
 	
 	move = { 0,0,0 };
 
-	if (moveSpeed <= InitMoveSpd)
+	if (isJumpCheck) isBossMove = false;
+
+	if (isBossMove)
 	{
-		InputMove();
-		tempMoveVec = { 0,0,0 };
+		move += {-0.5f, 0, 0};
 	}
 	else
 	{
-		move.x += tempMoveVec.x * moveSpeed;
-		move.z += tempMoveVec.z * moveSpeed;
+		if (moveSpeed <= InitMoveSpd)
+		{
+			InputMove();
+			tempMoveVec = { 0,0,0 };
+		}
+		else
+		{
+			move.x += tempMoveVec.x * moveSpeed;
+			move.z += tempMoveVec.z * moveSpeed;
+		}
 	}
 
 	//ダッシュ
@@ -268,6 +320,18 @@ void Player::SpriteDraw()
 	for (int i = 0; i < stock; i++)
 	{
 		//newstocks[i]->Draw();
+	}
+
+	backWhite->Draw();
+	skillIconSp->Draw();
+	lShift->Draw();
+
+	backWhite2->Draw();
+	shotIconSp->Draw();
+
+	if (dashCoolTime > 0)
+	{
+		skillCoolAlpha->Draw();
 	}
 }
 
@@ -400,4 +464,12 @@ void Player::EnforceJumpOnCol()
 {
 	jumpSpd = 0;
 	jumpSpd += 2.0f;
+}
+
+void Player::EnforceGoalOnCol()
+{
+	jumpSpd = 0;
+
+	jumpSpd += 1.8f;
+	isBossMove = true;
 }

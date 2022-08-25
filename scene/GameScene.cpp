@@ -123,8 +123,11 @@ void GameScene::Update() {
 
 	}
 
-	debugText_->SetPos(50, 50);
-	debugText_->Printf("fps %f", fpsFix.fps);
+	if (false)
+	{
+		debugText_->SetPos(50, 50);
+		debugText_->Printf("fps %f", fpsFix.fps);
+	}
 
 	pause.Update();
 
@@ -313,6 +316,7 @@ void GameScene::CheckPlayerAllCollision()
 		posB = item->GetWorldTrans();
 		if (BoxColAABB(posA, posB))
 		{
+			vpManager.CreateParticle(item->GetWorldTrans().translation_, { 2.0f ,2.0f ,2.0f }, 0.03f);
 			player_.StockPlus();
 			item->Erase();
 		}
@@ -323,7 +327,7 @@ void GameScene::CheckPlayerAllCollision()
 		//ボックスに当たったらイベントを開始する
 		if (BoxColAABB(posA, posB) && eventObj->IsEvent() == false)
 		{
-			enemyManager->EventStart();
+			enemyManager->EventStart(vpManager);
 			gManager.EventStart(posA.translation_);
 			eventObj->EventStart();
 		}
@@ -398,11 +402,21 @@ void GameScene::CheckPlayerAllCollision()
 	}
 
 	//ゴール時の処理
-	//ゴールしたらスタート地点に戻す
+	//ゴールしたらボスエリアに移動
 	posB = Goal.GetWorldTrans();
 	if (BoxColAABB(posA, posB))
 	{
-		player_.SetSpawnPos(gManager.GetSpawnPos());
+		player_.EnforceGoalOnCol();
+	}
+
+	for (const unique_ptr<EventObject>& eventObj : enemyEManager.GetBossObjects())
+	{
+		posB = eventObj->GetWorldTrans();
+		//ボス発生オブジェクトに衝突したら
+		if (BoxColAABB(posA, posB))
+		{
+
+		}
 	}
 }
 
