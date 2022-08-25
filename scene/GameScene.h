@@ -31,6 +31,8 @@
 
 #include "Pause.h"
 
+#include "BossManager.h"
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -82,7 +84,8 @@ private: // メンバ変数
 	//キャラクター
 	Player player_;
 	EnemyManager* enemyManager;
-	
+	BossManager bossManager;
+
 	//オブジェクト
 	Skydome skydome;
 

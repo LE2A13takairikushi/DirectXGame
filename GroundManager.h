@@ -27,6 +27,9 @@ public:
 	void EventStart(Vector3 playerPos);
 	void EventEnd();
 
+	Vector3 GetBossStagePos() { return bossStagePos; };
+	Vector3 GetBossStageScale() { return bossStageScale; };
+
 private:
 	std::list <std::unique_ptr<BoxObj>> Objects;
 
@@ -34,4 +37,6 @@ private:
 
 	Model* model_ = nullptr;
 	Vector3 spawnPos = { 0,20,0 };
+	Vector3 bossStagePos = {0,0,0};
+	Vector3 bossStageScale = {0,0,0};
 };

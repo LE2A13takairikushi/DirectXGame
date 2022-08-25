@@ -11,6 +11,10 @@ void enemyEventManager::Initialize(Model* model_)
 void enemyEventManager::Update()
 {
 	EventManager::Update();
+	BossObjects.remove_if([](std::unique_ptr<EventObject>& bossObj) {
+		return bossObj->IsDead();
+		});
+
 	for (unique_ptr<EventObject>& Object : BossObjects)
 	{
 		Object->Update();

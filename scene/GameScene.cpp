@@ -23,6 +23,7 @@ GameScene::~GameScene() {
 	delete sprite;
 	pause.End();
 	player_.End();
+	bossManager.End();
 }
 
 void GameScene::Initialize() {
@@ -37,13 +38,15 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("waito.jpg");
 	player_.Initialize(modelManager->player,modelManager->body,modelManager->taiya);
 
-	TextureHandle tex = TextureManager::Load("white.png");
+	TextureHandle white = TextureManager::Load("white.png");
 
 	enemyManager = new EnemyManager(
 		modelManager->firewisp,
 		modelManager->model_,
-		tex
+		white
 	);
+
+	bossManager.Initialize(modelManager->model_,white);
 
 	sprite = Sprite::Create(textureHandle_, { 0,0 });
 
@@ -86,7 +89,7 @@ void GameScene::Initialize() {
 
 	fpsFix.Initialize();
 
-	vpManager.Initialize(modelManager->model_,tex);
+	vpManager.Initialize(modelManager->model_,white);
 	pause.Initialize();
 
 	player_.SetSpawnPos(gManager.GetSpawnPos());
@@ -117,7 +120,10 @@ void GameScene::Update() {
 
 		vpManager.Update();
 
-		enemyManager->Update(player_.GetWorldTrans().translation_, vpManager);
+		enemyManager->Update(player_.GetPos(), vpManager);
+		
+		bossManager.Update(gManager.GetBossStagePos(),
+			gManager.GetBossStageScale(),player_.GetPos());
 
 		CheckAllCollision();
 
@@ -189,6 +195,7 @@ void GameScene::Draw() {
 
 	player_.Draw(viewProjection_);
 
+	bossManager.Draw(viewProjection_);
 	enemyManager->Draw(viewProjection_);
 
 	vpManager.Draw(viewProjection_);
@@ -415,7 +422,10 @@ void GameScene::CheckPlayerAllCollision()
 		//ボス発生オブジェクトに衝突したら
 		if (BoxColAABB(posA, posB))
 		{
-
+			Vector3 spawnPos = eventObj->GetWorldTrans().translation_;
+			spawnPos.y += 10;
+			bossManager.SpawnBoss(spawnPos);
+			eventObj->Erase();
 		}
 	}
 }

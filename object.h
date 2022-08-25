@@ -17,11 +17,15 @@ public:
 	void SetPos(Vector3 pos);
 	void SetScale(Vector3 scale);
 
+	Vector3 GetPos() { return worldTransform_.translation_; };
+	Vector3 GetScale() { return worldTransform_.scale_; };
+
 	void MatUpdate();
+
+	WorldTransform worldTransform_;
 
 protected:
 
-	WorldTransform worldTransform_;
 	Model* model_ = nullptr;
 	TextureHandle textureHandle_;
 

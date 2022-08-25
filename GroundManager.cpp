@@ -72,7 +72,10 @@ void GroundManager::Initialize(Model* model_)
 	}
 
 	//ƒ{ƒX‚Ì‘ä’n
-	SetBox({ 0,400,250 }, { 100,10,100 });
+	bossStagePos = { 0,400,250 };
+	bossStageScale = { 100,10,100 };
+	SetBox(bossStagePos, bossStageScale);
+	
 
 	SetSpawnPos({ 200,200,200 },50);
 }
