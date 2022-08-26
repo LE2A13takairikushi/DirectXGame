@@ -5,10 +5,6 @@ void VanishParticleManager::Initialize(Model* model, TextureHandle tex)
 {
 	model_ = model;
 	this->tex = tex;
-	/*for (unique_ptr<VanishParticle>& particle : particles)
-	{
-		particle->LoadModel(model_);
-	}*/
 }
 
 void VanishParticleManager::Update()
@@ -50,23 +46,23 @@ void VanishParticleManager::CreateParticle(Vector3 beginPos, Vector3 initScale,f
 	}
 }
 
-void VanishParticleManager::CreateSplitParticle(Vector3 beginPos, Vector3 initScale, float scaleSpd)
+void VanishParticleManager::CreateSplitParticle(Vector3 beginPos, Vector3 initScale, float scaleSpd,float moveSpd)
 {
 	splitParticles.emplace_back(new SplitParticle);
-	splitParticles.back()->Initialize({ 0.1f,0 }, beginPos, initScale, scaleSpd, model_);
+	splitParticles.back()->Initialize({ 0.1f * moveSpd,0 }, beginPos, initScale, scaleSpd, model_);
 	splitParticles.emplace_back(new SplitParticle);
-	splitParticles.back()->Initialize({ 0.1f,0.1f }, beginPos, initScale, scaleSpd, model_);
+	splitParticles.back()->Initialize({ 0.1f * moveSpd,0.1f * moveSpd }, beginPos, initScale, scaleSpd, model_);
 	splitParticles.emplace_back(new SplitParticle);
-	splitParticles.back()->Initialize({ 0.1f,-0.1f }, beginPos, initScale, scaleSpd, model_);
+	splitParticles.back()->Initialize({ 0.1f * moveSpd,-0.1f * moveSpd }, beginPos, initScale, scaleSpd, model_);
 	splitParticles.emplace_back(new SplitParticle);
-	splitParticles.back()->Initialize({ -0.1f,0 }, beginPos, initScale, scaleSpd, model_);
+	splitParticles.back()->Initialize({ -0.1f * moveSpd,0 }, beginPos, initScale, scaleSpd, model_);
 	splitParticles.emplace_back(new SplitParticle);
-	splitParticles.back()->Initialize({ -0.1f,0.1f }, beginPos, initScale, scaleSpd, model_);
+	splitParticles.back()->Initialize({ -0.1f * moveSpd,0.1f * moveSpd }, beginPos, initScale, scaleSpd, model_);
 	splitParticles.emplace_back(new SplitParticle);
-	splitParticles.back()->Initialize({ -0.1f,-0.1f }, beginPos, initScale, scaleSpd, model_);
+	splitParticles.back()->Initialize({ -0.1f * moveSpd,-0.1f * moveSpd }, beginPos, initScale, scaleSpd, model_);
 	splitParticles.emplace_back(new SplitParticle);
-	splitParticles.back()->Initialize({ 0,0.1f }, beginPos, initScale, scaleSpd, model_);
+	splitParticles.back()->Initialize({ 0,0.1f * moveSpd }, beginPos, initScale, scaleSpd, model_);
 	splitParticles.emplace_back(new SplitParticle);
-	splitParticles.back()->Initialize({ 0,-0.1f }, beginPos, initScale, scaleSpd, model_);
+	splitParticles.back()->Initialize({ 0,-0.1f * moveSpd }, beginPos, initScale, scaleSpd, model_);
 
 }

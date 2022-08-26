@@ -22,6 +22,25 @@ bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB)
 	return false;
 }
 
+bool BoxColAABB(WorldTransform worldTransformA, Vector3 pos, Vector3 scale)
+{
+	int DistanceX = worldTransformA.translation_.x - pos.x;
+	int DistanceY = worldTransformA.translation_.y - pos.y;
+	int DistanceZ = worldTransformA.translation_.z - pos.z;
+
+	DistanceX = Abs(DistanceX);
+	DistanceY = Abs(DistanceY);
+	DistanceZ = Abs(DistanceZ);
+
+	if (DistanceX <= worldTransformA.scale_.x + scale.x &&
+		DistanceY <= worldTransformA.scale_.y + scale.y &&
+		DistanceZ <= worldTransformA.scale_.z + scale.z)
+	{
+		return true;
+	}
+	return false;
+}
+
 bool LineFloarCol(Vector3 senbunPos1,Vector3 senbunPos2, Vector3 heimenPos,Vector3 normalVec)
 {
 	//ジャンプの方向ベクトル

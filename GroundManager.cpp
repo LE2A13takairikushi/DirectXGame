@@ -75,7 +75,6 @@ void GroundManager::Initialize(Model* model_)
 	bossStagePos = { 0,400,250 };
 	bossStageScale = { 100,10,100 };
 	SetBox(bossStagePos, bossStageScale);
-	
 
 	SetSpawnPos({ 200,200,200 },50);
 }
@@ -93,6 +92,50 @@ void GroundManager::EventEnd()
 	eventObjects.clear();
 }
 
+void GroundManager::BossBattleStart()
+{
+	BossBattleObject.emplace_back(new BoxObj);
+	BossBattleObject.back()->Initialize(model_);
+	BossBattleObject.back()->SetPos({
+	bossStagePos.x - bossStageScale.x - 10,
+	bossStagePos.y - bossStageScale.y,
+	bossStagePos.z
+		});
+	BossBattleObject.back()->SetScale({ 10, 100, 100 });
+	
+	BossBattleObject.emplace_back(new BoxObj);
+	BossBattleObject.back()->Initialize(model_);
+	BossBattleObject.back()->SetPos({
+	bossStagePos.x + bossStageScale.x + 10,
+	bossStagePos.y - bossStageScale.y,
+	bossStagePos.z
+		});
+	BossBattleObject.back()->SetScale({ 10, 100, 100 });
+
+	BossBattleObject.emplace_back(new BoxObj);
+	BossBattleObject.back()->Initialize(model_);
+	BossBattleObject.back()->SetPos({
+	bossStagePos.x,
+	bossStagePos.y - bossStageScale.y,
+	bossStagePos.z - bossStageScale.z - 10
+		});
+	BossBattleObject.back()->SetScale({ 100, 100, 10 });
+
+	BossBattleObject.emplace_back(new BoxObj);
+	BossBattleObject.back()->Initialize(model_);
+	BossBattleObject.back()->SetPos({
+	bossStagePos.x,
+	bossStagePos.y - bossStageScale.y,
+	bossStagePos.z + bossStageScale.z + 10
+		});
+	BossBattleObject.back()->SetScale({ 100, 100, 10 });
+}
+
+void GroundManager::BossBattleEnd()
+{
+	BossBattleObject.clear();
+}
+
 void GroundManager::Update()
 {
 	for (unique_ptr<BoxObj>& Object : Objects)
@@ -100,6 +143,10 @@ void GroundManager::Update()
 		Object->Update();
 	}
 	for (unique_ptr<BoxObj>& Object : eventObjects)
+	{
+		Object->Update();
+	}
+	for (unique_ptr<BoxObj>& Object : BossBattleObject)
 	{
 		Object->Update();
 	}
@@ -115,6 +162,11 @@ void GroundManager::Draw(ViewProjection viewProjection_)
 	{
 		Object->Draw(viewProjection_);
 	}
+	//É{ÉXêÌópÇÃå©Ç¶Ç»Ç¢ï«Ç»ÇÃÇ≈ï`âÊÇÕÇµÇ»Ç¢
+	/*for (unique_ptr<BoxObj>& Object : BossBattleObject)
+	{
+		Object->Draw(viewProjection_);
+	}*/
 }
 
 Vector3 GroundManager::GetSpawnPos()

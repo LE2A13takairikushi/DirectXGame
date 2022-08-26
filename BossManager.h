@@ -7,8 +7,9 @@ class BossManager
 {
 public:
 	void Initialize(Model* model, TextureHandle tex);
-	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos);
-	void Draw(ViewProjection view);
+	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos, VanishParticleManager& vpManager);
+	void Draw(ViewProjection view, float mouseVertRota);
+	void BossUIDraw();
 
 	void End();
 
@@ -18,11 +19,18 @@ public:
 		return bossList;
 	};
 
+	bool IsBossBattle() { return isBossBattle; };
+	bool BossBattleStart() { isBossBattle = true; };
+	bool BossBattleEnd() { isBossBattle = false; };
+
 private:
 	std::list<std::unique_ptr<Boss>> bossList;
+
+	bool isBossBattle = false;
 
 	Model* model = nullptr;
 	TextureHandle tex = 0;
 
+	TextureHandle weekTex = 0;
 };
 

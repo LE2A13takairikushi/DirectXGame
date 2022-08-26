@@ -54,6 +54,8 @@ public:
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 
+	float GetMouseVRota() { return verticalRotation; };
+
 private:
 
 	WorldTransform prevPos;

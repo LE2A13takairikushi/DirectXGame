@@ -5,6 +5,8 @@
 
 bool BoxColAABB(WorldTransform worldTransformA, WorldTransform worldTransformB);
 
+bool BoxColAABB(WorldTransform worldTransformA, Vector3 pos,Vector3 scale);
+
 bool BoxCollsion(Vector2 posA, Vector2 posB, Vector2 rA, Vector2 rB);
 
 bool SphereCol(WorldTransform worldTransformA, WorldTransform worldTransformB);

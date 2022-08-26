@@ -1,10 +1,11 @@
 #include "ParticleManager.h"
 using namespace std;
 
-void ParticleManager::CreateParticle(Vector3 beginPos)
+void ParticleManager::CreateParticle(Vector3 beginPos, Vector3 scale)
 {
 	particles.emplace_back(new Particle);
 	particles.back()->Initialize(beginPos, model_);
+	particles.back()->SetScale(scale);
 }
 
 ParticleManager::ParticleManager()
@@ -26,7 +27,7 @@ void ParticleManager::Initialize(Model* model,TextureHandle tex)
 	}
 }
 
-void ParticleManager::Update(Vector3 beginPos)
+void ParticleManager::Update(Vector3 beginPos, Vector3 scale)
 {
 	particles.remove_if([](std::unique_ptr<Particle>& particle) {
 		return particle->IsDead();
@@ -34,7 +35,7 @@ void ParticleManager::Update(Vector3 beginPos)
 
 	if (particles.size() <= LIMIT)
 	{
-		CreateParticle(beginPos);
+		CreateParticle(beginPos, scale);
 	}
 
 	for (unique_ptr<Particle>& particle : particles)

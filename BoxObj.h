@@ -6,7 +6,7 @@ class BoxObj : public object
 public:
 	void Initialize(Model* model_);
 	void Update();
-	void Draw(ViewProjection viewProjection);
+	void Draw(ViewProjection viewProjection,Vector3 shake = {0,0,0});
 
 	bool GetCheckUpdate();
 

@@ -10,10 +10,10 @@ public:
 	~ParticleManager();
 
 	void Initialize(Model* model, TextureHandle tex);
-	void Update(Vector3 beginPos);
+	void Update(Vector3 beginPos,Vector3 scale = {0.5f,0.5f,0.5f });
 	void Draw(ViewProjection view);
 
-	void CreateParticle(Vector3 beginPos);
+	void CreateParticle(Vector3 beginPos, Vector3 scale);
 
 	const std::list<std::unique_ptr<Particle>>& GetParticle() {
 		return particles; 

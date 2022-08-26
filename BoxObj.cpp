@@ -12,8 +12,9 @@ void BoxObj::Update()
 	MatUpdate();
 }
 
-void BoxObj::Draw(ViewProjection viewProjection)
+void BoxObj::Draw(ViewProjection viewProjection, Vector3 shake)
 {
+	worldTransform_.translation_ += shake;
 	model_->Draw(worldTransform_, viewProjection,textureHandle_);
 }
 

@@ -278,11 +278,11 @@ void Player::Draw(ViewProjection viewProjection_)
 		debugText->Printf("left %d", stock);
 
 		debugText->SetPos(50, 110);
-		debugText->Printf("movespd %f",
-			moveSpeed);
+		debugText->Printf("horizontalRotation %f",
+			horizontalRotation);
 		debugText->SetPos(50, 130);
-		debugText->Printf("moveVec %f %f %f",
-			moveVec.x, moveVec.y, moveVec.z
+		debugText->Printf("verticalRotation %f",
+			verticalRotation
 		);
 		debugText->SetPos(50, 150);
 		debugText->Printf("sideVec %f %f %f",

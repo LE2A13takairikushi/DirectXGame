@@ -90,6 +90,7 @@ void GameScene::Initialize() {
 	fpsFix.Initialize();
 
 	vpManager.Initialize(modelManager->model_,white);
+	pObjectManager.Initialize(modelManager->model_, white);
 	pause.Initialize();
 
 	player_.SetSpawnPos(gManager.GetSpawnPos());
@@ -119,17 +120,19 @@ void GameScene::Update() {
 		CheckEnemyAllCollision();
 
 		vpManager.Update();
+		pObjectManager.Update();
 
 		enemyManager->Update(player_.GetPos(), vpManager);
 		
 		bossManager.Update(gManager.GetBossStagePos(),
-			gManager.GetBossStageScale(),player_.GetPos());
+			gManager.GetBossStageScale(),player_.GetPos(),
+		vpManager);
 
-		CheckAllCollision();
+		CheckBulletCollision();
 
 	}
 
-	if (false)
+	if (true)
 	{
 		debugText_->SetPos(50, 50);
 		debugText_->Printf("fps %f", fpsFix.fps);
@@ -190,12 +193,13 @@ void GameScene::Draw() {
 	enemyEManager.Draw(viewProjection_);
 	jEManager.Draw(viewProjection_);
 	vEManager.Draw(viewProjection_);
+	pObjectManager.Draw(viewProjection_);
 
 	Goal.Draw(viewProjection_);
 
 	player_.Draw(viewProjection_);
 
-	bossManager.Draw(viewProjection_);
+	bossManager.Draw(viewProjection_,player_.GetMouseVRota());
 	enemyManager->Draw(viewProjection_);
 
 	vpManager.Draw(viewProjection_);
@@ -221,6 +225,7 @@ void GameScene::Draw() {
 	/// </summary>
 	
 	player_.SpriteDraw();
+	bossManager.BossUIDraw();
 	pause.MenuDraw();
 
 	// デバッグテキストの描画
@@ -232,7 +237,7 @@ void GameScene::Draw() {
 #pragma endregion
 }
 
-void GameScene::CheckAllCollision()
+void GameScene::CheckBulletCollision()
 {
 	WorldTransform posA;
 	WorldTransform posB;
@@ -299,6 +304,27 @@ void GameScene::CheckAllCollision()
 			}
 		}
 	}
+
+	//ボスと自分の弾の当たり判定
+	for (const unique_ptr<PlayerBullet>& bullet : playerBullets)
+	{
+		posA = bullet->GetWorldTrans();
+		for (const unique_ptr<Boss>& boss : bossManager.GetBossList())
+		{
+			posB = boss->GetBossPart(0).GetWorldTrans();
+			if (BoxColAABB(posA, posB))
+			{
+				boss->OnBodyColision();
+				bullet->OnCollision();
+			}
+			posB = boss->GetBossPart(1).GetWorldTrans();
+			if (BoxColAABB(posA, posB))
+			{
+				boss->OnWeekColision();
+				bullet->OnCollision();
+			}
+		}
+	}
 }
 
 void GameScene::CheckPlayerAllCollision()
@@ -314,6 +340,11 @@ void GameScene::CheckPlayerAllCollision()
 		player_.CheckHitBox(posB);
 	}
 	for (const unique_ptr<BoxObj>& object : gManager.GetEventObjects())
+	{
+		posB = object->GetWorldTrans();
+		player_.CheckHitBox(posB);
+	}
+	for (const unique_ptr<BoxObj>& object : gManager.GetBossObjects())
 	{
 		posB = object->GetWorldTrans();
 		player_.CheckHitBox(posB);
@@ -426,6 +457,7 @@ void GameScene::CheckPlayerAllCollision()
 			spawnPos.y += 10;
 			bossManager.SpawnBoss(spawnPos);
 			eventObj->Erase();
+			gManager.BossBattleStart();
 		}
 	}
 }

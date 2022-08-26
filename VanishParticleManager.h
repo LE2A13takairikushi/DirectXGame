@@ -12,7 +12,7 @@ public:
 	void Draw(ViewProjection view);
 	void CreateParticle(Vector3 beginPos, Vector3 initScale, float scaleSpd);
 
-	void CreateSplitParticle(Vector3 beginPos, Vector3 initScale, float scaleSpd);
+	void CreateSplitParticle(Vector3 beginPos, Vector3 initScale, float scaleSpd, float moveSpd = 1.0f);
 
 	const std::list<std::unique_ptr<VanishParticle>>& GetParticle() {
 		return particles;

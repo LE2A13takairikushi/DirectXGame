@@ -33,6 +33,8 @@
 
 #include "BossManager.h"
 
+#include "PartObjectManager.h"
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -100,6 +102,7 @@ private: // メンバ変数
 
 	//演出
 	VanishParticleManager vpManager;
+	PartObjectManager pObjectManager;
 
 	//描画系
 	Sprite *sprite = nullptr;
@@ -113,7 +116,7 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 	
-	void CheckAllCollision();
+	void CheckBulletCollision();
 	void CheckPlayerAllCollision();
 	void CheckEnemyAllCollision();
 };
