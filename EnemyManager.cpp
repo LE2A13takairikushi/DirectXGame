@@ -20,7 +20,6 @@ void EnemyManager::Initialize(Model* model_, Model* partModel, TextureHandle tex
 	this->model_ = model_;
 	this->partModel_ = partModel;
 	this->tex = tex;
-	//vpManager.Initialize(partModel, tex);
 }
 
 void EnemyManager::EnemyPop(VanishParticleManager& vpmanager)
@@ -40,19 +39,18 @@ void EnemyManager::EnemyPop(VanishParticleManager& vpmanager)
 	enemys.push_back(std::move(newEnemy));
 }
 
-void EnemyManager::Update(Vector3 PPos, VanishParticleManager &vpmanager)
+void EnemyManager::Update(Vector3 PPos, bool NotSpawnTerm, VanishParticleManager &vpmanager)
 {
 	maxEnemyCount = enemys.size();
 	popPos = PPos;
 
 	popCount++;
-	if (popCount > 120 && maxEnemyCount < MAX_ENEMY)
+	if ((popCount > 120 && maxEnemyCount < MAX_ENEMY)&&
+		NotSpawnTerm == false)
 	{
 		EnemyPop(vpmanager);
 		popCount = 0;
 	}
-
-	//vpManager.Update();
 
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
@@ -67,6 +65,10 @@ void EnemyManager::Update(Vector3 PPos, VanishParticleManager &vpmanager)
 		if (enemy->IsDead())
 		{
 			vpmanager.CreateParticle(enemy->GetWorldTrans().translation_,{0.5f,0.5f ,0.5f },0.01f);
+		}
+		if (NotSpawnTerm)
+		{
+			enemy->OnCollision();
 		}
 	}
 

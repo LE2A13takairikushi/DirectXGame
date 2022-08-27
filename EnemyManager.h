@@ -12,7 +12,7 @@ public:
 
 	void Initialize(Model *model_, Model* partModel, TextureHandle tex);
 	void EnemyPop(VanishParticleManager& vpmanager);
-	void Update(Vector3 PPos,VanishParticleManager &vpmanager);
+	void Update(Vector3 PPos, bool NotSpawnTerm,VanishParticleManager &vpmanager);
 	void Draw(ViewProjection viewProjection_);
 
 	void EventStart(VanishParticleManager& vpmanager);

@@ -2,6 +2,7 @@
 #include "BoxObj.h"
 #include "DebugText.h"
 #include "VanishParticleManager.h"
+#include "EnemyBullet.h"
 
 enum BossPartsName
 {
@@ -15,7 +16,10 @@ enum ActPhase
 	jump,
 	setTarget,
 	fall,
-	none,
+	miniJump,
+	superAttack,
+	appearance,
+	dead,
 	PhaseNum,
 };
 
@@ -45,23 +49,43 @@ public:
 	void OnWeekColision();
 
 private:
+	void Viblation();
+	void WeekViblation();
+	void ShakeUpdate();
+	void Attack(Vector3 velocity);
+
+private:
+	Vector3 initScale = { 10,10,10 };
+
+	BoxObj bodyShakeBox;
+	BoxObj weekShakeBox;
+
+	Vector3 scalePlus = { 0,0,0 };
+	float scaleSpd = 0.03f;
+	int scalePTimer = 0;
 
 	static const int HPINIT = 300;
 	float hitGaugeOneSize = 0;
 	int hitPoint = HPINIT;
+	bool isFormChange = false;
+	bool onGround = false;
 
 	Vector3 move = {0,0,0};
 	float jumpSpd = 0;
 	bool isDead = false; 
 
 	int fallTimer = 0;
+	int miniJumpTimer = 0;
+	int bulletTimer = 0;
+
+	int stumpStock = 0;
 
 	float moveSpd = 2.0f;
 	float gravity = 0.01f;
 
 	Vector3 targetDirectVec = {0,0,0};
 
-	ActPhase phase = ActPhase::jump;
+	ActPhase phase = ActPhase::appearance;
 
 	BoxObj bossParts[bossPartsNum];
 
@@ -70,5 +94,16 @@ private:
 
 	BoxObj exclamationObj;
 
-	Vector3 Shake = { 0,0,0 };
+	Vector3 shake = { 0,0,0 };
+	Vector3 weekShake = { 0,0,0 };
+
+	bool isShake = false;
+	int shakeTimer = 0;	
+	bool isWeekShake = false;
+	int weekShakeTimer = 0;
+
+	Vector3 prevPos = { 0,0,0 };
+
+	std::list<std::unique_ptr<EnemyBullet>> bullets_;
+	Model* bulletModel = nullptr;
 };

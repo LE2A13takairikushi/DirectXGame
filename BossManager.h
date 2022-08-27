@@ -20,8 +20,8 @@ public:
 	};
 
 	bool IsBossBattle() { return isBossBattle; };
-	bool BossBattleStart() { isBossBattle = true; };
-	bool BossBattleEnd() { isBossBattle = false; };
+	bool BossBattleStart() { return isBossBattle = true; };
+	bool BossBattleEnd() { return isBossBattle = false; };
 
 private:
 	std::list<std::unique_ptr<Boss>> bossList;

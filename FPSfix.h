@@ -15,7 +15,8 @@ public:
 
 private:
 	//ŒÅ’è‚µ‚½‚¢Å‘åfps
-	const float maxfps = 144;
+	//(60‚­‚ç‚¢‚ÅŒÅ’è‚µ‚½‚¢‚Ì‚Å‚¿‚å‚Á‚Æ‚‚ß‚Ì”’l‚ğİ’è‚·‚é)
+	const float maxfps = 90;
 
 	const float MIN_FREAM_TIME = 1.0f / maxfps;
 

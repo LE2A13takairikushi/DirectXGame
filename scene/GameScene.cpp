@@ -122,7 +122,7 @@ void GameScene::Update() {
 		vpManager.Update();
 		pObjectManager.Update();
 
-		enemyManager->Update(player_.GetPos(), vpManager);
+		enemyManager->Update(player_.GetPos(),bossManager.IsBossBattle(), vpManager);
 		
 		bossManager.Update(gManager.GetBossStagePos(),
 			gManager.GetBossStageScale(),player_.GetPos(),
@@ -134,7 +134,7 @@ void GameScene::Update() {
 
 	if (true)
 	{
-		debugText_->SetPos(50, 50);
+		debugText_->SetPos(WinApp::kWindowWidth - 50, 50);
 		debugText_->Printf("fps %f", fpsFix.fps);
 	}
 
@@ -455,6 +455,7 @@ void GameScene::CheckPlayerAllCollision()
 		{
 			Vector3 spawnPos = eventObj->GetWorldTrans().translation_;
 			spawnPos.y += 10;
+			bossManager.BossBattleStart();
 			bossManager.SpawnBoss(spawnPos);
 			eventObj->Erase();
 			gManager.BossBattleStart();

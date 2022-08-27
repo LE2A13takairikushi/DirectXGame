@@ -96,7 +96,8 @@ void DirectXCommon::PostDraw() {
 	commandQueue_->ExecuteCommandLists(1, cmdLists);
 
 	// バッファをフリップ
-	result = swapChain_->Present(1, 0);
+	//result = swapChain_->Present(1, 0);
+	result = swapChain_->Present(0, 0);
 #ifdef _DEBUG
 	if (FAILED(result)) {
 		ComPtr<ID3D12DeviceRemovedExtendedData> dred;
