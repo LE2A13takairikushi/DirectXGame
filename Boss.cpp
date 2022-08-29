@@ -206,6 +206,9 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				if (superAttackCount >= 5)
 				{
 					phase = ActPhase::miniJump;
+					fallTimer = 0;
+					miniJumpTimer = 0;
+					break;
 				}
 
 				float minus = 0;
@@ -332,12 +335,11 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 
 void Boss::Draw(ViewProjection view,float mouseVertRota)
 {
-	for (int i = 0; i < bossPartsNum; i++)
-	{
-		bossParts[i].Draw(view);
-	}
-	bodyShakeBox.Draw(view);
-	weekShakeBox.Draw(view);
+	bossParts[0].Draw(view);
+	bossParts[1].Draw(view);
+
+	bodyShakeBox.Draw(view, shake);
+	weekShakeBox.Draw(view, weekShake);
 
 	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
 	{

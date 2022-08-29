@@ -24,6 +24,7 @@ public:
 
 	WorldTransform worldTransform_;
 
+	static void ScreenShake(Vector2 shake);
 protected:
 
 	Model* model_ = nullptr;
@@ -31,5 +32,7 @@ protected:
 
 	Vector3 initScale = { 0,0,0 };
 	Vector3 initPos = { 0,0,0 };
+	static Vector3 screenShake;
+	
 };
 

@@ -14,8 +14,14 @@ void BoxObj::Update()
 
 void BoxObj::Draw(ViewProjection viewProjection, Vector3 shake)
 {
-	worldTransform_.translation_ += shake;
-	model_->Draw(worldTransform_, viewProjection,textureHandle_);
+	WorldTransform tempworld = worldTransform_;
+	tempworld.translation_ += screenShake;
+	tempworld.translation_ += shake;
+	tempworld.UpdateMatrix();
+	tempworld.TransferMatrix();
+
+	
+	model_->Draw(tempworld, viewProjection,textureHandle_);
 }
 
 bool BoxObj::GetCheckUpdate()

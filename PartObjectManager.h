@@ -4,7 +4,7 @@
 class PartObjectManager
 {
 public:
-	void Initialize(Model* model_, TextureHandle tex = 0);
+	void Initialize(Vector3 stagePos, Vector3 stageScale, Model* model_, TextureHandle tex = 0);
 	void Update();
 	void Draw(ViewProjection viewProjection_);
 

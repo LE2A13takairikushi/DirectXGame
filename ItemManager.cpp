@@ -13,8 +13,12 @@ unique_ptr<Item> ItemCreate(Model* model_, Vector3 pos, Vector3 scale)
 
 void ItemManager::Initialize(Model* model_)
 {
-	Items.push_back(std::move(ItemCreate(model_, { -140,150,145 }, { 3,3,3 })));
+	Items.push_back(std::move(ItemCreate(model_, { -140,132,145 }, { 3,3,3 })));
 	Items.push_back(std::move(ItemCreate(model_, { 100,323,230 }, { 3,3,3 })));
+	
+	Items.push_back(std::move(ItemCreate(model_, { 440,220,200 }, { 3,3,3 })));
+	Items.push_back(std::move(ItemCreate(model_, { 460,280,400 }, { 3,3,3 })));
+	Items.push_back(std::move(ItemCreate(model_, { 440,360,200 }, { 3,3,3 })));
 }
 
 void ItemManager::Update()

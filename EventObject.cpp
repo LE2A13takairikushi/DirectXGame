@@ -21,7 +21,11 @@ void EventObject::Update()
 
 void EventObject::Draw(ViewProjection view)
 {
-	model_->Draw(worldTransform_,view,textureHandle_);
+	WorldTransform tempworld = worldTransform_;
+	tempworld.translation_ += screenShake;
+	tempworld.UpdateMatrix();
+	tempworld.TransferMatrix();
+	model_->Draw(tempworld, view, textureHandle_);
 }
 
 void EventObject::LoadTexture(TextureHandle tex)
@@ -52,6 +56,22 @@ void EventObject::InitScale()
 void EventObject::InitPos()
 {
 	worldTransform_.translation_ = initPos;
+}
+
+void EventObject::RemoveScale()
+{
+	static float removeSpd = 0.2f;
+	if (worldTransform_.scale_.x <= initScale.x)
+	{
+		worldTransform_.scale_.x += removeSpd;
+		worldTransform_.scale_.y += removeSpd;
+		worldTransform_.scale_.z += removeSpd;
+	}
+
+	if (worldTransform_.scale_.x > initScale.x)
+	{
+		worldTransform_.scale_ = initScale;
+	}
 }
 
 void EventObject::Vibration(float min, float max)

@@ -1,21 +1,21 @@
 #include "PartObjectManager.h"
 using namespace std;
 
-void PartObjectManager::Initialize(Model* model_, TextureHandle tex)
+void PartObjectManager::Initialize(Vector3 stagePos, Vector3 stageScale, Model* model_, TextureHandle tex)
 {
 	this->model_ = model_;
 	this->tex = tex;
 
-	Vector3 bossStagePos = { 0,400,250 };
-	Vector3 bossStageScale = { 100,10,100 };
+	//Vector3 bossStagePos = { 0,400,250 };
+	//Vector3 stageScale = { 100,10,100 };
 
 	//“ü‚Á‚Ä‚«‚½•ûŒü‚©‚çŒ©‚Äã
 	for (int i = 0; i < 2; i++)
 	{
 		CreateEventBox({
-			bossStagePos.x - bossStageScale.x,
-			bossStagePos.y + bossStageScale.y,
-			bossStagePos.z - bossStageScale.z + i * 100
+			stagePos.x - stageScale.x,
+			stagePos.y + stageScale.y,
+			stagePos.z - stageScale.z + i * 100 + 100
 			},
 			{ 1,1,1 });
 	}
@@ -24,9 +24,9 @@ void PartObjectManager::Initialize(Model* model_, TextureHandle tex)
 	for (int i = 0; i < 2; i++)
 	{
 		CreateEventBox({
-			bossStagePos.x - bossStageScale.x + i * 100,
-			bossStagePos.y + bossStageScale.y,
-			bossStagePos.z + bossStageScale.z
+			stagePos.x - stageScale.x + i * 100 + 100 ,
+			stagePos.y + stageScale.y,
+			stagePos.z + stageScale.z
 			},
 			{ 1,1,1 });
 	}
@@ -34,9 +34,9 @@ void PartObjectManager::Initialize(Model* model_, TextureHandle tex)
 	for (int i = 0; i < 2; i++)
 	{
 		CreateEventBox({
-			bossStagePos.x + bossStageScale.x,
-			bossStagePos.y + bossStageScale.y,
-			bossStagePos.z - bossStageScale.z + i * 100
+			stagePos.x + stageScale.x,
+			stagePos.y + stageScale.y,
+			stagePos.z - stageScale.z + i * 100
 			},
 			{ 1,1,1 });
 	}
@@ -44,9 +44,9 @@ void PartObjectManager::Initialize(Model* model_, TextureHandle tex)
 	for (int i = 0; i < 2; i++)
 	{
 		CreateEventBox({
-			bossStagePos.x - bossStageScale.x + i * 100,
-			bossStagePos.y + bossStageScale.y,
-			bossStagePos.z - bossStageScale.z
+			stagePos.x - stageScale.x + i * 100,
+			stagePos.y + stageScale.y,
+			stagePos.z - stageScale.z
 			},
 			{ 1,1,1 });
 	}

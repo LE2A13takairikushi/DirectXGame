@@ -31,10 +31,13 @@ public:
 private:
 
 	Sprite* menu[MENU_NUM] = { nullptr };
+	Sprite* curser = nullptr;
 	TextureHandle tex = 0;
 
 	Vector2 mousePos;
 	Vector2 mouseR = {1,1};
 
 	bool openMenu = false;
+
+	int menuData = PAUSE_CONTINUE;
 };

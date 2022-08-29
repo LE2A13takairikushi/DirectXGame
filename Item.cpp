@@ -1,4 +1,5 @@
 #include "Item.h"
+#include <math.h>
 
 void Item::Initialize(Model* model, TextureHandle tex)
 {
@@ -9,6 +10,8 @@ void Item::Initialize(Model* model, TextureHandle tex)
 
 void Item::Update()
 {
+	worldTransform_.rotation_.y += 0.01f;
+
 	object::MatUpdate();
 }
 

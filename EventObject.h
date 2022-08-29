@@ -27,6 +27,9 @@ public:
 	void InitScale();
 	void InitPos();
 
+	Vector3 GetInitScale() { return initScale; };
+	void RemoveScale();
+
 	void Vibration(float min, float max);
 
 private:

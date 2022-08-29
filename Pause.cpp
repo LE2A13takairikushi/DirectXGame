@@ -17,32 +17,40 @@ void Pause::Initialize()
 		{ WinApp::kWindowWidth / 2 - 150 ,WinApp::kWindowHeight / 2 });
 	menu[PAUSE_END] = Sprite::Create(TextureManager::Load("end.png"),
 		{ WinApp::kWindowWidth / 2 - 150,WinApp::kWindowHeight / 2 + 150});
+	curser = Sprite::Create(TextureManager::Load("curser.png"),
+		{ 0,0 });
 
+	curser->SetSize({ 100, 100 });
 }
 
 void Pause::Update()
 {
-	POINT point;
-	GetCursorPos(&point);
 
-	mousePos = { (float)point.x,(float)point.y };
-
-	for (int i = 0; i < MENU_NUM; i++)
+	if (input->TriggerKey(DIK_W))
 	{
-		if (BoxCollsion(
-			menu[i]->GetPosition(), mousePos,
-			menu[i]->GetSize(), mouseR)&&
-			input->IsTriggerMouse(0))
+		if (menuData > PAUSE_CONTINUE)menuData--;
+	}
+
+	if (input->TriggerKey(DIK_S))
+	{
+		if (menuData < PAUSE_END)menuData++;
+	}
+
+	if (input->TriggerKey(DIK_SPACE))
+	{
+		if (menuData == PAUSE_CONTINUE)
 		{
-			if (menu[PAUSE_CONTINUE]) {
-				openMenu = false; 
-			}
-			if (menu[PAUSE_END]){
-				
-			}
+			openMenu = false;
+		}
+		if (menuData == PAUSE_END)
+		{
+			//title.NotTitle();
 		}
 	}
 
+	curser->SetPosition({
+	menu[menuData]->GetPosition().x - 70,
+	menu[menuData]->GetPosition().y });
 
 	if (input->TriggerKey(DIK_ESCAPE)) {
 		openMenu = !openMenu;
@@ -74,5 +82,6 @@ void Pause::MenuDraw()
 		{
 			menu[i]->Draw();
 		}
+		curser->Draw();
 	}
 }

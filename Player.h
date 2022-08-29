@@ -38,7 +38,10 @@ public:
 
 	void JumpReady();
 	void StockPlus();
+	void OnDamage(int damage);
 
+	//無敵時間さん！？
+	int mutekiTimer = 0;
 
 	float GetJumpSpd() { return jumpSpd; };
 
@@ -51,16 +54,18 @@ public:
 	bool isJumpCheck = false;
 	
 	bool IsDash() { return isDash; };
+	void SetMuteki() { mutekiTimer = MUTEKI_TIME; };
 
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
 
 	float GetMouseVRota() { return verticalRotation; };
 
+	float enforceJumpSpd = 2.0f;
+
 private:
 
 	WorldTransform prevPos;
 
-	WorldTransform modelTransform;
 
 	bool hitGround = false;
 	bool hitCeiling = false;
@@ -68,6 +73,12 @@ private:
 	bool oldIsJumpCheck = false;
 
 	bool isBossMove = false;
+
+	bool isDamageHit = false;
+
+	//ステータス関係
+	int bulletCool = 0;
+	static const int MAX_BULLET_COOL = 30;
 
 	//移動した値
 	Vector3 move = {0,0,0};
@@ -77,7 +88,7 @@ private:
 
 	Vector3 tempMoveVec;
 	Vector3 tempSideVec;
-	 
+
 	Vector3 respawnPos;
 
 	//縦方向の回転角度
@@ -87,24 +98,33 @@ private:
 	//マウスの感度
 	float mouseSpd = 0.01f;
 
-	//残基
+	//hp
 	int stock = 3;
+	int hp = 30;
+	static const int MUTEKI_TIME = 120;
 
 	//移動関係
-	float moveSpeed = 0.1f;
+
+	float InitMoveSpd = 0.21f;
+	float moveSpeed = InitMoveSpd;
 	float jumpSpd = 0.0f;
 	float gravity = 0.01f;
 
+	//スキル関係
 	float oldMoveSpd = 0;
 	int dashCoolTime = 0;
 	bool isDash = false;
 
+	//描画関係
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
 	Model* bodyModel = nullptr;
 	Model* taiyaModel = nullptr;
 
-	Sprite* newstocks[99] = { nullptr };
+	static const int MAX_STACK = 10;
+	Sprite* newstocks[MAX_STACK] = { nullptr };
+
+	Vector2 HPPOS_INIT[MAX_STACK];
 
 	Sprite* skillIconSp = nullptr;
 	Sprite* skillCoolAlpha = nullptr;
@@ -113,10 +133,13 @@ private:
 	Sprite* lShift = nullptr;
 	Sprite* shotIconSp = nullptr;
 
+	Sprite* hpRed = nullptr;
+
 	void Move(VanishParticleManager& vpmanager);
 	void Dash(VanishParticleManager& vpmanager);
 	void InputMove();
 	void Attack();
+	void DamageHitEffect();
 
 	void PlayerUpdateMatrix();
 };

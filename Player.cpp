@@ -6,14 +6,20 @@
 
 using namespace std;
 
-static const float InitMoveSpd = 0.11f;
 
 void Player::End()
 {
-	for (int i = 0; i < 99; i++)
+	for (int i = 0; i < MAX_STACK; i++)
 	{
 		delete newstocks[i];
 	}
+	delete skillIconSp;
+	delete shotIconSp;
+	delete skillCoolAlpha;
+	delete backWhite;
+	delete backWhite2;
+	delete lShift;
+	delete hpRed;
 }
 
 void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
@@ -26,12 +32,18 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	this->bodyModel = bodyModel;
 	this->taiyaModel = taiyaModel;
 
-	for (int i = 0; i < 99; i++)
+	for (int i = 0; i < MAX_STACK; i++)
 	{
-		newstocks[i] = Sprite::Create(TextureManager::Load("life.png"), {0,0});
+		newstocks[i] = Sprite::Create(TextureManager::Load("lifecase2.png"), {0,0});
 		newstocks[i]->SetSize({ 100,100 });
-		newstocks[i]->SetPosition({ 0 + (i * 100.0f), 0 });
+		HPPOS_INIT[i] = { 0 + (i * 100.0f), WinApp::kWindowHeight - 100 };
+		newstocks[i]->SetPosition(HPPOS_INIT[i]);
+		
 	}
+
+	hpRed = Sprite::Create(TextureManager::Load("red.png"), { 0,0 });
+	hpRed->SetPosition({ newstocks[0]->GetPosition().x,newstocks[0]->GetPosition().y });
+	hpRed->SetSize(newstocks[0]->GetSize());
 
 	skillIconSp = Sprite::Create(TextureManager::Load("dash_skill_icon.png"), { 0,0 });
 	shotIconSp = Sprite::Create(TextureManager::Load("shot_skill_icon.png"), { 0,0 });
@@ -79,14 +91,16 @@ void Player::Update(VanishParticleManager &vpmanager)
 	}
 	oldIsJumpCheck = isJumpCheck;
 
+	hpRed->SetSize({ hp * 10.0f ,100});
+
+	DamageHitEffect();
+
 	//弾の削除
 	//弾の方でisDeadが呼ばれたらこっちのリストから消す設計
 	//(ちょっと直感的じゃないけどまあ一番きれい)
 	bullets_.remove_if([](std::unique_ptr<PlayerBullet>& bullet) {
 		return bullet->IsDead();
 		});
-
-	modelTransform = worldTransform_;
 
 
 	//前回のフレームの座標を保存
@@ -106,10 +120,11 @@ void Player::Update(VanishParticleManager &vpmanager)
 	{
 		verticalRotation = 0;
 	}*/
-
-	if (input_->IsTriggerMouse(0))
+	if (bulletCool > 0)bulletCool--;
+	if (input_->IsPressMouse(0) && bulletCool <= 0)
 	{
 		Attack();
+		bulletCool = MAX_BULLET_COOL;
 	}
 
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
@@ -150,12 +165,13 @@ void Player::Dash(VanishParticleManager& vpmanager)
 	isDash = false;
 	if (input_->TriggerKey(DIK_LSHIFT) && dashCoolTime <= 0)
 	{
-		moveSpeed = 1.0f;
+		moveSpeed = InitMoveSpd + 1.0f;
 		tempMoveVec = moveVec;
 		vpmanager.CreateParticle(worldTransform_.translation_,
 			{1.5f,1.5f ,1.5f },0.01f);
 		dashCoolTime = 180;
 		isDash = true;
+		SetMuteki();
 	}
 
 	oldMoveSpd = moveSpeed;
@@ -210,7 +226,7 @@ void Player::Move(VanishParticleManager& vpmanager)
 	//ジャンプする処理
 	if (input_->TriggerKey(DIK_SPACE) && isJumpCheck)
 	{
-		jumpSpd = 1.0f;
+		jumpSpd = 0.8f;
 		isJumpCheck = false;
 	}
 	//重力をかける処理
@@ -241,7 +257,7 @@ void Player::Move(VanishParticleManager& vpmanager)
 	if (worldTransform_.translation_.y <= -100)
 	{
 		worldTransform_.translation_ = respawnPos;
-		stock -= 1;
+		hp -= 10;
 	}
 }
 
@@ -260,6 +276,38 @@ void Player::Attack()
 
 	//弾を登録する
 	bullets_.push_back(std::move(newBullet));
+}
+
+void Player::DamageHitEffect()
+{
+	if (mutekiTimer > 0)
+	{
+		if (mutekiTimer > 100 && isDamageHit)
+		{
+			for (int i = 0; i < MAX_STACK; i++)
+			{
+				Vector2 shake;
+				shake.x = RNG(-10, 10);
+				shake.y = RNG(-10, 10);
+				newstocks[i]->SetPosition({ HPPOS_INIT[i].x + shake.x ,HPPOS_INIT[i].y + shake.y });
+			}
+			Vector2 allshake;
+			allshake.x = RNG(-1, 1);
+			allshake.y = RNG(-1, 1);
+
+			object::ScreenShake(allshake);
+		}
+		else
+		{
+			isDamageHit = false;
+			for (int i = 0; i < MAX_STACK; i++)
+			{
+				newstocks[i]->SetPosition(HPPOS_INIT[i]);
+			}
+			object::ScreenShake({ 0,0 });
+		}
+		mutekiTimer--;
+	}
 }
 
 void Player::Draw(ViewProjection viewProjection_)
@@ -305,9 +353,12 @@ void Player::Draw(ViewProjection viewProjection_)
 
 	}
 
-	model_->Draw(modelTransform, viewProjection_);
-	bodyModel->Draw(modelTransform, viewProjection_);
-	taiyaModel->Draw(modelTransform, viewProjection_);
+	if (mutekiTimer % 6 == 0)
+	{
+		model_->Draw(worldTransform_, viewProjection_);
+		bodyModel->Draw(worldTransform_, viewProjection_);
+		taiyaModel->Draw(worldTransform_, viewProjection_);
+	}
 
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
@@ -317,9 +368,11 @@ void Player::Draw(ViewProjection viewProjection_)
 
 void Player::SpriteDraw()
 {
+	hpRed->Draw();
+
 	for (int i = 0; i < stock; i++)
 	{
-		//newstocks[i]->Draw();
+		newstocks[i]->Draw();
 	}
 
 	backWhite->Draw();
@@ -457,13 +510,27 @@ bool Player::CheckHitBox(WorldTransform box)
 
 void Player::StockPlus()
 {
-	stock += 1;
+	if (stock < MAX_STACK)
+	{
+		stock += 1;
+	}
+	hp += 10;
+}
+
+void Player::OnDamage(int damage)
+{
+	if (mutekiTimer == 0)
+	{
+		SetMuteki();
+		isDamageHit = true;
+		hp -= damage;
+	}
 }
 
 void Player::EnforceJumpOnCol()
 {
 	jumpSpd = 0;
-	jumpSpd += 2.0f;
+	jumpSpd += enforceJumpSpd;
 }
 
 void Player::EnforceGoalOnCol()

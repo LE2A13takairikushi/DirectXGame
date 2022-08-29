@@ -60,77 +60,89 @@ void GameScene::Initialize() {
 	winApp_;
 	debugCamera_ = new DebugCamera(winApp_.kWindowWidth, winApp_.kWindowHeight);
 
-	if (debugCameraMode)
-	{
-		PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());	
-		//AxisIndicator::GetInstance()->SetVisible(true);
-		//AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
-	}
-	else
-	{
-		PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
-		//AxisIndicator::GetInstance()->SetVisible(true);
-		//AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
-	}
-
-	//skydome = Model::CreateFromOBJ("skydome");
+	PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
 
 	skydome.Initialize(modelManager->skydome);
 
 	gManager.Initialize(modelManager->model_);
 	iManager.Initialize(modelManager->model_);
-	enemyEManager.Initialize(modelManager->model_);
+	enemyEManager.Initialize(gManager.GetBossStagePos(), modelManager->model_);
 	jEManager.Initialize(modelManager->model_);
 	vEManager.Initialize(modelManager->model_);
 
 	Goal.Initialize(modelManager->model_,TextureManager::Load("goal.png"));
-	Goal.SetPos({ 200,300,200 });
+	Goal.SetPos({ 490,370,420 });
 	Goal.SetScale({ 8, 8, 8 });
 
 	fpsFix.Initialize();
 
 	vpManager.Initialize(modelManager->model_,white);
-	pObjectManager.Initialize(modelManager->model_, white);
+	pObjectManager.Initialize(gManager.GetBossStagePos(), 
+		gManager.GetBossStageScale(),
+		modelManager->model_,
+		white);
 	pause.Initialize();
 
 	player_.SetSpawnPos(gManager.GetSpawnPos());
+
+
+	title.Initialize(modelManager->player, modelManager->body, modelManager->taiya, titleView);
+	titleView.Initialize();
+	titleView.fovAngleY = DegreeConversionRad(90.0f);
+	//アスペクト比
+	titleView.aspectRatio = 1.0f;
 }
 
 void GameScene::Update() {
 	fpsFix.Update();
 
-	if (pause.IsMenuOpen() == false)
+	if (title.IsTitle())
 	{
-		debugCamera_->Update();
-
-		gManager.Update();
-		iManager.Update();
-		enemyEManager.Update();
-		jEManager.Update();
-		vEManager.Update();
-
-		Goal.Update();
-
-		player_.Update(vpManager);
-
-		CheckPlayerAllCollision();
-
-		player_.UpdateMatrixAndMove();
-
-		CheckEnemyAllCollision();
-
-		vpManager.Update();
-		pObjectManager.Update();
-
-		enemyManager->Update(player_.GetPos(),bossManager.IsBossBattle(), vpManager);
-		
-		bossManager.Update(gManager.GetBossStagePos(),
-			gManager.GetBossStageScale(),player_.GetPos(),
-		vpManager);
-
-		CheckBulletCollision();
-
+		title.Update();
 	}
+	else
+	{
+		if (pause.IsMenuOpen() == false)
+		{
+			debugCamera_->Update();
+
+			gManager.Update();
+			iManager.Update();
+			enemyEManager.Update();
+			jEManager.Update();
+			vEManager.Update();
+
+			Goal.Update();
+
+			player_.Update(vpManager);
+
+			CheckPlayerAllCollision();
+
+			player_.UpdateMatrixAndMove();
+
+			CheckEnemyAllCollision();
+
+			vpManager.Update();
+			pObjectManager.Update();
+
+			enemyManager->Update(player_.GetPos(), bossManager.IsBossBattle(), vpManager);
+
+			bossManager.Update(gManager.GetBossStagePos(),
+				gManager.GetBossStageScale(), player_.GetPos(),
+				vpManager);
+
+			CheckBulletCollision();
+
+			viewProjection_.target = player_.GetWorldTrans().translation_;
+
+			//マウスでカメラを動かす処理
+			const float length = 10.0f;
+			viewProjection_.eye = player_.GetWorldTrans().translation_ + (-player_.centerVec.normalize() * length);
+
+		}
+		pause.Update();
+	}
+	viewProjection_.UpdateMatrix();
 
 	if (true)
 	{
@@ -138,23 +150,6 @@ void GameScene::Update() {
 		debugText_->Printf("fps %f", fpsFix.fps);
 	}
 
-	pause.Update();
-
-	if (debugCameraMode == false)
-	{
-		//クォータニオンでは、注視点のオブジェクトの回転量がわかる
-		//これをカメラに入れるには、注視点オブジェクトの正面ベクトルをカメラのベクトルに代入する
-
-		viewProjection_.target = player_.GetWorldTrans().translation_;
-
-		//マウスでカメラを動かす処理
-		const float length = 10.0f;
-
-		viewProjection_.eye = player_.GetWorldTrans().translation_ + (-player_.centerVec.normalize() * length);
-
-		viewProjection_.UpdateMatrix();
-	}
-	viewProjection_.UpdateMatrix();
 }
 
 void GameScene::Draw() {
@@ -188,23 +183,29 @@ void GameScene::Draw() {
 	
 	skydome.Draw(viewProjection_);
 
-	gManager.Draw(viewProjection_);
-	iManager.Draw(viewProjection_);
-	enemyEManager.Draw(viewProjection_);
-	jEManager.Draw(viewProjection_);
-	vEManager.Draw(viewProjection_);
-	pObjectManager.Draw(viewProjection_);
+	if (title.IsTitle())
+	{
+		title.ModelDraw(titleView);
+	}
+	else
+	{
+		gManager.Draw(viewProjection_);
+		iManager.Draw(viewProjection_);
+		enemyEManager.Draw(viewProjection_);
+		jEManager.Draw(viewProjection_);
+		vEManager.Draw(viewProjection_);
+		pObjectManager.Draw(viewProjection_);
 
-	Goal.Draw(viewProjection_);
+		Goal.Draw(viewProjection_);
 
-	player_.Draw(viewProjection_);
+		player_.Draw(viewProjection_);
 
-	bossManager.Draw(viewProjection_,player_.GetMouseVRota());
-	enemyManager->Draw(viewProjection_);
+		bossManager.Draw(viewProjection_, player_.GetMouseVRota());
+		enemyManager->Draw(viewProjection_);
 
-	vpManager.Draw(viewProjection_);
-	//particleManager.Draw(viewProjection_);
-
+		vpManager.Draw(viewProjection_);
+	}
+	
 	if (false)
 	{
 		PrimitiveDrawer::GetInstance()->DrawLine3d(Vector3(-100, 0, 0), Vector3(100, 0, 0), Vector4(255, 0, 0, 255));
@@ -224,9 +225,17 @@ void GameScene::Draw() {
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 	
-	player_.SpriteDraw();
-	bossManager.BossUIDraw();
-	pause.MenuDraw();
+	if (title.IsTitle() == false)
+	{
+		player_.SpriteDraw();
+		bossManager.BossUIDraw();
+		pause.MenuDraw();
+	}
+
+	if (title.IsTitle())
+	{
+		title.Draw();
+	}
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
@@ -274,6 +283,7 @@ void GameScene::CheckBulletCollision()
 			if (BoxColAABB(posA, posB))
 			{
 				bullet->OnCollision();
+				player_.OnDamage(1);
 			}
 		}
 	}
@@ -323,6 +333,16 @@ void GameScene::CheckBulletCollision()
 				boss->OnWeekColision();
 				bullet->OnCollision();
 			}
+		}
+	}
+	//自分とボスの当たり判定
+	for (const unique_ptr<Boss>& boss : bossManager.GetBossList())
+	{
+		posA = player_.GetWorldTrans();
+		posB = boss->GetBossPart(0).GetWorldTrans();
+		if (BoxColAABB(posA, posB))
+		{
+			player_.OnDamage(1);
 		}
 	}
 }
@@ -393,12 +413,15 @@ void GameScene::CheckPlayerAllCollision()
 	for (const unique_ptr<EventObject>& eventObj : jEManager.GetObjects())
 	{
 		posB = eventObj->GetWorldTrans();
-		if (BoxColAABB(posA, posB) && eventObj->IsEvent() == false)
+		if (BoxColAABB(posA, posB))
 		{
-			player_.EnforceJumpOnCol();
-			eventObj->EventStart();
+			if (eventObj->IsEvent() == false)
+			{
+				player_.EnforceJumpOnCol();
+				eventObj->EventStart();
+			}
 		}
-		if (player_.isJumpCheck)
+		else
 		{
 			eventObj->EventEnd();
 		}
@@ -409,6 +432,20 @@ void GameScene::CheckPlayerAllCollision()
 
 		if (player_.CheckHitBox(posB))
 		{
+			eventObj->EventStart();
+		}
+
+		if (eventObj->IsEvent())
+		{
+			eventObj->CountUp();
+			//二秒たったら消す
+			if (eventObj->GetEventCount() >= 120)
+			{
+				eventObj->NotCol();
+				eventObj->EventEnd();
+				vpManager.CreateParticle(eventObj->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
+			}
+
 			if (eventObj->GetEventCount() <= 60)
 			{
 				eventObj->Vibration(-0.1f, 0.1f);
@@ -416,13 +453,6 @@ void GameScene::CheckPlayerAllCollision()
 			else
 			{
 				eventObj->Vibration(-0.5f, 0.5f);
-			}
-			eventObj->CountUp();
-			//二秒たったら消す
-			if (eventObj->GetEventCount() >= 120)
-			{
-				eventObj->NotCol();
-				vpManager.CreateParticle(eventObj->GetWorldTrans().translation_,{ 3.0f ,3.0f ,3.0f },0.03f);
 			}
 		}
 		else
@@ -434,9 +464,11 @@ void GameScene::CheckPlayerAllCollision()
 			}
 			if (eventObj->GetEventCount() <= 0)
 			{
-				eventObj->InitScale();
+				eventObj->RemoveScale();
+				
 			}
 		}
+
 	}
 
 	//ゴール時の処理

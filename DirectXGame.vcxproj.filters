@@ -195,16 +195,19 @@
     <ClCompile Include="SplitParticle.cpp">
       <Filter>ソース ファイル\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="Boss.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="BossManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleObject.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Boss.cpp">
+      <Filter>ソース ファイル\character</Filter>
     </ClCompile>
     <ClCompile Include="PartObjectManager.cpp">
+      <Filter>ソース ファイル\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleObject.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="Title.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -377,16 +380,19 @@
     <ClInclude Include="SplitParticle.h">
       <Filter>ヘッダー ファイル\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="PartObjectManager.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
     <ClInclude Include="Boss.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\character</Filter>
     </ClInclude>
     <ClInclude Include="BossManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Manager</Filter>
     </ClInclude>
     <ClInclude Include="ParticleObject.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
-    <ClInclude Include="PartObjectManager.h">
+    <ClInclude Include="Title.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

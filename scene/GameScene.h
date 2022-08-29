@@ -35,6 +35,8 @@
 
 #include "PartObjectManager.h"
 
+#include "Title.h"
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -110,7 +112,8 @@ private: // メンバ変数
 
 	FPSfix fpsFix;
 
-	bool debugCameraMode = false;
+	Title title;
+	ViewProjection titleView;
 
 	/// <summary>
 	/// ゲームシーン用

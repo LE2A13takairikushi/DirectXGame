@@ -43,3 +43,10 @@ void object::MatUpdate()
 	worldTransform_.UpdateMatrix();
 	worldTransform_.TransferMatrix();
 }
+
+Vector3 object::screenShake = { 0,0,0 };
+
+void object::ScreenShake(Vector2 shake)
+{
+	screenShake = { shake.x,shake.y ,0 };
+}
