@@ -173,7 +173,19 @@ void GroundManager::Initialize(Model* model_)
 	bossStageScale = { 100,10,100 };
 	SetBox(bossStagePos, bossStageScale);
 
-	SetSpawnPos({ 500,350,300 },10);
+	//
+	for (int i = 0; i < 5; i++)
+	{
+		unique_ptr<BoxObj> newBox = make_unique<BoxObj>();
+		newBox->Initialize(model_);
+		newBox->LoadTexture(TextureManager::Load("spawn.png"));
+		newBox->SetPos({ 490,360 + i * 20.0f,280 });
+		newBox->SetScale({ 10,10,10 });
+		enforceObjects.push_back(std::move(newBox));
+	}
+
+
+	SetSpawnPos({ 0, 0, 50 },10);
 }
 
 void GroundManager::EventStart(Vector3 playerPos)
@@ -233,6 +245,42 @@ void GroundManager::BossBattleEnd()
 	BossBattleObject.clear();
 }
 
+void GroundManager::EnforceEventStart()
+{
+	for (int i = 0; i < 5; i++)
+	{
+		unique_ptr<BoxObj> newBox = make_unique<BoxObj>();
+		newBox->Initialize(model_);
+		newBox->LoadTexture(TextureManager::Load("spawn.png"));
+		newBox->SetPos({ 650 ,360 + i * 20.0f,100 });
+		newBox->SetScale({ 10,10,10 });
+		enforceObjects.push_back(std::move(newBox));
+	}
+}
+
+void GroundManager::EnforceEventEnd()
+{
+	enforceObjects.clear();
+}
+
+void GroundManager::DeadInit()
+{
+	eventObjects.clear();
+	enforceObjects.clear();
+	BossBattleObject.clear();
+
+	for (int i = 0; i < 5; i++)
+	{
+		unique_ptr<BoxObj> newBox = make_unique<BoxObj>();
+		newBox->Initialize(model_);
+		newBox->LoadTexture(TextureManager::Load("spawn.png"));
+		newBox->SetPos({ 490,360 + i * 20.0f,280 });
+		newBox->SetScale({ 10,10,10 });
+		enforceObjects.push_back(std::move(newBox));
+	}
+
+}
+
 void GroundManager::Update()
 {
 	for (unique_ptr<BoxObj>& Object : Objects)
@@ -247,6 +295,10 @@ void GroundManager::Update()
 	{
 		Object->Update();
 	}
+	for (unique_ptr<BoxObj>& Object : enforceObjects)
+	{
+		Object->Update();
+	}
 }
 
 void GroundManager::Draw(ViewProjection viewProjection_)
@@ -256,6 +308,10 @@ void GroundManager::Draw(ViewProjection viewProjection_)
 		Object->Draw(viewProjection_);
 	}
 	for (unique_ptr<BoxObj>& Object : eventObjects)
+	{
+		Object->Draw(viewProjection_);
+	}
+	for (unique_ptr<BoxObj>& Object : enforceObjects)
 	{
 		Object->Draw(viewProjection_);
 	}

@@ -26,10 +26,13 @@ public:
 	void PhaseChange(Phase phase_);
 
 	bool IsDead() { return isDead; }
+	void revival() { isDead = false; };
 
 	void OnWallMove();
 
 	void CheckHitBox(WorldTransform box);
+
+	void SetAttackCount(int aCount) { attackCount = aCount; };
 
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 

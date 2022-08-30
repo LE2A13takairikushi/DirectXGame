@@ -14,7 +14,11 @@ public:
 		return Items;
 	};
 
+	void DeadInit();
+
 private:
+	void SetObjects();
+
 	std::list <std::unique_ptr<Item>> Items;
 	Model* model_ = nullptr;
 };

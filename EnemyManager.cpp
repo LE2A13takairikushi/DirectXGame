@@ -14,6 +14,15 @@ EnemyManager::~EnemyManager()
 	
 }
 
+void EnemyManager::DeadInit()
+{
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		enemy->revival();
+	}
+	enemys.clear();
+}
+
 void EnemyManager::Initialize(Model* model_, Model* partModel, TextureHandle tex)
 {
 	assert(model_);
@@ -25,12 +34,15 @@ void EnemyManager::Initialize(Model* model_, Model* partModel, TextureHandle tex
 void EnemyManager::EnemyPop(VanishParticleManager& vpmanager)
 {
 	Vector3 tempPopPos = popPos;
-	tempPopPos.x += RNG(-30, 30);
-	tempPopPos.y += RNG(0,10);
-	tempPopPos.z += RNG(-30, 30);
+	tempPopPos.x += RNG(-40, 40);
+	tempPopPos.y += RNG(5,15);
+	tempPopPos.z += RNG(-40, 40);
 
 	unique_ptr<Enemy> newEnemy = make_unique<Enemy>();
 	newEnemy->Initialize(model_, partModel_,tex,tempPopPos);
+
+
+	newEnemy->SetAttackCount(RNG(-30, 100));
 
 	vpmanager.CreateParticle(newEnemy->GetWorldTrans().translation_, 
 		{ 1.0f,1.0f ,1.0f }, 0.03f);

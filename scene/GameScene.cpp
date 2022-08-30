@@ -102,6 +102,7 @@ void GameScene::Update() {
 	}
 	else
 	{
+
 		if (pause.IsMenuOpen() == false)
 		{
 			debugCamera_->Update();
@@ -112,6 +113,7 @@ void GameScene::Update() {
 			jEManager.Update();
 			vEManager.Update();
 
+			Goal.worldTransform_.rotation_.y += 0.01f;
 			Goal.Update();
 
 			player_.Update(vpManager);
@@ -140,15 +142,30 @@ void GameScene::Update() {
 			viewProjection_.eye = player_.GetWorldTrans().translation_ + (-player_.centerVec.normalize() * length);
 
 		}
+
+		if (player_.IsDead())
+		{
+			player_.DeadInit();
+			gManager.DeadInit();
+			iManager.DeadInit();
+			enemyEManager.DeadInit();
+			enemyManager->DeadInit();
+			bossManager.DeadInit();
+		}
+
 		pause.Update();
 	}
 	viewProjection_.UpdateMatrix();
 
-	if (true)
+	if (false)
 	{
 		debugText_->SetPos(WinApp::kWindowWidth - 50, 50);
 		debugText_->Printf("fps %f", fpsFix.fps);
 	}
+
+
+	debugText_->SetPos(50, 50);
+	debugText_->Printf("player_ %d", player_.IsDead());
 
 }
 
@@ -283,7 +300,7 @@ void GameScene::CheckBulletCollision()
 			if (BoxColAABB(posA, posB))
 			{
 				bullet->OnCollision();
-				player_.OnDamage(1);
+				player_.OnDamage(5);
 			}
 		}
 	}
@@ -342,7 +359,7 @@ void GameScene::CheckBulletCollision()
 		posB = boss->GetBossPart(0).GetWorldTrans();
 		if (BoxColAABB(posA, posB))
 		{
-			player_.OnDamage(1);
+			player_.OnDamage(8);
 		}
 	}
 }
@@ -365,6 +382,11 @@ void GameScene::CheckPlayerAllCollision()
 		player_.CheckHitBox(posB);
 	}
 	for (const unique_ptr<BoxObj>& object : gManager.GetBossObjects())
+	{
+		posB = object->GetWorldTrans();
+		player_.CheckHitBox(posB);
+	}
+	for (const unique_ptr<BoxObj>& object : gManager.GetEnforceObjects())
 	{
 		posB = object->GetWorldTrans();
 		player_.CheckHitBox(posB);
@@ -407,6 +429,33 @@ void GameScene::CheckPlayerAllCollision()
 			//周りの壁を消す
 			gManager.EventEnd();
 			eventObj->Erase();
+		}
+	}
+	for (const unique_ptr<EventObject>& eventObj : enemyEManager.GetEnforceObjects())
+	{
+		posB = eventObj->GetWorldTrans();
+		if (BoxColAABB(posA, posB) && eventObj->IsEvent() == false)
+		{
+			gManager.EnforceEventStart();
+			enemyManager->EventStart(vpManager);
+			eventObj->EventStart();
+
+		}
+		//イベント中なら敵が倒したかをカウントする
+		if (eventObj->IsEvent())
+		{
+			eventObj->SetEventCount(enemyManager->GetEventCount());
+		}
+		if (eventObj->GetEventCount() <= 0 && eventObj->IsEvent())
+		{
+			vpManager.CreateParticle(eventObj->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
+			for (const unique_ptr<BoxObj>& object : gManager.GetEnforceObjects())
+			{
+				vpManager.CreateParticle(object->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
+			}
+
+			eventObj->Erase();
+			gManager.EnforceEventEnd();
 		}
 	}
 

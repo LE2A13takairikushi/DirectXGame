@@ -102,7 +102,7 @@ void Enemy::Attack()
 	attackCount++;
 
 	//’e‚ÌˆÊ’u‚ðŒˆ’è
-	if (attackCount == MAX_ATTACK_COUNT)
+	if (attackCount >= MAX_ATTACK_COUNT)
 	{
 		tempVec = pCenterVec;
 		

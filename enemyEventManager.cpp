@@ -7,11 +7,16 @@ void enemyEventManager::Initialize(Vector3 stagePos, Model* model_)
 {
 	EventManager::Initialize(model_,TextureManager::Load("hatena.png"));
 	bossTex = TextureManager::Load("spawn.png");
-	SetObjects(stagePos);
+	bossStagePos = stagePos;
+	SetObjects(bossStagePos);
 }
 
 void enemyEventManager::Update()
 {
+	for (unique_ptr<EventObject>& Object : Objects)
+	{
+		Object->worldTransform_.rotation_.y += 0.01f;
+	}
 	EventManager::Update();
 	BossObjects.remove_if([](std::unique_ptr<EventObject>& bossObj) {
 		return bossObj->IsDead();
@@ -19,6 +24,17 @@ void enemyEventManager::Update()
 
 	for (unique_ptr<EventObject>& Object : BossObjects)
 	{
+		Object->worldTransform_.rotation_.y += 0.01f;
+		Object->Update();
+	}
+	
+	EnforceObjects.remove_if([](std::unique_ptr<EventObject>& enforceObject) {
+		return enforceObject->IsDead();
+		});
+
+	for (unique_ptr<EventObject>& Object : EnforceObjects)
+	{
+		Object->worldTransform_.rotation_.y += 0.01f;
 		Object->Update();
 	}
 }
@@ -30,6 +46,18 @@ void enemyEventManager::Draw(ViewProjection view)
 	{
 		Object->Draw(view);
 	}
+	for (unique_ptr<EventObject>& Object : EnforceObjects)
+	{
+		Object->Draw(view);
+	}
+}
+
+void enemyEventManager::DeadInit()
+{
+	Objects.clear();
+	BossObjects.clear();
+	EnforceObjects.clear();
+	SetObjects(bossStagePos);
 }
 
 void enemyEventManager::SetObjects(Vector3 stagePos)
@@ -42,5 +70,11 @@ void enemyEventManager::SetObjects(Vector3 stagePos)
 	newBox->SetPos({ stagePos.x, stagePos.y + 30, stagePos.z });
 	newBox->SetScale({ 5, 5, 5 });
 	BossObjects.push_back(std::move(newBox));
+
+	unique_ptr<EventObject> newBox2 = make_unique<EventObject>();
+	newBox2->Initialize(model_, bossTex);
+	newBox2->SetPos({ 560, 370, 190 });
+	newBox2->SetScale({ 2, 2, 2 });
+	EnforceObjects.push_back(std::move(newBox2));
 
 }

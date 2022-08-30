@@ -50,3 +50,9 @@ void BossManager::SpawnBoss(Vector3 initpos)
 	newBoss->SetPos(initpos);
 	bossList.push_back(std::move(newBoss));
 }
+
+void BossManager::DeadInit()
+{
+	isBossBattle = false;
+	bossList.clear();
+}

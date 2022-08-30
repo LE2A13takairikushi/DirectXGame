@@ -23,6 +23,8 @@ public:
 	bool BossBattleStart() { return isBossBattle = true; };
 	bool BossBattleEnd() { return isBossBattle = false; };
 
+	void DeadInit();
+
 private:
 	std::list<std::unique_ptr<Boss>> bossList;
 

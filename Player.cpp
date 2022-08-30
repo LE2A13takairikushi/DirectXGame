@@ -18,8 +18,22 @@ void Player::End()
 	delete skillCoolAlpha;
 	delete backWhite;
 	delete backWhite2;
+	delete backWhite3;
 	delete lShift;
 	delete hpRed;
+	delete mouseIcon;
+	delete jumpIcon;
+	delete spaceIcon;
+}
+
+void Player::DeadInit()
+{
+	worldTransform_.translation_ = respawnPos;
+	stock = 3;
+	hp = 30; 
+	jumpSpd = 0;
+
+	isDead = false;
 }
 
 void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
@@ -38,7 +52,6 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 		newstocks[i]->SetSize({ 100,100 });
 		HPPOS_INIT[i] = { 0 + (i * 100.0f), WinApp::kWindowHeight - 100 };
 		newstocks[i]->SetPosition(HPPOS_INIT[i]);
-		
 	}
 
 	hpRed = Sprite::Create(TextureManager::Load("red.png"), { 0,0 });
@@ -50,7 +63,11 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	skillCoolAlpha = Sprite::Create(TextureManager::Load("alpha.png"), { 0,0 },{1,1,1,0.9f});
 	backWhite = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
 	backWhite2 = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
+	backWhite3 = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
 	lShift = Sprite::Create(TextureManager::Load("Lshift.png"), { 0,0 });
+	mouseIcon = Sprite::Create(TextureManager::Load("mouse.png"), { 0,0 });
+	jumpIcon = Sprite::Create(TextureManager::Load("jump_skill_icon.png"), { 0,0 });
+	spaceIcon = Sprite::Create(TextureManager::Load("space.png"), { 0,0 });
 
 	Vector2 dashSkillPos = {
 		WinApp::kWindowWidth - 160,
@@ -63,6 +80,9 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	skillIconSp->SetSize({ 80,80 });
 	skillIconSp->SetPosition(dashSkillPos);
 
+	jumpIcon->SetSize({ 80,80 });
+	jumpIcon->SetPosition({ dashSkillPos.x - 240, dashSkillPos.y});
+
 	skillCoolAlpha->SetSize({ 80,80 });
 	skillCoolAlpha->SetPosition(dashSkillPos);
 
@@ -72,8 +92,17 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	backWhite2->SetSize({ 90,90 });
 	backWhite2->SetPosition({ dashSkillPos.x - 125,dashSkillPos.y - 5 });
 
+	backWhite3->SetSize({ 90,90 });
+	backWhite3->SetPosition({ dashSkillPos.x - 245,dashSkillPos.y - 5 });
+
 	lShift->SetSize({ 120,30 });
 	lShift->SetPosition({ dashSkillPos.x - 15,dashSkillPos.y + 75 });
+	
+	mouseIcon->SetSize({ 120,30 });
+	mouseIcon->SetPosition({ dashSkillPos.x - 120 - 15,dashSkillPos.y + 75 });
+	
+	spaceIcon->SetSize({ 120,30 });
+	spaceIcon->SetPosition({ dashSkillPos.x - 240 - 15,dashSkillPos.y + 75 });
 }
 
 void Player::SetSpawnPos(Vector3 pos)
@@ -84,16 +113,17 @@ void Player::SetSpawnPos(Vector3 pos)
 
 void Player::Update(VanishParticleManager &vpmanager)
 {
+	hpRed->SetSize({ hp * 10.0f ,100 });
+	DamageHitEffect();
+
+	if (hp <= 0) isDead = true;
+
 	if (oldIsJumpCheck == false && isJumpCheck)
 	{
 		vpmanager.CreateSplitParticle(worldTransform_.translation_,
 			{ 0.5f,0.5f,0.5f }, 0.01f);
 	}
 	oldIsJumpCheck = isJumpCheck;
-
-	hpRed->SetSize({ hp * 10.0f ,100});
-
-	DamageHitEffect();
 
 	//’e‚Ìíœ
 	//’e‚Ì•û‚ÅisDead‚ªŒÄ‚Î‚ê‚½‚ç‚±‚Á‚¿‚ÌƒŠƒXƒg‚©‚çÁ‚·ÝŒv
@@ -121,7 +151,7 @@ void Player::Update(VanishParticleManager &vpmanager)
 		verticalRotation = 0;
 	}*/
 	if (bulletCool > 0)bulletCool--;
-	if (input_->IsPressMouse(0) && bulletCool <= 0)
+	if ((input_->IsPressMouse(0) || input_->IsPressMouse(1)) && bulletCool <= 0)
 	{
 		Attack();
 		bulletCool = MAX_BULLET_COOL;
@@ -381,6 +411,11 @@ void Player::SpriteDraw()
 
 	backWhite2->Draw();
 	shotIconSp->Draw();
+	mouseIcon->Draw();
+
+	backWhite3->Draw();
+	jumpIcon->Draw();
+	spaceIcon->Draw();
 
 	if (dashCoolTime > 0)
 	{

@@ -62,10 +62,15 @@ public:
 
 	float enforceJumpSpd = 2.0f;
 
+	bool IsDead() { return isDead; };
+
+	void DeadInit();
+
 private:
 
 	WorldTransform prevPos;
 
+	bool isDead = false;
 
 	bool hitGround = false;
 	bool hitCeiling = false;
@@ -130,8 +135,12 @@ private:
 	Sprite* skillCoolAlpha = nullptr;
 	Sprite* backWhite = nullptr;
 	Sprite* backWhite2 = nullptr;
+	Sprite* backWhite3 = nullptr;
 	Sprite* lShift = nullptr;
 	Sprite* shotIconSp = nullptr;
+	Sprite* mouseIcon = nullptr;
+	Sprite* jumpIcon = nullptr;
+	Sprite* spaceIcon = nullptr;
 
 	Sprite* hpRed = nullptr;
 

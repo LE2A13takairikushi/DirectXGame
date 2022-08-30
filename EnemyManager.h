@@ -22,6 +22,8 @@ public:
 	EnemyManager(Model* model_, Model* partModel, TextureHandle tex);
 	~EnemyManager();
 
+	void DeadInit();
+
 private:
 	int popCount = 0;
 

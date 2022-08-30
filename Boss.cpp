@@ -355,7 +355,7 @@ void Boss::Draw(ViewProjection view,float mouseVertRota)
 		exclamationObj.Draw(view);
 	}
 	
-	if (true)
+	if (false)
 	{
 		dT->SetPos(50, 50);
 		dT->Printf("bossPos %f %f %f",

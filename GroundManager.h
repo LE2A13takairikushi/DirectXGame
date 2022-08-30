@@ -20,6 +20,10 @@ public:
 		return eventObjects;
 	};
 	
+	const std::list <std::unique_ptr<BoxObj>>& GetEnforceObjects() {
+		return enforceObjects;
+	};
+	
 	const std::list <std::unique_ptr<BoxObj>>& GetBossObjects() {
 		return BossBattleObject;
 	};
@@ -37,10 +41,17 @@ public:
 	void BossBattleStart();
 	void BossBattleEnd();
 
+	void EnforceEventStart();
+	void EnforceEventEnd();
+
+	void DeadInit();
+
 private:
 	std::list <std::unique_ptr<BoxObj>> Objects;
 
 	std::list <std::unique_ptr<BoxObj>> eventObjects;
+
+	std::list <std::unique_ptr<BoxObj>> enforceObjects;
 
 	std::list <std::unique_ptr<BoxObj>> BossBattleObject;
 
