@@ -95,6 +95,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ArrowBoardManager.cpp" />
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\TextureManager.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
@@ -102,6 +103,7 @@
     <ClCompile Include="BossManager.cpp" />
     <ClCompile Include="BoxObj.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="checkPointManager.cpp" />
     <ClCompile Include="Collsion.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
@@ -112,6 +114,7 @@
     <ClCompile Include="FPSfix.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="GroundManager.cpp" />
+    <ClCompile Include="HealItemManager.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemManager.cpp" />
     <ClCompile Include="JumpEventManager.cpp" />
@@ -154,6 +157,7 @@
     <ClInclude Include="3d\SpotLight.h" />
     <ClInclude Include="3d\ViewProjection.h" />
     <ClInclude Include="3d\WorldTransform.h" />
+    <ClInclude Include="ArrowBoardManager.h" />
     <ClInclude Include="audio\Audio.h" />
     <ClInclude Include="base\DirectXCommon.h" />
     <ClInclude Include="base\SafeDelete.h" />
@@ -163,6 +167,7 @@
     <ClInclude Include="BossManager.h" />
     <ClInclude Include="BoxObj.h" />
     <ClInclude Include="Bullet.h" />
+    <ClInclude Include="checkPointManager.h" />
     <ClInclude Include="Collsion.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBullet.h" />
@@ -173,6 +178,7 @@
     <ClInclude Include="FPSfix.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="GroundManager.h" />
+    <ClInclude Include="HealItemManager.h" />
     <ClInclude Include="input\Input.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemManager.h" />

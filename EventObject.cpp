@@ -19,13 +19,20 @@ void EventObject::Update()
 	object::MatUpdate();
 }
 
-void EventObject::Draw(ViewProjection view)
+void EventObject::Draw(ViewProjection view,TextureHandle tex)
 {
 	WorldTransform tempworld = worldTransform_;
 	tempworld.translation_ += screenShake;
 	tempworld.UpdateMatrix();
 	tempworld.TransferMatrix();
-	model_->Draw(tempworld, view, textureHandle_);
+	if (tex == 0)
+	{
+		model_->Draw(tempworld, view, textureHandle_);
+	}
+	else
+	{
+		model_->Draw(tempworld, view, tex);
+	}
 }
 
 void EventObject::LoadTexture(TextureHandle tex)

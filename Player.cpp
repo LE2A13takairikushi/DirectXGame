@@ -26,6 +26,15 @@ void Player::End()
 	delete spaceIcon;
 }
 
+void Player::HealEffect(int heal)
+{
+	hp += heal;
+	if (hp > stock * 10)
+	{
+		hp = stock * 10;
+	}
+}
+
 void Player::DeadInit()
 {
 	worldTransform_.translation_ = respawnPos;
@@ -42,6 +51,8 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	assert(bodyModel);
 
 	worldTransform_.Initialize();
+	worldTransform_.translation_ = respawnPos;
+
 	this->model_ = model_;
 	this->bodyModel = bodyModel;
 	this->taiyaModel = taiyaModel;
@@ -107,7 +118,7 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 
 void Player::SetSpawnPos(Vector3 pos)
 {
-	worldTransform_.translation_ = pos;
+	//worldTransform_.translation_ = pos;
 	respawnPos = pos;
 }
 
@@ -287,7 +298,7 @@ void Player::Move(VanishParticleManager& vpmanager)
 	if (worldTransform_.translation_.y <= -100)
 	{
 		worldTransform_.translation_ = respawnPos;
-		hp -= 10;
+		OnDamage(5);
 	}
 }
 
@@ -342,7 +353,7 @@ void Player::DamageHitEffect()
 
 void Player::Draw(ViewProjection viewProjection_)
 {
-	if (false)
+	if (true)
 	{
 		debugText->SetPos(50, 50);
 		debugText->Printf("move %f %f %f", move.x, move.y, move.z);
@@ -549,7 +560,7 @@ void Player::StockPlus()
 	{
 		stock += 1;
 	}
-	hp += 10;
+	hp = stock * 10;
 }
 
 void Player::OnDamage(int damage)

@@ -184,7 +184,8 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 
 		if (isFormChange == false)
 		{
-			superAttackMoveVec.y = 0;
+			isFormChange = true;
+			/*superAttackMoveVec.y = 0;
 			move += superAttackMoveVec * moveSpd;
 			if ((bossParts[body].GetPos().x >= pos.x - 10) &&
 				(bossParts[body].GetPos().x <= pos.x + 10) &&
@@ -193,7 +194,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				)
 			{
 				isFormChange = true;
-			}
+			}*/
 		}
 		
 		if (onGround && isFormChange)
@@ -208,6 +209,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 					phase = ActPhase::miniJump;
 					fallTimer = 0;
 					miniJumpTimer = 0;
+					isSuperAttack = true;
 					break;
 				}
 
@@ -249,10 +251,10 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		bossParts[BossPartsName::body].GetScale().z
 				});
 		}
-		if (bossParts[body].worldTransform_.scale_.x >= initScale.x)
+		if (bossParts[body].worldTransform_.scale_.x >= initScale.x && onGround)
 		{
 			phase = ActPhase::miniJump;
-			miniJumpTimer = 200;
+			miniJumpTimer = 100;
 		}
 		break;
 	case dead:
@@ -303,6 +305,11 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		vpManager.CreateSplitParticle(
 			bossParts[BossPartsName::weekPoint].GetPos(),
 			{ 5,5,5 }, 0.05f, 3.0f);
+		if (isFormChange && isSuperAttack)
+		{
+			phase = ActPhase::superAttack;
+			superAttackCount = 4;
+		}
 	}
 
 	//’n–Ê”»’è
@@ -350,7 +357,8 @@ void Boss::Draw(ViewProjection view,float mouseVertRota)
 	if (mouseVertRota > -0.2f &&
 		(phase == ActPhase::jump ||
 		phase == ActPhase::setTarget ||
-		phase == ActPhase::fall))
+		phase == ActPhase::fall ||
+		phase == ActPhase::appearance))
 	{
 		exclamationObj.Draw(view);
 	}

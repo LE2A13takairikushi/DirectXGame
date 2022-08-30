@@ -20,6 +20,7 @@ void EnemyManager::DeadInit()
 	{
 		enemy->revival();
 	}
+	eventSlayCount = 0;
 	enemys.clear();
 }
 
@@ -98,9 +99,9 @@ void EnemyManager::Draw(ViewProjection viewProjection_)
 	//vpManager.Draw(viewProjection_);
 }
 
-void EnemyManager::EventStart(VanishParticleManager& vpmanager)
+void EnemyManager::EventStart(VanishParticleManager& vpmanager,int PopEnemyNum)
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < PopEnemyNum; i++)
 	{
 		EnemyPop(vpmanager);
 		eventSlayCount++;

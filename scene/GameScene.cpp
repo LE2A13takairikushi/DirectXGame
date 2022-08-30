@@ -36,7 +36,6 @@ void GameScene::Initialize() {
 	modelManager = new ModelManager();
 
 	textureHandle_ = TextureManager::Load("waito.jpg");
-	player_.Initialize(modelManager->player,modelManager->body,modelManager->taiya);
 
 	TextureHandle white = TextureManager::Load("white.png");
 
@@ -65,10 +64,17 @@ void GameScene::Initialize() {
 	skydome.Initialize(modelManager->skydome);
 
 	gManager.Initialize(modelManager->model_);
+
+	player_.SetSpawnPos(gManager.GetSpawnPos());
+	player_.Initialize(modelManager->player, modelManager->body, modelManager->taiya);
+
 	iManager.Initialize(modelManager->model_);
 	enemyEManager.Initialize(gManager.GetBossStagePos(), modelManager->model_);
 	jEManager.Initialize(modelManager->model_);
 	vEManager.Initialize(modelManager->model_);
+	cManager.Initialize(modelManager->model_);
+	hIManager.Initialize(modelManager->model_);
+	aBoardManager.Initialize(modelManager->model_);
 
 	Goal.Initialize(modelManager->model_,TextureManager::Load("goal.png"));
 	Goal.SetPos({ 490,370,420 });
@@ -82,8 +88,6 @@ void GameScene::Initialize() {
 		modelManager->model_,
 		white);
 	pause.Initialize();
-
-	player_.SetSpawnPos(gManager.GetSpawnPos());
 
 
 	title.Initialize(modelManager->player, modelManager->body, modelManager->taiya, titleView);
@@ -112,6 +116,9 @@ void GameScene::Update() {
 			enemyEManager.Update();
 			jEManager.Update();
 			vEManager.Update();
+			cManager.Update();
+			hIManager.Update();
+			aBoardManager.Update();
 
 			Goal.worldTransform_.rotation_.y += 0.01f;
 			Goal.Update();
@@ -151,6 +158,7 @@ void GameScene::Update() {
 			enemyEManager.DeadInit();
 			enemyManager->DeadInit();
 			bossManager.DeadInit();
+			hIManager.DeadInit();
 		}
 
 		pause.Update();
@@ -162,11 +170,6 @@ void GameScene::Update() {
 		debugText_->SetPos(WinApp::kWindowWidth - 50, 50);
 		debugText_->Printf("fps %f", fpsFix.fps);
 	}
-
-
-	debugText_->SetPos(50, 50);
-	debugText_->Printf("player_ %d", player_.IsDead());
-
 }
 
 void GameScene::Draw() {
@@ -212,6 +215,9 @@ void GameScene::Draw() {
 		jEManager.Draw(viewProjection_);
 		vEManager.Draw(viewProjection_);
 		pObjectManager.Draw(viewProjection_);
+		cManager.Draw(viewProjection_);
+		hIManager.Draw(viewProjection_);
+		aBoardManager.Draw(viewProjection_, player_.GetMouseVRota());
 
 		Goal.Draw(viewProjection_);
 
@@ -359,7 +365,7 @@ void GameScene::CheckBulletCollision()
 		posB = boss->GetBossPart(0).GetWorldTrans();
 		if (BoxColAABB(posA, posB))
 		{
-			player_.OnDamage(8);
+			player_.OnDamage(7);
 		}
 	}
 }
@@ -407,7 +413,7 @@ void GameScene::CheckPlayerAllCollision()
 		//ボックスに当たったらイベントを開始する
 		if (BoxColAABB(posA, posB) && eventObj->IsEvent() == false)
 		{
-			enemyManager->EventStart(vpManager);
+			enemyManager->EventStart(vpManager,5);
 			gManager.EventStart(posA.translation_);
 			eventObj->EventStart();
 		}
@@ -426,6 +432,9 @@ void GameScene::CheckPlayerAllCollision()
 				vpManager.CreateParticle(object->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
 			}
 
+			//回復アイテムを出す
+			hIManager.CreateHealItem(eventObj->GetPos());
+
 			//周りの壁を消す
 			gManager.EventEnd();
 			eventObj->Erase();
@@ -434,6 +443,7 @@ void GameScene::CheckPlayerAllCollision()
 	for (const unique_ptr<EventObject>& eventObj : enemyEManager.GetEnforceObjects())
 	{
 		posB = eventObj->GetWorldTrans();
+
 		if (BoxColAABB(posA, posB) && eventObj->IsEvent() == false)
 		{
 			gManager.EnforceEventStart();
@@ -456,6 +466,30 @@ void GameScene::CheckPlayerAllCollision()
 
 			eventObj->Erase();
 			gManager.EnforceEventEnd();
+		}
+	}
+
+	for (const unique_ptr<EventObject>& eventObj : cManager.GetObjects())
+	{
+		posB = eventObj->GetWorldTrans();
+		if (BoxColAABB(posA, posB))
+		{
+			player_.SetSpawnPos(eventObj->GetPos());
+			if (eventObj->IsEvent() == false)
+			{
+				eventObj->EventStart();
+				vpManager.CreateParticle(eventObj->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
+			}
+		}
+	}
+	for (const unique_ptr<EventObject>& eventObj : hIManager.GetObjects())
+	{
+		posB = eventObj->GetWorldTrans();
+		if (BoxColAABB(posA, posB))
+		{
+			vpManager.CreateParticle(eventObj->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
+			player_.HealEffect(5);
+			eventObj->Erase();
 		}
 	}
 

@@ -34,8 +34,11 @@
 #include "BossManager.h"
 
 #include "PartObjectManager.h"
+#include "checkPointManager.h"
+#include "HealItemManager.h"
 
 #include "Title.h"
+#include "ArrowBoardManager.h"
 
 /// <summary>
 /// ゲームシーン
@@ -92,6 +95,7 @@ private: // メンバ変数
 
 	//オブジェクト
 	Skydome skydome;
+	ArrowBoardManager aBoardManager;
 
 	//イベントを発生させるオブジェクト群
 	GroundManager gManager;
@@ -99,6 +103,8 @@ private: // メンバ変数
 	enemyEventManager enemyEManager;
 	JumpEventManager jEManager;
 	VanishEventManager vEManager;
+	checkPointManager cManager;
+	HealItemManager hIManager;
 
 	EventObject Goal;
 

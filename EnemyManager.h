@@ -15,7 +15,7 @@ public:
 	void Update(Vector3 PPos, bool NotSpawnTerm,VanishParticleManager &vpmanager);
 	void Draw(ViewProjection viewProjection_);
 
-	void EventStart(VanishParticleManager& vpmanager);
+	void EventStart(VanishParticleManager& vpmanager, int PopEnemyNum = 10);
 
 	int GetEventCount() { return eventSlayCount; };
 

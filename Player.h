@@ -64,6 +64,7 @@ public:
 
 	bool IsDead() { return isDead; };
 
+	void HealEffect(int heal);
 	void DeadInit();
 
 private:

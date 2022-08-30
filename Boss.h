@@ -68,6 +68,7 @@ private:
 	float hitGaugeOneSize = 0;
 	int hitPoint = HPINIT;
 	bool isFormChange = false;
+	bool isSuperAttack = false;
 	bool onGround = false;
 
 	Vector3 move = {0,0,0};

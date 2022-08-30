@@ -6,7 +6,7 @@ class EventObject : public object
 public:
 	void Initialize(Model* model_,TextureHandle tex = 0);
 	void Update();
-	void Draw(ViewProjection view);
+	void Draw(ViewProjection view, TextureHandle tex = 0);
 
 	void LoadTexture(TextureHandle tex);
 
