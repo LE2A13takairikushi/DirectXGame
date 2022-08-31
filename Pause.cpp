@@ -23,34 +23,8 @@ void Pause::Initialize()
 	curser->SetSize({ 100, 100 });
 }
 
-void Pause::Update()
+void Pause::Update(Audio* audio, SoundDataManager sdmanager, bool pIsDead)
 {
-
-	if (input->TriggerKey(DIK_W))
-	{
-		if (menuData > PAUSE_CONTINUE)menuData--;
-	}
-
-	if (input->TriggerKey(DIK_S))
-	{
-		if (menuData < PAUSE_END)menuData++;
-	}
-
-	if (input->TriggerKey(DIK_SPACE))
-	{
-		if (menuData == PAUSE_CONTINUE)
-		{
-			openMenu = false;
-		}
-		if (menuData == PAUSE_END)
-		{
-			//title.NotTitle();
-		}
-	}
-
-	curser->SetPosition({
-	menu[menuData]->GetPosition().x - 70,
-	menu[menuData]->GetPosition().y });
 
 	if (input->TriggerKey(DIK_ESCAPE)) {
 		openMenu = !openMenu;
@@ -61,16 +35,52 @@ void Pause::Update()
 	case true:
 		//マウスを表示
 		ShowCursor(true);
+
+		if (input->TriggerKey(DIK_W))
+		{
+			if (menuData != PAUSE_CONTINUE) {
+				menuData--;
+				//audio->PlayWave(sdmanager.curserSE, false, 0.1f);
+			}
+		}
+
+		if (input->TriggerKey(DIK_S))
+		{
+			if (menuData != PAUSE_END) {
+				menuData++;
+				//audio->PlayWave(sdmanager.curserSE, false, 0.1f);
+			}
+		}
+
+		if (input->TriggerKey(DIK_SPACE))
+		{
+			if (menuData == PAUSE_CONTINUE)
+			{
+				openMenu = false;
+			}
+			if (menuData == PAUSE_END)
+			{
+				//title.NotTitle();
+			}
+		}
+
 		break;
 	case false:
-		//マウスを非表示に
-		ShowCursor(false);
-		//マウスでカメラを動かす処理
-		Vector2 temp = { 1920 / 2, 1080 / 2 };
-		//マウスを固定する処理
-		SetCursorPos(temp.x, temp.y);
+		if (pIsDead == false)
+		{
+			//マウスを非表示に
+			ShowCursor(false);
+			//マウスでカメラを動かす処理
+			Vector2 temp = { 1920 / 2, 1080 / 2 };
+			//マウスを固定する処理
+			SetCursorPos(temp.x, temp.y);
+		}
 		break;
 	}
+
+	curser->SetPosition({
+	menu[menuData]->GetPosition().x - 70,
+	menu[menuData]->GetPosition().y });
 }
 
 void Pause::MenuDraw()

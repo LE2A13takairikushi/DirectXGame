@@ -36,11 +36,18 @@ void Boss::Initialize(Model* model,TextureHandle tex, TextureHandle weekTex)
 
 	TextureHandle redTex = weekTex;
 
-	hitPointGauge = Sprite::Create(redTex, {300 ,50 });
+	HPPosInit = { 300 ,50 };
+
+	hitPointGauge = Sprite::Create(redTex, { 300 ,50 });
+	oldHitPointGauge = Sprite::Create(redTex, { 300 ,50 },{0.5f,1,1,1});
 	//xのサイズは640になるように
 	hitGaugeOneSize = 640 / HPINIT;
-	
-	hitPointGauge->SetSize( { HPINIT * hitGaugeOneSize, 50 });
+
+	hitPointGauge->SetSize( { HPINIT * hitGaugeOneSize, 60 });
+
+	HpbarGraph = Sprite::Create(TextureManager::Load("boss_hpbar.png"), {300 ,50});
+	HpbarGraph->SetSize({ 670,80 });
+	HpbarGraph->SetPosition({ hitPointGauge->GetPosition().x - 60, hitPointGauge->GetPosition().y - 10});
 }
 
 void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleManager& vpManager)
@@ -70,10 +77,22 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 	if (shake.y < 0) shake.y += 0.01f;
 	if (shake.z < 0) shake.z += 0.01f;
 
+	//static Vector2 tempHitGauge = { 0,0 };
+
+	static float oldHitPoint = hitPoint;
+
 	//hpが減ったらゲージにも反映
 	if (hitPoint >= 0)
 	{
-		hitPointGauge->SetSize({ hitPoint * hitGaugeOneSize, 50 });
+		if (shakeTimer <= 0 && weekShakeTimer <= 0)
+		{
+			if (oldHitPoint >= hitPoint)
+			{
+				oldHitPoint -= 0.5f;
+			}
+			oldHitPointGauge->SetSize({ oldHitPoint * hitGaugeOneSize, 60 });
+		}
+		hitPointGauge->SetSize({ hitPoint * hitGaugeOneSize, 60 });
 	}
 
 	if (jumpSpd >= -1.0f)
@@ -217,7 +236,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				while (minus < PIf * 2)
 				{
 					minus += 0.08f;
-					Attack({ cosf(PIf - minus),0, sinf(PIf - minus) });
+					Attack({ cosf(PIf - minus),0, sinf(PIf - minus)});
 				}
 				bulletTimer = 240;
 				superAttackCount++;
@@ -262,7 +281,6 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		scalePTimer--;
 		if (bossParts[body].worldTransform_.scale_.x > 0.1f)
 		{
-			
 			if (scalePTimer <= 0)
 			{
 				vpManager.CreateParticle(
@@ -289,6 +307,9 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				bossParts[BossPartsName::weekPoint].GetPos(),
 				{ 10,10,10 }, 0.05f, 5.0f);
 		}
+
+		isShake = true;
+		shakeTimer = 60;
 		break;
 	}
 
@@ -383,13 +404,17 @@ void Boss::Draw(ViewProjection view,float mouseVertRota)
 		dT->Printf("Shake %f %f %f",
 			shake.x, shake.y, shake.z);
 		dT->SetPos(50, 150);
-		dT->Printf("scale %f %f %f",
-			bossParts[0].GetScale().x, bossParts[0].GetScale().y, bossParts[0].GetScale().z);dT->SetPos(50, 150);
-		dT->SetPos(50, 170);
-		dT->Printf("weekScale %f %f %f",
-			bossParts[1].GetScale().x, bossParts[1].GetScale().y, bossParts[1].GetScale().z);
+		dT->Printf("targetDirectVec %f %f %f",
+			targetDirectVec.x, targetDirectVec.y, targetDirectVec.z);dT->SetPos(50, 150);
 	}
-}	
+}
+void Boss::End()
+{
+	delete hitPointGauge;
+	delete oldHitPointGauge;
+	delete HpbarGraph;
+}
+
 
 void Boss::SetPos(Vector3 pos)
 {
@@ -408,6 +433,8 @@ void Boss::SetScale(Vector3 scale)
 
 void Boss::HPDraw()
 {
+	HpbarGraph->Draw();
+	oldHitPointGauge->Draw();
 	hitPointGauge->Draw();
 }
 
@@ -425,7 +452,7 @@ void Boss::OnBodyColision()
 
 void Boss::OnWeekColision()
 {
-	hitPoint -= 1 * 3;
+	hitPoint -= 1 * 5;
 	isWeekShake = true;
 	weekShakeTimer = 60;
 }
@@ -460,6 +487,10 @@ void Boss::ShakeUpdate()
 		isWeekShake = false;
 	}
 
+	hitPointGauge->SetPosition({ HPPosInit.x + shake.x * 3.0f,HPPosInit.y + shake.y * 3.0f });
+	if(weekShake.x != 0)hitPointGauge->SetPosition({ HPPosInit.x + weekShake.x * 3.0f,HPPosInit.y + weekShake.y * 3.0f });
+	HpbarGraph->SetPosition({ hitPointGauge->GetPosition().x - 60, hitPointGauge->GetPosition().y - 10 });
+
 	bodyShakeBox.worldTransform_ = bossParts[BossPartsName::body].GetWorldTrans();
 	bodyShakeBox.worldTransform_.translation_ += shake;
 	bodyShakeBox.Update();
@@ -477,7 +508,11 @@ void Boss::Attack(Vector3 velocity)
 {
 	unique_ptr<EnemyBullet> newBullet = make_unique<EnemyBullet>();
 	newBullet->Initialize(bulletModel,
-		bossParts[BossPartsName::weekPoint].GetPos(),
+		{ 
+			bossParts[BossPartsName::weekPoint].GetPos().x,
+			bossParts[BossPartsName::weekPoint].GetPos().y + 3,
+			bossParts[BossPartsName::weekPoint].GetPos().z
+		},
 		velocity);
 	bullets_.push_back(std::move(newBullet));
 }

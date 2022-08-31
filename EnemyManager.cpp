@@ -52,7 +52,7 @@ void EnemyManager::EnemyPop(VanishParticleManager& vpmanager)
 	enemys.push_back(std::move(newEnemy));
 }
 
-void EnemyManager::Update(Vector3 PPos, bool NotSpawnTerm, VanishParticleManager &vpmanager)
+void EnemyManager::Update(Vector3 PPos, bool NotSpawnTerm, VanishParticleManager &vpmanager, Audio* audio, SoundDataManager sdmanager)
 {
 	maxEnemyCount = enemys.size();
 	popPos = PPos;
@@ -67,7 +67,7 @@ void EnemyManager::Update(Vector3 PPos, bool NotSpawnTerm, VanishParticleManager
 
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
-		enemy->Update(PPos);
+		enemy->Update(PPos,audio,sdmanager);
 		if (enemy->IsDead())
 		{
 			if (eventSlayCount > 0)
@@ -99,11 +99,12 @@ void EnemyManager::Draw(ViewProjection viewProjection_)
 	//vpManager.Draw(viewProjection_);
 }
 
-void EnemyManager::EventStart(VanishParticleManager& vpmanager,int PopEnemyNum)
+void EnemyManager::EventStart(VanishParticleManager& vpmanager, Audio* audio, SoundDataManager sdmanager, int PopEnemyNum)
 {
 	for (int i = 0; i < PopEnemyNum; i++)
 	{
 		EnemyPop(vpmanager);
+		audio->PlayWave(sdmanager.enemyPopSE, false, 0.1f);
 		eventSlayCount++;
 	}
 }

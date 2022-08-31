@@ -44,24 +44,32 @@ void Title::Initialize(Model* model, Model* model2, Model* model3, ViewProjectio
 	}*/
 }
 
-void Title::Update()
+void Title::Update(Audio* audio, SoundDataManager sdmanager)
 {
 	if (input->PushKey(DIK_SPACE))
 	{
 		if (titleMenu == start)
 		{
 			isTitle = false;
+			audio->StopWave(sdmanager.titleBGM);
+			audio->PlayWave(sdmanager.gamesceneBGM, true, 0.1f);
 		}
 	}
 
 	if (input->TriggerKey(DIK_W))
 	{
-		if (titleMenu != start)titleMenu--;
+		if (titleMenu != start) { 
+			titleMenu--; 
+			//audio->PlayWave(sdmanager.curserSE, false, 0.1f);
+		}
 		
 	}
 	if (input->TriggerKey(DIK_S))
 	{
-		if (titleMenu != end)titleMenu++;
+		if (titleMenu != end) { 
+			titleMenu++; 
+			//audio->PlayWave(sdmanager.curserSE, false, 0.1f);
+		}
 	}
 	
 	curser->SetPosition({ 

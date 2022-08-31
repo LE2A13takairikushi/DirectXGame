@@ -41,6 +41,8 @@ void Player::DeadInit()
 	stock = 3;
 	hp = 30; 
 	jumpSpd = 0;
+	getHeartCount = 0;
+	nohitFlag = true;
 
 	isDead = false;
 }
@@ -49,6 +51,7 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 {
 	assert(model_);
 	assert(bodyModel);
+	assert(taiyaModel);
 
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = respawnPos;
@@ -118,11 +121,10 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 
 void Player::SetSpawnPos(Vector3 pos)
 {
-	//worldTransform_.translation_ = pos;
 	respawnPos = pos;
 }
 
-void Player::Update(VanishParticleManager &vpmanager)
+void Player::Update(VanishParticleManager &vpmanager,Audio* audio, SoundDataManager sdmanager)
 {
 	hpRed->SetSize({ hp * 10.0f ,100 });
 	DamageHitEffect();
@@ -133,6 +135,10 @@ void Player::Update(VanishParticleManager &vpmanager)
 	{
 		vpmanager.CreateSplitParticle(worldTransform_.translation_,
 			{ 0.5f,0.5f,0.5f }, 0.01f);
+		/*if (audio->IsPlaying(sdmanager.jumpEndSE) == false)
+		{
+			audio->PlayWave(sdmanager.jumpEndSE, false, 0.08f);
+		}*/
 	}
 	oldIsJumpCheck = isJumpCheck;
 
@@ -148,7 +154,7 @@ void Player::Update(VanishParticleManager &vpmanager)
 	prevPos = worldTransform_;
 
 	//移動とか攻撃とかの入力系
-	Move(vpmanager);
+	Move(vpmanager,audio,sdmanager);
 
 	if (jumpSpd > 1.01f)
 	{
@@ -166,6 +172,7 @@ void Player::Update(VanishParticleManager &vpmanager)
 	{
 		Attack();
 		bulletCool = MAX_BULLET_COOL;
+		audio->PlayWave(sdmanager.shotSE,false,0.1f);
 	}
 
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
@@ -200,7 +207,7 @@ void Player::InputMove()
 	move.z += (sideVec.z * moveSpeed) * -input_->PushKey(DIK_A);
 }
 
-void Player::Dash(VanishParticleManager& vpmanager)
+void Player::Dash(VanishParticleManager& vpmanager, Audio* audio, SoundDataManager sdmanager)
 {
 	//毎フレームダッシュ中か確認する
 	isDash = false;
@@ -213,6 +220,7 @@ void Player::Dash(VanishParticleManager& vpmanager)
 		dashCoolTime = 180;
 		isDash = true;
 		SetMuteki();
+		//audio->PlayWave(sdmanager.dashSE, false, 0.1f);
 	}
 
 	oldMoveSpd = moveSpeed;
@@ -225,7 +233,7 @@ void Player::Dash(VanishParticleManager& vpmanager)
 		if (dashCoolTime % 6 == 0)
 		{
 			vpmanager.CreateParticle(worldTransform_.translation_,
-				{ 1.5f,1.5f ,1.5f }, 0.02f);
+				{ 1.0f,1.0f ,1.0f }, 0.02f);
 		}
 	}
 	if (dashCoolTime > 0)
@@ -234,7 +242,7 @@ void Player::Dash(VanishParticleManager& vpmanager)
 	}
 }
 
-void Player::Move(VanishParticleManager& vpmanager)
+void Player::Move(VanishParticleManager& vpmanager, Audio* audio, SoundDataManager sdmanager)
 {
 	//操作は混同すると大変そうなので、移動、ジャンプ、座標更新くらいで関数にしたい
 	//移動値の初期化
@@ -262,13 +270,14 @@ void Player::Move(VanishParticleManager& vpmanager)
 	}
 
 	//ダッシュ
-	Dash(vpmanager);
+	Dash(vpmanager,audio, sdmanager);
 
 	//ジャンプする処理
 	if (input_->TriggerKey(DIK_SPACE) && isJumpCheck)
 	{
 		jumpSpd = 0.8f;
 		isJumpCheck = false;
+		audio->PlayWave(sdmanager.jumpSE, false, 0.1f);
 	}
 	//重力をかける処理
 	if (jumpSpd > -1.0f)
@@ -298,6 +307,10 @@ void Player::Move(VanishParticleManager& vpmanager)
 	if (worldTransform_.translation_.y <= -100)
 	{
 		worldTransform_.translation_ = respawnPos;
+		/*if (audio->IsPlaying(sdmanager.jumpEndSE) == false)
+		{
+			audio->PlayWave(sdmanager.jumpEndSE, false, 0.08f);
+		}*/
 		OnDamage(5);
 	}
 }
@@ -353,7 +366,7 @@ void Player::DamageHitEffect()
 
 void Player::Draw(ViewProjection viewProjection_)
 {
-	if (true)
+	if (false)
 	{
 		debugText->SetPos(50, 50);
 		debugText->Printf("move %f %f %f", move.x, move.y, move.z);
@@ -571,6 +584,7 @@ void Player::OnDamage(int damage)
 		isDamageHit = true;
 		hp -= damage;
 	}
+	nohitFlag = false;
 }
 
 void Player::EnforceJumpOnCol()

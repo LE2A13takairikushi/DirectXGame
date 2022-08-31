@@ -7,8 +7,9 @@
 #include "DebugText.h"
 #include <memory>
 #include <list>
-
+#include "Audio.h"
 #include "VanishParticleManager.h"
+#include "SoundDataManager.h"
 
 class Player : public object
 {
@@ -29,7 +30,7 @@ public:
 
 	void Initialize(Model* model_,Model* bodyModel, Model* taiyaModel);
 	void SetSpawnPos(Vector3 pos);
-	void Update(VanishParticleManager& vpmanager);
+	void Update(VanishParticleManager& vpmanager,Audio *audio,SoundDataManager sdmanager);
 	void UpdateMatrixAndMove();
 	void Draw(ViewProjection viewProjection_);
 	void SpriteDraw();
@@ -66,6 +67,13 @@ public:
 
 	void HealEffect(int heal);
 	void DeadInit();
+
+	int GetBulletCool() { return bulletCool; };
+
+	int GetHeartCount() { return getHeartCount; };
+	void HeartCountUp() { getHeartCount++; };
+
+	bool GetNoHitFlag() { return nohitFlag; };
 
 private:
 
@@ -121,6 +129,10 @@ private:
 	int dashCoolTime = 0;
 	bool isDash = false;
 
+	//ƒŠƒUƒ‹ƒgŠÖŒW
+	int getHeartCount = 0;
+	bool nohitFlag = true;
+
 	//•`‰æŠÖŒW
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
@@ -145,8 +157,8 @@ private:
 
 	Sprite* hpRed = nullptr;
 
-	void Move(VanishParticleManager& vpmanager);
-	void Dash(VanishParticleManager& vpmanager);
+	void Move(VanishParticleManager& vpmanager, Audio* audio, SoundDataManager sdmanager);
+	void Dash(VanishParticleManager& vpmanager, Audio* audio, SoundDataManager sdmanager);
 	void InputMove();
 	void Attack();
 	void DamageHitEffect();

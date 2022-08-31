@@ -5,6 +5,7 @@
 #include "WinApp.h"
 #include "Input.h"
 #include "DebugText.h"
+#include "SoundDataManager.h"
 
 enum menu_Data
 {
@@ -21,7 +22,7 @@ public:
 	DebugText* debugText = DebugText::GetInstance();
 
 	void Initialize();
-	void Update();
+	void Update(Audio* audio,SoundDataManager sdmanager,bool pIsDead);
 	void MenuDraw();
 
 	void End();

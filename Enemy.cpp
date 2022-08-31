@@ -23,13 +23,13 @@ void Enemy::Initialize(Model* model_, Model* partModel,TextureHandle tex, Vector
 	pManager.Initialize(partModel, tex);
 }
 
-void Enemy::Update(Vector3 pPos)
+void Enemy::Update(Vector3 pPos, Audio* audio, SoundDataManager sdmanager)
 {
 	bullets_.remove_if([](std::unique_ptr<EnemyBullet>& bullet) {
 		return bullet->IsDead();
 		});
 
-	Attack();
+	Attack(audio,sdmanager);
 
 	pManager.Update(worldTransform_.translation_);
 
@@ -95,7 +95,7 @@ void Enemy::OnCollision()
 	isDead = true;
 }
 
-void Enemy::Attack()
+void Enemy::Attack(Audio* audio,SoundDataManager sdmanager)
 {
 	//tempVec‚ª’e‚ÌƒxƒNƒgƒ‹‚É‚È‚é
 	static Vector3 tempVec = {0,0,0};
@@ -104,6 +104,7 @@ void Enemy::Attack()
 	//’e‚ÌˆÊ’u‚ðŒˆ’è
 	if (attackCount >= MAX_ATTACK_COUNT)
 	{
+		audio->PlayWave(sdmanager.shotSE, false, 0.1f);
 		tempVec = pCenterVec;
 		
 		unique_ptr<EnemyBullet> newBullet = make_unique<EnemyBullet>();

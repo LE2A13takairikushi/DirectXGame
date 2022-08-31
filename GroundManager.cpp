@@ -60,16 +60,23 @@ void GroundManager::Initialize(Model* model_)
 	//上の方の安全なほう
 	for (int i = 0; i < 5; i++)
 	{
-		SetBox({ 0,270,210 - (i * 10.0f) }, { 5,5,5 });
+		SetBox({ 0,250 + i * 5.0f,215 - (i * 10.0f) }, { 5,5,5 });
+		SetBox({ -10,250 + i * 5.0f,215 - (i * 10.0f) }, { 5,5,5 });
 	}
 
-	SetBox({ 4,270,150 }, { 8,8,8 });
-	SetBox({ 20,270,150 }, { 8,8,8 });
+	SetBox({ -20,270,160 }, { 10,10,10 });
+	SetBox({ -20,270,140 }, { 10,10,10 });
+	SetBox({ 0,270,160 }, { 10,10,10 });
+	SetBox({ 0,270,140 }, { 10,10,10 });
+	SetBox({ 20,270,160 }, { 10,10,10 });
+	SetBox({ 20,270,140 }, { 10,10,10 });
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 6; i++)
 	{
-		SetBox({ 40 + (i * 20.0f),270,130 }, { 10,10,10 });
+		SetBox({ 40 + (i * 20.0f),270 - (i * 5.0f),140}, {10,10,10});
+		SetBox({ 40 + (i * 20.0f),270 - (i * 5.0f),160}, {10,10,10});
 	}
+	SetBox({ 160,240,140 }, { 10,10,10 });
 
 	//挟まれてる落ちる足場ゾーン
 	for (int i = 0; i < 10; i++)
@@ -161,14 +168,6 @@ void GroundManager::Initialize(Model* model_)
 	}
 	SetBox({ 490,340,420}, { 30, 10, 30 });
 
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	for (int j = 0; j < 11; j++)
-	//	{
-	//		SetBox({ 470 + j * 20.0f,460,100 + i * 20.0f }, { 10, 10, 10 });
-	//	}
-	//}
-
 
 	//ボスの台地
 	bossStagePos = { 300,450,400 };
@@ -186,8 +185,8 @@ void GroundManager::Initialize(Model* model_)
 		enforceObjects.push_back(std::move(newBox));
 	}
 
-
-	SetSpawnPos({ 0, 0, 50 },10);
+	//SetSpawnPos({ 0,0,50 }, 10);
+	SetSpawnPos(bossStagePos, 10);
 }
 
 void GroundManager::EventStart(Vector3 playerPos)

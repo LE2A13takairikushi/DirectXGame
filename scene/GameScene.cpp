@@ -24,6 +24,7 @@ GameScene::~GameScene() {
 	pause.End();
 	player_.End();
 	bossManager.End();
+	result.End();
 }
 
 void GameScene::Initialize() {
@@ -32,6 +33,8 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+
+	SDManager.Initialize();
 
 	modelManager = new ModelManager();
 
@@ -66,7 +69,10 @@ void GameScene::Initialize() {
 	gManager.Initialize(modelManager->model_);
 
 	player_.SetSpawnPos(gManager.GetSpawnPos());
-	player_.Initialize(modelManager->player, modelManager->body, modelManager->taiya);
+	player_.Initialize(
+		modelManager->player,
+		modelManager->body,
+		modelManager->taiya);
 
 	iManager.Initialize(modelManager->model_);
 	enemyEManager.Initialize(gManager.GetBossStagePos(), modelManager->model_);
@@ -95,6 +101,10 @@ void GameScene::Initialize() {
 	titleView.fovAngleY = DegreeConversionRad(90.0f);
 	//アスペクト比
 	titleView.aspectRatio = 1.0f;
+
+	result.Initialize();
+
+	audio_->PlayWave(SDManager.titleBGM, true, 0.1f);
 }
 
 void GameScene::Update() {
@@ -102,12 +112,12 @@ void GameScene::Update() {
 
 	if (title.IsTitle())
 	{
-		title.Update();
+		title.Update(audio_,SDManager);
 	}
 	else
 	{
 
-		if (pause.IsMenuOpen() == false)
+		if (pause.IsMenuOpen() == false && result.isResult == false)
 		{
 			debugCamera_->Update();
 
@@ -123,7 +133,7 @@ void GameScene::Update() {
 			Goal.worldTransform_.rotation_.y += 0.01f;
 			Goal.Update();
 
-			player_.Update(vpManager);
+			player_.Update(vpManager,audio_,SDManager);
 
 			CheckPlayerAllCollision();
 
@@ -134,11 +144,12 @@ void GameScene::Update() {
 			vpManager.Update();
 			pObjectManager.Update();
 
-			enemyManager->Update(player_.GetPos(), bossManager.IsBossBattle(), vpManager);
+			enemyManager->Update(player_.GetPos(), bossManager.IsBossBattle(), vpManager,audio_,SDManager);
 
 			bossManager.Update(gManager.GetBossStagePos(),
 				gManager.GetBossStageScale(), player_.GetPos(),
 				vpManager);
+
 
 			CheckBulletCollision();
 
@@ -152,23 +163,59 @@ void GameScene::Update() {
 
 		if (player_.IsDead())
 		{
-			player_.DeadInit();
-			gManager.DeadInit();
-			iManager.DeadInit();
-			enemyEManager.DeadInit();
-			enemyManager->DeadInit();
-			bossManager.DeadInit();
-			hIManager.DeadInit();
+			result.isResult = true;
+		}
+		for (const unique_ptr<Boss>& boss : bossManager.GetBossList())
+		{
+			if (boss->IsDead())
+			{
+				result.isResult = true;
+				clearFlag = true;
+			}
 		}
 
-		pause.Update();
+		result.Update(player_.GetHeartCount(), player_.GetNoHitFlag(), clearFlag);
+		if (result.isResult)
+		{
+			if (input_->TriggerKey(DIK_SPACE))
+			{
+				player_.DeadInit();
+				gManager.DeadInit();
+				iManager.DeadInit();
+				enemyEManager.DeadInit();
+				enemyManager->DeadInit();
+				bossManager.DeadInit();
+				hIManager.DeadInit();
+				result.isResult = false;
+				clearFlag = false;
+			}
+		}
+
+		pause.Update(audio_, SDManager, player_.IsDead());
 	}
 	viewProjection_.UpdateMatrix();
 
-	if (false)
+	if (true)
 	{
-		debugText_->SetPos(WinApp::kWindowWidth - 50, 50);
+		debugText_->SetPos(WinApp::kWindowWidth - 200, 50);
 		debugText_->Printf("fps %f", fpsFix.fps);
+		debugText_->SetPos(50, 50);
+		debugText_->Printf("boss %d", bossManager.GetBossList().size());
+		debugText_->SetPos(50, 70);
+		debugText_->Printf("gBGM %d",
+			audio_->IsPlaying(SDManager.gamesceneBGM));	
+		debugText_->SetPos(50, 90);
+		debugText_->Printf("tBGM %d",
+			audio_->IsPlaying(SDManager.titleBGM));
+		debugText_->SetPos(50, 110);
+		debugText_->Printf("bBGM %d",
+			audio_->IsPlaying(SDManager.bossBGM));
+		debugText_->SetPos(50, 130);
+		debugText_->Printf("bBGM2 %d",
+			audio_->IsPlaying(SDManager.bossBGM2));
+		debugText_->SetPos(50, 150);
+		debugText_->Printf("result.isResult %d",
+			result.isResult);
 	}
 }
 
@@ -260,6 +307,11 @@ void GameScene::Draw() {
 		title.Draw();
 	}
 
+	if (result.isResult) {
+		result.Draw();
+	}
+	//result.Draw();
+
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
 	//
@@ -289,8 +341,9 @@ void GameScene::CheckBulletCollision()
 			if (BoxColAABB(posA, posB))
 			{
 				enemy->OnCollision();
-
 				bullet->OnCollision();
+				audio_->PlayWave(SDManager.hitSE, false, 0.1f);
+				audio_->PlayWave(SDManager.deadEnemySE, false, 0.1f);
 			}
 		}
 	}
@@ -306,6 +359,11 @@ void GameScene::CheckBulletCollision()
 			if (BoxColAABB(posA, posB))
 			{
 				bullet->OnCollision();
+				if (audio_->IsPlaying(SDManager.dashSE) == false
+					&& player_.mutekiTimer <= 0)
+				{
+					audio_->PlayWave(SDManager.dashSE, false, 0.08f);
+				}
 				player_.OnDamage(5);
 			}
 		}
@@ -365,9 +423,28 @@ void GameScene::CheckBulletCollision()
 		posB = boss->GetBossPart(0).GetWorldTrans();
 		if (BoxColAABB(posA, posB))
 		{
+			if (audio_->IsPlaying(SDManager.dashSE) == false
+				&& player_.mutekiTimer <= 0)
+			{
+				audio_->PlayWave(SDManager.dashSE, false, 0.08f);
+			}
 			player_.OnDamage(7);
 		}
+		for (const unique_ptr<EnemyBullet>& bossB : boss->GetBullets())
+		{
+			posB = bossB->GetWorldTrans();
+;			if (BoxColAABB(posA, posB))
+			{
+				if (audio_->IsPlaying(SDManager.dashSE) == false
+					&& player_.mutekiTimer <= 0)
+				{
+					audio_->PlayWave(SDManager.dashSE, false, 0.08f);
+				}
+				player_.OnDamage(5);
+			}
+		}
 	}
+
 }
 
 void GameScene::CheckPlayerAllCollision()
@@ -404,6 +481,8 @@ void GameScene::CheckPlayerAllCollision()
 		{
 			vpManager.CreateParticle(item->GetWorldTrans().translation_, { 2.0f ,2.0f ,2.0f }, 0.03f);
 			player_.StockPlus();
+			player_.HeartCountUp();
+			audio_->PlayWave(SDManager.healSE, false, 0.1f);
 			item->Erase();
 		}
 	}
@@ -413,7 +492,7 @@ void GameScene::CheckPlayerAllCollision()
 		//ボックスに当たったらイベントを開始する
 		if (BoxColAABB(posA, posB) && eventObj->IsEvent() == false)
 		{
-			enemyManager->EventStart(vpManager,5);
+			enemyManager->EventStart(vpManager,audio_,SDManager,5);
 			gManager.EventStart(posA.translation_);
 			eventObj->EventStart();
 		}
@@ -435,6 +514,8 @@ void GameScene::CheckPlayerAllCollision()
 			//回復アイテムを出す
 			hIManager.CreateHealItem(eventObj->GetPos());
 
+			audio_->PlayWave(SDManager.eventclearSE, false, 0.1f);
+
 			//周りの壁を消す
 			gManager.EventEnd();
 			eventObj->Erase();
@@ -447,7 +528,7 @@ void GameScene::CheckPlayerAllCollision()
 		if (BoxColAABB(posA, posB) && eventObj->IsEvent() == false)
 		{
 			gManager.EnforceEventStart();
-			enemyManager->EventStart(vpManager);
+			enemyManager->EventStart(vpManager, audio_, SDManager);
 			eventObj->EventStart();
 
 		}
@@ -463,6 +544,8 @@ void GameScene::CheckPlayerAllCollision()
 			{
 				vpManager.CreateParticle(object->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
 			}
+
+			audio_->PlayWave(SDManager.eventclearSE, false, 0.1f);
 
 			eventObj->Erase();
 			gManager.EnforceEventEnd();
@@ -488,6 +571,7 @@ void GameScene::CheckPlayerAllCollision()
 		if (BoxColAABB(posA, posB))
 		{
 			vpManager.CreateParticle(eventObj->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
+			audio_->PlayWave(SDManager.healSE, false, 0.1f);
 			player_.HealEffect(5);
 			eventObj->Erase();
 		}
@@ -500,6 +584,7 @@ void GameScene::CheckPlayerAllCollision()
 		{
 			if (eventObj->IsEvent() == false)
 			{
+				audio_->PlayWave(SDManager.jumpEventSE, false, 0.1f);
 				player_.EnforceJumpOnCol();
 				eventObj->EventStart();
 			}
@@ -526,6 +611,7 @@ void GameScene::CheckPlayerAllCollision()
 			{
 				eventObj->NotCol();
 				eventObj->EventEnd();
+				audio_->PlayWave(SDManager.vibrationEndSE, false, 0.1f);
 				vpManager.CreateParticle(eventObj->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
 			}
 
@@ -537,6 +623,12 @@ void GameScene::CheckPlayerAllCollision()
 			{
 				eventObj->Vibration(-0.5f, 0.5f);
 			}
+
+			if (eventObj->GetEventCount() % 10 == 1)
+			{
+				audio_->PlayWave(SDManager.vibrationSE, false, 0.05f);
+			}
+
 		}
 		else
 		{
@@ -568,6 +660,8 @@ void GameScene::CheckPlayerAllCollision()
 		//ボス発生オブジェクトに衝突したら
 		if (BoxColAABB(posA, posB))
 		{
+			//audio_->StopWave(SDManager.gamesceneBGM);
+			//audio_->PlayWave(SDManager.bossBGM, true, 0.1f);
 			Vector3 spawnPos = eventObj->GetWorldTrans().translation_;
 			spawnPos.y += 10;
 			bossManager.BossBattleStart();

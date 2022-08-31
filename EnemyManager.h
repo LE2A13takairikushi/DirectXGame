@@ -4,6 +4,7 @@
 #include <memory>
 #include <list>
 #include "VanishParticleManager.h"
+#include "SoundDataManager.h"
 
 class EnemyManager
 {
@@ -12,10 +13,10 @@ public:
 
 	void Initialize(Model *model_, Model* partModel, TextureHandle tex);
 	void EnemyPop(VanishParticleManager& vpmanager);
-	void Update(Vector3 PPos, bool NotSpawnTerm,VanishParticleManager &vpmanager);
+	void Update(Vector3 PPos, bool NotSpawnTerm,VanishParticleManager &vpmanager, Audio* audio, SoundDataManager sdmanager);
 	void Draw(ViewProjection viewProjection_);
 
-	void EventStart(VanishParticleManager& vpmanager, int PopEnemyNum = 10);
+	void EventStart(VanishParticleManager& vpmanager, Audio* audio, SoundDataManager sdmanager, int PopEnemyNum = 10);
 
 	int GetEventCount() { return eventSlayCount; };
 

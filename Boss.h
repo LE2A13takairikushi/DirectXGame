@@ -30,6 +30,8 @@ public:
 	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos,VanishParticleManager& vpManager);
 	void Draw(ViewProjection view, float mouseVertRota);
 
+	void End();
+
 	void SetPos(Vector3 pos);
 	void SetScale(Vector3 scale);
 
@@ -47,6 +49,10 @@ public:
 
 	void OnBodyColision();
 	void OnWeekColision();
+
+	Vector3 GetTargetVec() { return targetDirectVec; };
+
+	std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; };
 
 private:
 	void Viblation();
@@ -92,6 +98,9 @@ private:
 
 	TextureHandle exclamation;
 	Sprite* hitPointGauge = nullptr;
+	Sprite* oldHitPointGauge = nullptr;
+
+	int hitTimer = 0;
 
 	BoxObj exclamationObj;
 
@@ -107,4 +116,7 @@ private:
 
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 	Model* bulletModel = nullptr;
+	Sprite* HpbarGraph = nullptr;
+
+	Vector2 HPPosInit;
 };

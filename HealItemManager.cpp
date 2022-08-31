@@ -35,10 +35,16 @@ void HealItemManager::SetObjects()
 {
 	CreateEventBox({ 660, 370, 80 },{2,2,2});
 	CreateEventBox({ 660, 380, 80 },{2,2,2});
+
 	for (int i = 0; i < 3; i++)
 	{
 		CreateEventBox({ 490,355,300 + i * 20.0f }, { 2, 2, 2 });
 	}
+
+	CreateEventBox({ 300 + 90,465,400 + 90 }, { 2,2,2 });
+	CreateEventBox({ 300 + 90,465,400 - 90 }, { 2,2,2 });
+	CreateEventBox({ 300 - 90,465,400 + 90 }, { 2,2,2 });
+	CreateEventBox({ 300 - 90,465,400 - 90 }, { 2,2,2 });
 }
 
 

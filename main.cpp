@@ -7,6 +7,7 @@
 #include "PrimitiveDrawer.h"
 
 #include "FPSfix.h"
+#include "SoundManager.h"
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -19,6 +20,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//AxisIndicator* axisIndicator = nullptr;
 	PrimitiveDrawer* primitiveDrawer = nullptr;
 	GameScene* gameScene = nullptr;
+
+	//Microsoft::WRL::ComPtr<IXAudio2> xAudio2;
+	//IXAudio2MasteringVoice* masterVoice;
+	//XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
 
 	// ゲームウィンドウの作成
 	win = WinApp::GetInstance();
@@ -35,7 +40,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// オーディオの初期化
 	audio = Audio::GetInstance();
-	audio->Initialize();
+	audio->Initialize("Resources\\sound\\");
 
 	// テクスチャマネージャの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon->GetDevice());

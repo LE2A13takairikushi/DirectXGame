@@ -39,6 +39,9 @@
 
 #include "Title.h"
 #include "ArrowBoardManager.h"
+#include "SoundDataManager.h"
+
+#include "Result.h"
 
 /// <summary>
 /// ゲームシーン
@@ -115,11 +118,18 @@ private: // メンバ変数
 	//描画系
 	Sprite *sprite = nullptr;
 	Pause pause;
+	Result result;
+
+	//サウンド
+	//BGM
+	SoundDataManager SDManager;
 
 	FPSfix fpsFix;
 
 	Title title;
 	ViewProjection titleView;
+
+	bool clearFlag = false;
 
 	/// <summary>
 	/// ゲームシーン用

@@ -5,7 +5,7 @@
 #include "DebugText.h"
 
 #include "ParticleManager.h"
-
+#include "SoundDataManager.h"
 
 enum class Phase {
 	Approach,
@@ -19,7 +19,7 @@ public:
 	Enemy();
 	~Enemy();
 	void Initialize(Model* model_, Model* partModel, TextureHandle tex, Vector3 popPos);
-	void Update(Vector3 pPos);
+	void Update(Vector3 pPos, Audio* audio, SoundDataManager sdmanager);
 	void Draw(ViewProjection viewProjection_);
 	void OnCollision();
 
@@ -68,6 +68,6 @@ private:
 
 	void MoveOpp();
 	void MoveCenter();
-	void Attack();
+	void Attack(Audio* audio, SoundDataManager sdmanager);
 
 };

@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "Utill.h"
 #include "Model.h"
+#include "SoundDataManager.h"
 
 enum TitleMenu
 {
@@ -16,7 +17,7 @@ class Title
 {
 public:
 	void Initialize(Model* model, Model* model2, Model* model3, ViewProjection view);
-	void Update();
+	void Update(Audio* audio,SoundDataManager sdmanager);
 	void Draw();
 
 	void ModelDraw(ViewProjection view);
@@ -24,6 +25,7 @@ public:
 	bool IsTitle() { return isTitle; };
 
 	void NotTitle() { isTitle = false; };
+	void TitleBack() { isTitle = true; };
 
 private:
 	Input* input = nullptr;

@@ -1,6 +1,7 @@
 #pragma once
 
 typedef unsigned int TextureHandle;
+typedef unsigned int SoundDataHandle;
 
 int Abs(int a);
 

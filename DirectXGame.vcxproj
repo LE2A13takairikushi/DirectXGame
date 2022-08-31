@@ -132,8 +132,11 @@
     <ClCompile Include="Pause.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerBullet.cpp" />
+    <ClCompile Include="Result.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="Skydome.cpp" />
+    <ClCompile Include="SoundDataManager.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="SplitParticle.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Utill.cpp" />
@@ -198,8 +201,11 @@
     <ClInclude Include="Pause.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerBullet.h" />
+    <ClInclude Include="Result.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="Skydome.h" />
+    <ClInclude Include="SoundDataManager.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="SplitParticle.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="Utill.h" />
