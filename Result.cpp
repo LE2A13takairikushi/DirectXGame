@@ -53,23 +53,43 @@ void Result::Initialize()
 
 	starGraph[0] = Sprite::Create(TextureManager::Load("star.png"),
 		{
-			resultString[1]->GetPosition().x,
-			resultString[1]->GetPosition().y + 100
+			resultString[1]->GetPosition().x + 80,
+			resultString[1]->GetPosition().y + 120
 		});
 	starGraph[1] = Sprite::Create(TextureManager::Load("star.png"),
 		{
-			resultString[2]->GetPosition().x + 100,
-			resultString[2]->GetPosition().y + 100
+			resultString[2]->GetPosition().x + 180,
+			resultString[2]->GetPosition().y + 120
 		});
 	starGraph[2] = Sprite::Create(TextureManager::Load("star.png"),
 		{
-			resultString[3]->GetPosition().x,
-			resultString[3]->GetPosition().y + 100
+			resultString[3]->GetPosition().x + 80,
+			resultString[3]->GetPosition().y + 120
 		});
-	starGraph[0]->SetSize({ 100,100 });
-	starGraph[1]->SetSize({ 100,100 });
-	starGraph[2]->SetSize({ 100,100 });
 
+	starBlankGraph[0] = Sprite::Create(TextureManager::Load("star_blank.png"),
+		{
+			resultString[1]->GetPosition().x + 80,
+			resultString[1]->GetPosition().y + 120
+		});
+	starBlankGraph[1] = Sprite::Create(TextureManager::Load("star_blank.png"),
+		{
+			resultString[2]->GetPosition().x + 180,
+			resultString[2]->GetPosition().y + 120
+		});
+	starBlankGraph[2] = Sprite::Create(TextureManager::Load("star_blank.png"),
+		{
+			resultString[3]->GetPosition().x + 80,
+			resultString[3]->GetPosition().y + 120
+		});
+	for (int i = 0; i < 3; i++)
+	{
+		starGraph[i]->SetSize({ 0,0 });
+		starGraph[i]->SetAnchorPoint({ 0.5f,0.5f });
+		starBlankGraph[i]->SetSize({ 0,0 });
+		starBlankGraph[i]->SetAnchorPoint({ 0.5f,0.5f });
+	}
+	
 	heartGraph = Sprite::Create(TextureManager::Load("life.png"),
 		{
 			resultString[4]->GetPosition().x - 50,
@@ -138,12 +158,71 @@ void Result::Update(int getHeart,bool nohitFlag,bool clearFlag)
 
 	curser->SetPosition({
 	resultString[curserNum + 5]->GetPosition().x - 70,
-	resultString[curserNum + 5]->GetPosition().y });
+	resultString[curserNum + 5]->GetPosition().y - 20 });
 
 	this->nohitFlag = nohitFlag;
 	this->clearFlag = clearFlag;
 
 	allHeartFlag = getHeart >= 5;
+
+	static float a[3] = {0};
+	if (isResult == false)
+	{
+		a[0] = 0;
+		a[1] = 0;
+		a[2] = 0;
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		
+		
+		starGraph[i]->SetSize({ a[i],a[i] });
+		starBlankGraph[i]->SetSize({ a[i],a[i] });
+	}
+
+	if (starGraph[0]->GetSize().x <= 100)
+	{
+		a[0] += 5;
+	}
+	if (starGraph[0]->GetSize().x >= 100 && 
+		starGraph[1]->GetSize().x < 100)
+	{
+		a[1] += 5;
+	}
+	if (starGraph[1]->GetSize().x >= 100 && 
+		starGraph[2]->GetSize().x < 100)
+	{
+		a[2] += 5;
+	}
+
+	if (starGraph[2]->GetSize().x >= 100)
+	{
+		static float scaleTimer = 0;
+		static float scaleSpd = 1;
+
+		if (scaleTimer > 60.0f || scaleTimer < -60.0f)scaleSpd = -scaleSpd;
+		scaleTimer += scaleSpd;
+
+		if (clearFlag)
+		{
+			a[0] += scaleTimer * 0.01f;
+		}
+		if (allHeartFlag)
+		{
+			a[1] += scaleTimer * 0.01f;
+		}
+		if (nohitFlag)
+		{
+			a[2] += scaleTimer * 0.01f;
+		}
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		starGraph[i]->SetSize({ a[i],a[i] });
+		starBlankGraph[i]->SetSize({ a[i],a[i] });
+	}
 
 	if (isResult)
 	{
@@ -178,14 +257,27 @@ void Result::Draw()
 	{
 		starGraph[0]->Draw();
 	}
+	else
+	{
+		starBlankGraph[0]->Draw();
+	}
 	if (allHeartFlag)
 	{
 		starGraph[1]->Draw();
+	}
+	else
+	{
+		starBlankGraph[1]->Draw();
 	}
 	if (nohitFlag)
 	{
 		starGraph[2]->Draw();
 	}
+	else
+	{
+		starBlankGraph[2]->Draw();
+	}
+
 	heartGraph->Draw();
 	maxNum->Draw();
 	curser->Draw();

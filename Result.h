@@ -37,6 +37,7 @@ private:
 	Sprite* maxNum = nullptr;
 
 	Sprite* starGraph[3] = { nullptr };
+	Sprite* starBlankGraph[3] = { nullptr };
 
 	Sprite* heartGraph = nullptr;
 	Sprite* back = nullptr;

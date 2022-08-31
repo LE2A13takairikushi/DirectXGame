@@ -385,7 +385,7 @@ void Boss::Draw(ViewProjection view,float mouseVertRota)
 		exclamationObj.Draw(view);
 	}
 	
-	if (false)
+	if (true)
 	{
 		dT->SetPos(50, 50);
 		dT->Printf("bossPos %f %f %f",
@@ -406,7 +406,10 @@ void Boss::Draw(ViewProjection view,float mouseVertRota)
 			shake.x, shake.y, shake.z);
 		dT->SetPos(50, 150);
 		dT->Printf("targetDirectVec %f %f %f",
-			targetDirectVec.x, targetDirectVec.y, targetDirectVec.z);dT->SetPos(50, 150);
+			targetDirectVec.x, targetDirectVec.y, targetDirectVec.z);dT->SetPos(50, 150);dT->SetPos(50, 150);
+		dT->SetPos(50, 170);
+		dT->Printf("oldHitPoint %f",
+			oldHitPoint);
 	}
 }
 void Boss::End()
@@ -453,7 +456,7 @@ void Boss::OnBodyColision()
 
 void Boss::OnWeekColision()
 {
-	hitPoint -= 1 * 50;
+	hitPoint -= 1 * 5;
 	isWeekShake = true;
 	weekShakeTimer = 60;
 }

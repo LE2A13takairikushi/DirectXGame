@@ -20,6 +20,7 @@ void Enemy::Initialize(Model* model_, Model* partModel,TextureHandle tex, Vector
 	//this->textureHandle_ = TextureManager::Load("enemy.png");;
 
 	worldTransform_.translation_ = popPos;
+	worldTransform_.scale_ = { 0,0,0 };
 	pManager.Initialize(partModel, tex);
 }
 
@@ -32,6 +33,13 @@ void Enemy::Update(Vector3 pPos, Audio* audio, SoundDataManager sdmanager)
 	Attack(audio,sdmanager);
 
 	pManager.Update(worldTransform_.translation_);
+
+	if (worldTransform_.scale_.x < 1.5f)
+	{
+		worldTransform_.scale_.x += 0.01f;
+		worldTransform_.scale_.y += 0.01f;
+		worldTransform_.scale_.z += 0.01f;
+	}
 
 	for (std::unique_ptr<EnemyBullet>& bullet : bullets_)
 	{

@@ -130,7 +130,7 @@ void Pause::Update(Audio* audio, SoundDataManager sdmanager, bool pIsDead)
 
 	curser->SetPosition({
 	menu[menuData]->GetPosition().x - 70,
-	menu[menuData]->GetPosition().y });
+	menu[menuData]->GetPosition().y - 20});
 }
 
 void Pause::MenuDraw()

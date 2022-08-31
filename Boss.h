@@ -73,10 +73,10 @@ private:
 	float scaleSpd = 0.03f;
 	int scalePTimer = 0;
 
-	float oldHitPoint = hitPoint;
 	static const int HPINIT = 300;
 	float hitGaugeOneSize = 0;
 	int hitPoint = HPINIT;
+	float oldHitPoint = hitPoint;
 	bool isFormChange = false;
 	bool isSuperAttack = false;
 	bool onGround = false;

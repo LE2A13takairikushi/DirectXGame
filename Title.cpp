@@ -122,7 +122,7 @@ void Title::Update(Audio* audio, SoundDataManager sdmanager)
 
 	curser->SetPosition({ 
 		UI[titleMenu]->GetPosition().x - 70,
-		UI[titleMenu]->GetPosition().y });
+		UI[titleMenu]->GetPosition().y - 20});
 
 
 	for (int i = 0; i < 2; i++)

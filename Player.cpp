@@ -6,6 +6,10 @@
 
 using namespace std;
 
+Vector2 dashSkillPos = {
+		WinApp::kWindowWidth - 160,
+		WinApp::kWindowHeight - 160
+};
 
 void Player::End()
 {
@@ -75,18 +79,15 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	skillIconSp = Sprite::Create(TextureManager::Load("dash_skill_icon.png"), { 0,0 });
 	shotIconSp = Sprite::Create(TextureManager::Load("shot_skill_icon.png"), { 0,0 });
 	skillCoolAlpha = Sprite::Create(TextureManager::Load("alpha.png"), { 0,0 },{1,1,1,0.9f});
+	
 	backWhite = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
 	backWhite2 = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
 	backWhite3 = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
+	
 	lShift = Sprite::Create(TextureManager::Load("Lshift.png"), { 0,0 });
 	mouseIcon = Sprite::Create(TextureManager::Load("MouseClick.png"), { 0,0 });
 	jumpIcon = Sprite::Create(TextureManager::Load("jump_skill_icon.png"), { 0,0 });
 	spaceIcon = Sprite::Create(TextureManager::Load("space.png"), { 0,0 });
-
-	Vector2 dashSkillPos = {
-		WinApp::kWindowWidth - 160,
-		WinApp::kWindowHeight - 160
-	};
 
 	shotIconSp->SetSize({ 80,80 });
 	shotIconSp->SetPosition({ dashSkillPos.x - 120 ,dashSkillPos.y});
@@ -135,6 +136,7 @@ void Player::Update(VanishParticleManager &vpmanager,Audio* audio, SoundDataMana
 	{
 		vpmanager.CreateSplitParticle(worldTransform_.translation_,
 			{ 0.5f,0.5f,0.5f }, 0.01f);
+		audio->PlayWave(sdmanager.jumpEndSE, false, 0.1f);
 	}
 	oldIsJumpCheck = isJumpCheck;
 
@@ -158,7 +160,6 @@ void Player::Update(VanishParticleManager &vpmanager,Audio* audio, SoundDataMana
 			{ 0.5f,0.5f,0.5f }, 0.01f);
 	}
 
-	//視点を正面に向ける
 	if (bulletCool > 0)bulletCool--;
 	if ((input_->IsPressMouse(0) || input_->IsPressMouse(1)) && bulletCool <= 0)
 	{
@@ -167,10 +168,79 @@ void Player::Update(VanishParticleManager &vpmanager,Audio* audio, SoundDataMana
 		audio->PlayWave(sdmanager.shotSE,false,0.1f);
 	}
 
+	if (bulletCool > 20) {
+		posY[0] -= 3.0f;
+	}
+
 	for (std::unique_ptr<PlayerBullet>& bullet : bullets_)
 	{
 		bullet->Update();
 	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (posY[i] < 0)
+		{
+			posY[i] += 1.5f;
+		}
+		if (posY[i] > 0)
+		{
+			posY[i] = 0;
+		}
+	}
+
+	shotIconSp->SetSize({80,80});
+	shotIconSp->SetPosition({
+		dashSkillPos.x - 120 ,
+		dashSkillPos.y + posY[0] });
+
+	backWhite2->SetSize({ 90,90 });
+	backWhite2->SetPosition({ 
+		dashSkillPos.x - 125,
+		dashSkillPos.y - 5 + posY[0] });
+
+	mouseIcon->SetSize({ 120,60 });
+	mouseIcon->SetPosition({ 
+		dashSkillPos.x - 120 - 15,
+		dashSkillPos.y + 75 + posY[0] });
+
+
+	skillIconSp->SetSize({ 80,80 });
+	skillIconSp->SetPosition({
+		dashSkillPos.x,
+		dashSkillPos.y + posY[1]});
+
+	backWhite->SetSize({ 90,90 });
+	backWhite->SetPosition({
+		dashSkillPos.x - 5,
+		dashSkillPos.y - 5 + posY[1] });
+
+	skillCoolAlpha->SetSize({ 80,80 });
+	skillCoolAlpha->SetPosition({
+		dashSkillPos.x,
+		dashSkillPos.y + posY[1] });
+
+	lShift->SetSize({ 120,30 });
+	lShift->SetPosition({
+		dashSkillPos.x - 15,
+		dashSkillPos.y + 75 + posY[1] });
+
+
+	jumpIcon->SetSize({ 80,80 });
+	jumpIcon->SetPosition({ 
+		dashSkillPos.x - 240, 
+		dashSkillPos.y + posY[2] });
+
+	backWhite3->SetSize({ 90,90 });
+	backWhite3->SetPosition({ 
+		dashSkillPos.x - 245,
+		dashSkillPos.y - 5 + posY[2] });
+
+	spaceIcon->SetSize({ 120,30 });
+	spaceIcon->SetPosition({
+		dashSkillPos.x - 240 - 15,
+		dashSkillPos.y + 75 + posY[2] });
+
 }
 
 void Player::UpdateMatrixAndMove()
@@ -212,8 +282,9 @@ void Player::Dash(VanishParticleManager& vpmanager, Audio* audio, SoundDataManag
 		dashCoolTime = 180;
 		isDash = true;
 		SetMuteki();
-		//audio->PlayWave(sdmanager.dashSE, false, 0.1f);
+		
 	}
+	if(dashCoolTime > 160) posY[1] -= 3.0f;
 
 	oldMoveSpd = moveSpeed;
 	if (moveSpeed > InitMoveSpd)
@@ -226,6 +297,7 @@ void Player::Dash(VanishParticleManager& vpmanager, Audio* audio, SoundDataManag
 		{
 			vpmanager.CreateParticle(worldTransform_.translation_,
 				{ 1.0f,1.0f ,1.0f }, 0.02f);
+			audio->PlayWave(sdmanager.dashSE, false, 0.05f);
 		}
 	}
 	if (dashCoolTime > 0)
@@ -263,13 +335,19 @@ void Player::Move(VanishParticleManager& vpmanager, Audio* audio, SoundDataManag
 
 	//ダッシュ
 	Dash(vpmanager,audio, sdmanager);
-
+	static int jumptime = 0;
 	//ジャンプする処理
 	if (input_->TriggerKey(DIK_SPACE) && isJumpCheck)
 	{
 		jumpSpd = 0.8f;
 		isJumpCheck = false;
 		audio->PlayWave(sdmanager.jumpSE, false, 0.1f);
+		if(jumptime <= 0) jumptime = 20;
+	}
+
+	if (jumptime > 0) {
+		--jumptime;
+		posY[2] -= 3.0f;
 	}
 	//重力をかける処理
 	if (jumpSpd > -1.0f)
@@ -297,10 +375,7 @@ void Player::Move(VanishParticleManager& vpmanager, Audio* audio, SoundDataManag
 	if (worldTransform_.translation_.y <= -100)
 	{
 		worldTransform_.translation_ = respawnPos;
-		/*if (audio->IsPlaying(sdmanager.jumpEndSE) == false)
-		{
-			audio->PlayWave(sdmanager.jumpEndSE, false, 0.08f);
-		}*/
+		audio->PlayWave(sdmanager.damageSE, false, 0.1f);
 		OnDamage(5);
 	}
 }

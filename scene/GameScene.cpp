@@ -215,6 +215,7 @@ void GameScene::Update() {
 		screenWhite->SetColor({ 1,1,1,clearWhite });
 
 		result.Update(player_.GetHeartCount(), player_.GetNoHitFlag(), clearFlag);
+		//result.isResult = true;
 		if (result.isResult)
 		{
 			if (input_->TriggerKey(DIK_SPACE))
@@ -419,10 +420,10 @@ void GameScene::CheckBulletCollision()
 			if (BoxColAABB(posA, posB))
 			{
 				bullet->OnCollision();
-				if (audio_->IsPlaying(SDManager.dashSE) == false
+				if (audio_->IsPlaying(SDManager.damageSE) == false
 					&& player_.mutekiTimer <= 0)
 				{
-					audio_->PlayWave(SDManager.dashSE, false, 0.08f);
+					audio_->PlayWave(SDManager.damageSE, false, 0.08f);
 				}
 				player_.OnDamage(5);
 			}
@@ -483,10 +484,10 @@ void GameScene::CheckBulletCollision()
 		posB = boss->GetBossPart(0).GetWorldTrans();
 		if (BoxColAABB(posA, posB))
 		{
-			if (audio_->IsPlaying(SDManager.dashSE) == false
+			if (audio_->IsPlaying(SDManager.damageSE) == false
 				&& player_.mutekiTimer <= 0)
 			{
-				audio_->PlayWave(SDManager.dashSE, false, 0.08f);
+				audio_->PlayWave(SDManager.damageSE, false, 0.08f);
 			}
 			player_.OnDamage(7);
 		}
@@ -495,10 +496,10 @@ void GameScene::CheckBulletCollision()
 			posB = bossB->GetWorldTrans();
 ;			if (BoxColAABB(posA, posB))
 			{
-				if (audio_->IsPlaying(SDManager.dashSE) == false
+				if (audio_->IsPlaying(SDManager.damageSE) == false
 					&& player_.mutekiTimer <= 0)
 				{
-					audio_->PlayWave(SDManager.dashSE, false, 0.08f);
+					audio_->PlayWave(SDManager.damageSE, false, 0.08f);
 				}
 				player_.OnDamage(5);
 			}

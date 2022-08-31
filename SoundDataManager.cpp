@@ -9,9 +9,9 @@ void SoundDataManager::Initialize()
 	
 	shotSE = audio->LoadWave("shot.wav");
 	jumpSE = audio->LoadWave("jump.wav");
-	dashSE = audio->LoadWave("dash.wav");
+	damageSE = audio->LoadWave("dash.wav");
 	healSE = audio->LoadWave("heal.wav");
-	//jumpEndSE = audio->LoadWave("jump_end.wav");
+	jumpEndSE = audio->LoadWave("jump_end.wav");
 	enemyPopSE = audio->LoadWave("enemypop.wav");
 	hitSE = audio->LoadWave("hit.wav");
 	deadEnemySE = audio->LoadWave("deadenemy.wav");
@@ -24,4 +24,5 @@ void SoundDataManager::Initialize()
 	bossendboomSE = audio->LoadWave("boss_endboom.wav");
 	checkpointSE = audio->LoadWave("checkpoint.wav");
 	pushSE = audio->LoadWave("push.wav");
+	dashSE = audio->LoadWave("dash_2.wav");
 }

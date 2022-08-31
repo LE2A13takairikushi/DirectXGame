@@ -129,6 +129,8 @@ private:
 	int dashCoolTime = 0;
 	bool isDash = false;
 
+	float posY[3] = { 0,0,0 };
+
 	//ƒŠƒUƒ‹ƒgŠÖŒW
 	int getHeartCount = 0;
 	bool nohitFlag = true;
