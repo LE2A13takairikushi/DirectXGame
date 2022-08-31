@@ -2,12 +2,13 @@
 #include "Boss.h"
 #include <memory>
 #include <list>
+#include "SoundDataManager.h"
 
 class BossManager
 {
 public:
 	void Initialize(Model* model, TextureHandle tex);
-	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos, VanishParticleManager& vpManager);
+	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos, VanishParticleManager& vpManager,Audio* audio,SoundDataManager sdmanager);
 	void Draw(ViewProjection view, float mouseVertRota);
 	void BossUIDraw();
 

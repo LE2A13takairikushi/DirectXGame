@@ -3,6 +3,13 @@
 #include "Sprite.h"
 #include "Input.h"
 
+enum startChoese
+{
+	initStart,
+	checkpointStart,
+	choeseNum,
+};
+
 class Result
 {
 public:
@@ -15,12 +22,14 @@ public:
 
 	bool isResult = false;
 
+	int curserNum = 0;
+
 private:
 	Input* input = nullptr;
 
 	void NumInit();
 
-	static const int num = 5;
+	static const int num = 7;
 	Sprite* resultString[num] = { nullptr };
 	Sprite* backWhite[num] = { nullptr };
 
@@ -31,6 +40,10 @@ private:
 
 	Sprite* heartGraph = nullptr;
 	Sprite* back = nullptr;
+
+	Sprite* curser = nullptr;
+
+	Vector2 uiPos[2];
 
 	//ƒŠƒUƒ‹ƒg‚ÉŠÖŒW‚·‚é—v‘f
 	int getHeart = 0;

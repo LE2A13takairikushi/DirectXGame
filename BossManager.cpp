@@ -9,7 +9,7 @@ void BossManager::Initialize(Model* model, TextureHandle tex)
 	weekTex = TextureManager::Load("red.png");
 }
 
-void BossManager::Update(Vector3 pos, Vector3 scale, Vector3 targetPos, VanishParticleManager& vpManager)
+void BossManager::Update(Vector3 pos, Vector3 scale, Vector3 targetPos, VanishParticleManager& vpManager, Audio* audio, SoundDataManager sdmanager)
 {
 	bossList.remove_if([](std::unique_ptr<Boss>& boss) {
 		return boss->IsDead();
@@ -17,7 +17,7 @@ void BossManager::Update(Vector3 pos, Vector3 scale, Vector3 targetPos, VanishPa
 
 	for (std::unique_ptr<Boss>& boss : bossList)
 	{
-		boss->Update( pos, scale, targetPos, vpManager);
+		boss->Update( pos, scale, targetPos, vpManager,audio,sdmanager);
 	}
 }
 

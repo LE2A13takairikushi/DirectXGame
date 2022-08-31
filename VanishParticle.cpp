@@ -14,6 +14,10 @@ void VanishParticle::Initialize(Vector3 initPos,Vector3 initScale,float scaleSpd
 	moveVec.z = RNG(-10, 10) * 0.01f;
 
 	worldTransform_.scale_ = initScale;
+
+	//worldTransform_.rotation_.x = RNG(-300, 300) * 0.01f;
+	//worldTransform_.rotation_.y = RNG(-300, 300) * 0.01f;
+	//worldTransform_.rotation_.z = RNG(-300, 300) * 0.01f;
 }
 
 void VanishParticle::Update()

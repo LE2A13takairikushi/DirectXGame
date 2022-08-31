@@ -79,7 +79,7 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	backWhite2 = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
 	backWhite3 = Sprite::Create(TextureManager::Load("white.png"), { 0,0 }, { 1,1,1,1 });
 	lShift = Sprite::Create(TextureManager::Load("Lshift.png"), { 0,0 });
-	mouseIcon = Sprite::Create(TextureManager::Load("mouse.png"), { 0,0 });
+	mouseIcon = Sprite::Create(TextureManager::Load("MouseClick.png"), { 0,0 });
 	jumpIcon = Sprite::Create(TextureManager::Load("jump_skill_icon.png"), { 0,0 });
 	spaceIcon = Sprite::Create(TextureManager::Load("space.png"), { 0,0 });
 
@@ -112,7 +112,7 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 	lShift->SetSize({ 120,30 });
 	lShift->SetPosition({ dashSkillPos.x - 15,dashSkillPos.y + 75 });
 	
-	mouseIcon->SetSize({ 120,30 });
+	mouseIcon->SetSize({ 120,60 });
 	mouseIcon->SetPosition({ dashSkillPos.x - 120 - 15,dashSkillPos.y + 75 });
 	
 	spaceIcon->SetSize({ 120,30 });
@@ -135,10 +135,6 @@ void Player::Update(VanishParticleManager &vpmanager,Audio* audio, SoundDataMana
 	{
 		vpmanager.CreateSplitParticle(worldTransform_.translation_,
 			{ 0.5f,0.5f,0.5f }, 0.01f);
-		/*if (audio->IsPlaying(sdmanager.jumpEndSE) == false)
-		{
-			audio->PlayWave(sdmanager.jumpEndSE, false, 0.08f);
-		}*/
 	}
 	oldIsJumpCheck = isJumpCheck;
 
@@ -163,10 +159,6 @@ void Player::Update(VanishParticleManager &vpmanager,Audio* audio, SoundDataMana
 	}
 
 	//視点を正面に向ける
-	/*if (input_->PushKey(DIK_R))
-	{
-		verticalRotation = 0;
-	}*/
 	if (bulletCool > 0)bulletCool--;
 	if ((input_->IsPressMouse(0) || input_->IsPressMouse(1)) && bulletCool <= 0)
 	{
@@ -293,8 +285,6 @@ void Player::Move(VanishParticleManager& vpmanager, Audio* audio, SoundDataManag
 
 	//マウスでカメラを動かす処理
 	Vector2 temp = { 1920 / 2, 1080 / 2 };
-	////マウスを固定する処理
-	//SetCursorPos(temp.x, temp.y);
 
 	//マウスの移動量に応じてカメラを動かす処理
 	horizontalRotation += (point.x - temp.x) * mouseSpd;

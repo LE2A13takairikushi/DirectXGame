@@ -1,5 +1,6 @@
 #include "Result.h"
 #include "WinApp.h"
+#include "MyMath.h"
 
 void Result::Initialize()
 {
@@ -25,8 +26,14 @@ void Result::Initialize()
 			{ WinApp::kWindowWidth / 2 + 200,150 });
 	resultString[4] =
 		Sprite::Create(TextureManager::Load("collectheart.png"),
-			{ WinApp::kWindowWidth / 2 - 100,450 });
+			{ WinApp::kWindowWidth / 2 - 450,420 });
 
+	resultString[5] = 
+		Sprite::Create(TextureManager::Load("start.png"),
+			{ WinApp::kWindowWidth / 2 - 30,450 });
+	resultString[6] =
+		Sprite::Create(TextureManager::Load("checkPointMozi.png"),
+			{ WinApp::kWindowWidth / 2 - 30,550 });
 
 	for (int i = 0; i < num; i++)
 	{
@@ -70,10 +77,69 @@ void Result::Initialize()
 		});
 	heartGraph->SetSize({100, 100});
 
+	curser = Sprite::Create(TextureManager::Load("curser.png"),
+		{ 0,0 });
+	curser->SetSize({ 100, 100 });
+
+	uiPos[0] = resultString[5]->GetPosition();
+	uiPos[1] = resultString[6]->GetPosition();
 }
 
 void Result::Update(int getHeart,bool nohitFlag,bool clearFlag)
 {
+	static int time = 0;
+	static int timespd = 1;
+
+	time += timespd;
+	if (time >= 360 || time <= 0)
+	{
+		timespd = -timespd;
+	}
+
+	if (input->TriggerKey(DIK_S))
+	{
+		if (curserNum != checkpointStart)
+		{
+			curserNum++;
+			time = 0;
+		}
+	}
+	if (input->TriggerKey(DIK_W))
+	{
+		if (curserNum != initStart)
+		{
+			curserNum--;
+			time = 0;
+		}
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		if (curserNum == i)
+		{
+			resultString[i + 5]->SetPosition({
+				uiPos[i].x + cosf(DegreeConversionRad(time)) * 10.0f,
+				uiPos[i].y
+				});
+			backWhite[i + 5]->SetPosition({
+				uiPos[i].x + cosf(DegreeConversionRad(time)) * 10.0f - 10,
+				uiPos[i].y - 10
+				});
+		}
+		else
+		{
+			resultString[i + 5]->SetPosition({ uiPos[i].x,uiPos[i].y });
+			backWhite[i + 5]->SetPosition({
+					uiPos[i].x - 10,
+					uiPos[i].y - 10
+				});
+		}
+	}
+
+	curser->SetPosition({
+	resultString[curserNum + 5]->GetPosition().x - 70,
+	resultString[curserNum + 5]->GetPosition().y });
+
 	this->nohitFlag = nohitFlag;
 	this->clearFlag = clearFlag;
 
@@ -122,6 +188,7 @@ void Result::Draw()
 	}
 	heartGraph->Draw();
 	maxNum->Draw();
+	curser->Draw();
 }
 
 void Result::End()

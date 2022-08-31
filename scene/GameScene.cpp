@@ -20,11 +20,13 @@ GameScene::~GameScene() {
 	delete enemyManager;
 
 	delete debugCamera_;
-	delete sprite;
+	//delete sprite;
+	delete screenWhite;
 	pause.End();
 	player_.End();
 	bossManager.End();
 	result.End();
+	title.End();
 }
 
 void GameScene::Initialize() {
@@ -50,7 +52,7 @@ void GameScene::Initialize() {
 
 	bossManager.Initialize(modelManager->model_,white);
 
-	sprite = Sprite::Create(textureHandle_, { 0,0 });
+	//sprite = Sprite::Create(textureHandle_, { 0,0 });
 
 	viewProjection_.Initialize();
 	viewProjection_.eye = { 0,50,100 };
@@ -104,7 +106,10 @@ void GameScene::Initialize() {
 
 	result.Initialize();
 
-	audio_->PlayWave(SDManager.titleBGM, true, 0.1f);
+	audio_->PlayWave(SDManager.gamesceneBGM, true, 0.1f);
+
+	screenWhite = Sprite::Create(TextureManager::Load("white.png"), { 0,0 },{1,1,1,0});
+	screenWhite->SetSize({ WinApp::kWindowWidth,WinApp::kWindowHeight });
 }
 
 void GameScene::Update() {
@@ -113,10 +118,29 @@ void GameScene::Update() {
 	if (title.IsTitle())
 	{
 		title.Update(audio_,SDManager);
+
+		if (input_->TriggerKey(DIK_SPACE))
+		{
+			player_.DeadInit();
+			gManager.DeadInit();
+			iManager.DeadInit();
+			enemyEManager.DeadInit();
+			enemyManager->DeadInit();
+			bossManager.DeadInit();
+			hIManager.DeadInit();
+			result.isResult = false;
+			clearFlag = false;
+			pause.titleBack = false;
+			pause.Reset();
+		}
 	}
 	else
 	{
-
+		if (pause.titleBack)
+		{
+			title.isTitle = true;
+		}
+		
 		if (pause.IsMenuOpen() == false && result.isResult == false)
 		{
 			debugCamera_->Update();
@@ -148,7 +172,7 @@ void GameScene::Update() {
 
 			bossManager.Update(gManager.GetBossStagePos(),
 				gManager.GetBossStageScale(), player_.GetPos(),
-				vpManager);
+				vpManager,audio_,SDManager);
 
 
 			CheckBulletCollision();
@@ -167,18 +191,42 @@ void GameScene::Update() {
 		}
 		for (const unique_ptr<Boss>& boss : bossManager.GetBossList())
 		{
-			if (boss->IsDead())
+			clearEffectFlag = boss->bossDeadEffectFlag;
+		}
+		if (clearEffectFlag)
+		{
+			clearTimer++;
+			if (clearTimer <= 300)
+			{
+				clearWhite += 0.007f;
+			}
+			if (clearTimer >= 600)
 			{
 				result.isResult = true;
 				clearFlag = true;
+				clearEffectFlag = false;
+				clearTimer = 0;
 			}
 		}
+		if (clearWhite > 0)
+		{
+			clearWhite -= 0.005f;
+		}
+		screenWhite->SetColor({ 1,1,1,clearWhite });
 
 		result.Update(player_.GetHeartCount(), player_.GetNoHitFlag(), clearFlag);
 		if (result.isResult)
 		{
 			if (input_->TriggerKey(DIK_SPACE))
 			{
+				if (result.curserNum == initStart)
+				{
+					player_.SetSpawnPos({ 0,20,50 });
+					for (const unique_ptr<EventObject>& eventObj : cManager.GetObjects())
+					{
+						eventObj->EventEnd();
+					}
+				}
 				player_.DeadInit();
 				gManager.DeadInit();
 				iManager.DeadInit();
@@ -195,7 +243,7 @@ void GameScene::Update() {
 	}
 	viewProjection_.UpdateMatrix();
 
-	if (true)
+	if (false)
 	{
 		debugText_->SetPos(WinApp::kWindowWidth - 200, 50);
 		debugText_->Printf("fps %f", fpsFix.fps);
@@ -217,6 +265,17 @@ void GameScene::Update() {
 		debugText_->Printf("result.isResult %d",
 			result.isResult);
 	}
+	/*debugText_->SetPos(50, 170);
+	debugText_->Printf("clearWhite %f",
+		clearWhite);
+	debugText_->SetPos(50, 190);
+	debugText_->Printf("clearTimer %d",
+		clearTimer);
+	debugText_->SetPos(50, 210);
+	debugText_->Printf("clearEffectFlag %d",
+		clearEffectFlag);*/
+
+	endFlag = title.endflag;
 }
 
 void GameScene::Draw() {
@@ -310,7 +369,8 @@ void GameScene::Draw() {
 	if (result.isResult) {
 		result.Draw();
 	}
-	//result.Draw();
+	
+	screenWhite->Draw();
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
@@ -560,6 +620,7 @@ void GameScene::CheckPlayerAllCollision()
 			player_.SetSpawnPos(eventObj->GetPos());
 			if (eventObj->IsEvent() == false)
 			{
+				audio_->PlayWave(SDManager.checkpointSE, false, 0.1f);
 				eventObj->EventStart();
 				vpManager.CreateParticle(eventObj->GetWorldTrans().translation_, { 3.0f ,3.0f ,3.0f }, 0.03f);
 			}
@@ -660,8 +721,6 @@ void GameScene::CheckPlayerAllCollision()
 		//ボス発生オブジェクトに衝突したら
 		if (BoxColAABB(posA, posB))
 		{
-			//audio_->StopWave(SDManager.gamesceneBGM);
-			//audio_->PlayWave(SDManager.bossBGM, true, 0.1f);
 			Vector3 spawnPos = eventObj->GetWorldTrans().translation_;
 			spawnPos.y += 10;
 			bossManager.BossBattleStart();

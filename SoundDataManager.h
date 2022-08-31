@@ -12,7 +12,6 @@ public:
 	SoundDataHandle jumpSE = 0;
 	SoundDataHandle dashSE = 0;
 	SoundDataHandle healSE = 0;
-	//SoundDataHandle jumpEndSE = 0;
 	SoundDataHandle enemyPopSE = 0;
 	SoundDataHandle hitSE = 0;
 	SoundDataHandle deadEnemySE = 0;
@@ -21,6 +20,10 @@ public:
 	SoundDataHandle eventclearSE = 0;
 	SoundDataHandle vibrationSE = 0;
 	SoundDataHandle vibrationEndSE = 0;
+	SoundDataHandle bossboomSE = 0;
+	SoundDataHandle bossendboomSE = 0;
+	SoundDataHandle checkpointSE = 0;
+	SoundDataHandle pushSE = 0;
 
 	SoundDataHandle titleBGM = 0;
 	SoundDataHandle gamesceneBGM = 0;

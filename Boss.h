@@ -3,6 +3,7 @@
 #include "DebugText.h"
 #include "VanishParticleManager.h"
 #include "EnemyBullet.h"
+#include "SoundDataManager.h"
 
 enum BossPartsName
 {
@@ -27,7 +28,7 @@ class Boss
 {
 public:
 	void Initialize(Model* model, TextureHandle tex,TextureHandle weekTex);
-	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos,VanishParticleManager& vpManager);
+	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos,VanishParticleManager& vpManager,Audio* audio,SoundDataManager sdmanager);
 	void Draw(ViewProjection view, float mouseVertRota);
 
 	void End();
@@ -54,6 +55,8 @@ public:
 
 	std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; };
 
+	bool bossDeadEffectFlag = false;
+
 private:
 	void Viblation();
 	void WeekViblation();
@@ -70,6 +73,7 @@ private:
 	float scaleSpd = 0.03f;
 	int scalePTimer = 0;
 
+	float oldHitPoint = hitPoint;
 	static const int HPINIT = 300;
 	float hitGaugeOneSize = 0;
 	int hitPoint = HPINIT;

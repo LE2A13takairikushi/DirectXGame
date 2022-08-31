@@ -20,4 +20,8 @@ void SoundDataManager::Initialize()
 	eventclearSE = audio->LoadWave("eventclear.wav");
 	vibrationSE = audio->LoadWave("vibration.wav");
 	vibrationEndSE = audio->LoadWave("vibration_end.wav");
+	bossboomSE = audio->LoadWave("boss_boom.wav");
+	bossendboomSE = audio->LoadWave("boss_endboom.wav");
+	checkpointSE = audio->LoadWave("checkpoint.wav");
+	pushSE = audio->LoadWave("push.wav");
 }

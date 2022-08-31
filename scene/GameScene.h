@@ -74,6 +74,8 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+	bool endFlag = false;
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -116,9 +118,10 @@ private: // メンバ変数
 	PartObjectManager pObjectManager;
 
 	//描画系
-	Sprite *sprite = nullptr;
 	Pause pause;
 	Result result;
+
+	Sprite* screenWhite = nullptr;
 
 	//サウンド
 	//BGM
@@ -130,6 +133,9 @@ private: // メンバ変数
 	ViewProjection titleView;
 
 	bool clearFlag = false;
+	int clearTimer = 0;
+	float clearWhite = 0;
+	bool clearEffectFlag = false;
 
 	/// <summary>
 	/// ゲームシーン用

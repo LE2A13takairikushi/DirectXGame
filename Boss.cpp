@@ -50,7 +50,7 @@ void Boss::Initialize(Model* model,TextureHandle tex, TextureHandle weekTex)
 	HpbarGraph->SetPosition({ hitPointGauge->GetPosition().x - 60, hitPointGauge->GetPosition().y - 10});
 }
 
-void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleManager& vpManager)
+void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleManager& vpManager, Audio* audio, SoundDataManager sdmanager)
 {
 	bullets_.remove_if([](std::unique_ptr<EnemyBullet>& bullet) {
 		return bullet->IsDead();
@@ -78,8 +78,6 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 	if (shake.z < 0) shake.z += 0.01f;
 
 	//static Vector2 tempHitGauge = { 0,0 };
-
-	static float oldHitPoint = hitPoint;
 
 	//hp‚ªŒ¸‚Á‚½‚çƒQ[ƒW‚É‚à”½‰f
 	if (hitPoint >= 0)
@@ -277,6 +275,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		}
 		break;
 	case dead:
+		bossDeadEffectFlag = true;
 		jumpSpd = 0.01f;
 		scalePTimer--;
 		if (bossParts[body].worldTransform_.scale_.x > 0.1f)
@@ -286,6 +285,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				vpManager.CreateParticle(
 					bossParts[BossPartsName::body].GetPos(),
 					{ 5,5,5 }, 0.05f);
+				audio->PlayWave(sdmanager.bossboomSE, false, 0.1f);
 				scalePTimer = 20;
 			}
 
@@ -303,6 +303,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		if (bossParts[body].worldTransform_.scale_.x <= 0.1f)
 		{
 			isDead = true;
+			audio->PlayWave(sdmanager.bossendboomSE, false, 0.3f);
 			vpManager.CreateSplitParticle(
 				bossParts[BossPartsName::weekPoint].GetPos(),
 				{ 10,10,10 }, 0.05f, 5.0f);
@@ -452,7 +453,7 @@ void Boss::OnBodyColision()
 
 void Boss::OnWeekColision()
 {
-	hitPoint -= 1 * 5;
+	hitPoint -= 1 * 50;
 	isWeekShake = true;
 	weekShakeTimer = 60;
 }

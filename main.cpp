@@ -7,7 +7,6 @@
 #include "PrimitiveDrawer.h"
 
 #include "FPSfix.h"
-#include "SoundManager.h"
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -20,10 +19,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//AxisIndicator* axisIndicator = nullptr;
 	PrimitiveDrawer* primitiveDrawer = nullptr;
 	GameScene* gameScene = nullptr;
-
-	//Microsoft::WRL::ComPtr<IXAudio2> xAudio2;
-	//IXAudio2MasteringVoice* masterVoice;
-	//XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
 
 	// ゲームウィンドウの作成
 	win = WinApp::GetInstance();
@@ -93,7 +88,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 描画終了
 		dxCommon->PostDraw();
 
-		if (input->TriggerKey(DIK_TAB)) {
+		if (gameScene->endFlag) {
 			break;
 		}
 	}

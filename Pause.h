@@ -29,14 +29,24 @@ public:
 
 	bool IsMenuOpen() { return openMenu; };
 
+	bool titleBack = false;
+
+	void Reset();
+
 private:
+	void SetBackWhite(int num);
+	Sprite* backWhite[MENU_NUM] = { nullptr };
 
 	Sprite* menu[MENU_NUM] = { nullptr };
 	Sprite* curser = nullptr;
+	Sprite* alpha = nullptr;
+
 	TextureHandle tex = 0;
 
 	Vector2 mousePos;
 	Vector2 mouseR = {1,1};
+
+	Vector2 uiPos[MENU_NUM];
 
 	bool openMenu = false;
 
