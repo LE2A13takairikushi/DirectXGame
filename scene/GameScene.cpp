@@ -638,7 +638,8 @@ void GameScene::CheckPlayerAllCollision()
 			eventObj->Erase();
 		}
 	}
-
+	static bool jESoundManageFlag = false;
+	jESoundManageFlag = false;
 	for (const unique_ptr<EventObject>& eventObj : jEManager.GetObjects())
 	{
 		posB = eventObj->GetWorldTrans();
@@ -646,7 +647,11 @@ void GameScene::CheckPlayerAllCollision()
 		{
 			if (eventObj->IsEvent() == false)
 			{
-				audio_->PlayWave(SDManager.jumpEventSE, false, 0.1f);
+				if (jESoundManageFlag == false)
+				{
+					audio_->PlayWave(SDManager.jumpEventSE, false, 0.1f);
+					jESoundManageFlag = true;
+				}
 				player_.EnforceJumpOnCol();
 				eventObj->EventStart();
 			}
@@ -713,7 +718,16 @@ void GameScene::CheckPlayerAllCollision()
 	posB = Goal.GetWorldTrans();
 	if (BoxColAABB(posA, posB))
 	{
+		if (Goal.IsEvent() == false)
+		{
+			audio_->PlayWave(SDManager.jumpEventSE, false, 0.1f);
+			Goal.EventStart();
+		}
 		player_.EnforceGoalOnCol();
+	}
+	else
+	{
+		Goal.EventEnd();
 	}
 
 	for (const unique_ptr<EventObject>& eventObj : enemyEManager.GetBossObjects())

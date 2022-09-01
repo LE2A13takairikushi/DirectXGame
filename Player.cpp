@@ -134,9 +134,14 @@ void Player::Update(VanishParticleManager &vpmanager,Audio* audio, SoundDataMana
 
 	if (oldIsJumpCheck == false && isJumpCheck)
 	{
-		vpmanager.CreateSplitParticle(worldTransform_.translation_,
-			{ 0.5f,0.5f,0.5f }, 0.01f);
-		audio->PlayWave(sdmanager.jumpEndSE, false, 0.1f);
+		if (jumpEfectManageFlag == false)
+		{
+			vpmanager.CreateSplitParticle(worldTransform_.translation_,
+				{ 0.5f,0.5f,0.5f }, 0.01f);
+
+			audio->PlayWave(sdmanager.jumpEndSE, false, 0.1f);
+			jumpEfectManageFlag = true;
+		}
 	}
 	oldIsJumpCheck = isJumpCheck;
 
@@ -342,6 +347,7 @@ void Player::Move(VanishParticleManager& vpmanager, Audio* audio, SoundDataManag
 		jumpSpd = 0.8f;
 		isJumpCheck = false;
 		audio->PlayWave(sdmanager.jumpSE, false, 0.1f);
+		jumpEfectManageFlag = false;
 		if(jumptime <= 0) jumptime = 20;
 	}
 

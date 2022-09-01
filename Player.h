@@ -118,11 +118,11 @@ private:
 	static const int MUTEKI_TIME = 120;
 
 	//ˆÚ“®ŠÖŒW
-
 	float InitMoveSpd = 0.21f;
 	float moveSpeed = InitMoveSpd;
 	float jumpSpd = 0.0f;
 	float gravity = 0.01f;
+	bool jumpEfectManageFlag = false;
 
 	//ƒXƒLƒ‹ŠÖŒW
 	float oldMoveSpd = 0;
