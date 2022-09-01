@@ -175,8 +175,6 @@ void Result::Update(int getHeart,bool nohitFlag,bool clearFlag)
 
 	for (int i = 0; i < 3; i++)
 	{
-		
-		
 		starGraph[i]->SetSize({ a[i],a[i] });
 		starBlankGraph[i]->SetSize({ a[i],a[i] });
 	}
@@ -338,4 +336,12 @@ void Result::NumInit()
 		{ -100,0 });
 	numberGraph[10] = Sprite::Create(TextureManager::Load("num\\slash.png"),
 		{ -100,0 });
+}
+
+void Result::NumPosInit()
+{
+	for (int i = 0; i < 10; i++)
+	{
+		numberGraph[i]->SetPosition({ -100,0 });
+	}
 }

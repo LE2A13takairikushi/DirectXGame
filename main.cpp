@@ -91,6 +91,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		if (gameScene->endFlag) {
 			break;
 		}
+		//緊急終了用
+		if (input->PushKey(DIK_TAB) && input->PushKey(DIK_F5)) {
+			break;
+		}
 	}
 
 	// 各種解放

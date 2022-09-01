@@ -1,12 +1,13 @@
 #include "BossManager.h"
 using namespace std;
 
-void BossManager::Initialize(Model* model, TextureHandle tex)
+void BossManager::Initialize(Model* model)
 {
 	this->model = model;
 	this->tex = TextureManager::Load("skyBlue.png");
 
 	weekTex = TextureManager::Load("red.png");
+	changeTex = TextureManager::Load("green.png");
 }
 
 void BossManager::Update(Vector3 pos, Vector3 scale, Vector3 targetPos, VanishParticleManager& vpManager, Audio* audio, SoundDataManager sdmanager)
@@ -46,7 +47,7 @@ void BossManager::End()
 void BossManager::SpawnBoss(Vector3 initpos)
 {
 	unique_ptr<Boss> newBoss = make_unique<Boss>();
-	newBoss->Initialize(model, tex,weekTex);
+	newBoss->Initialize(model, tex,weekTex, changeTex);
 	newBoss->SetPos(initpos);
 	bossList.push_back(std::move(newBoss));
 }

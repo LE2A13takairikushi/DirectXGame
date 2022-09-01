@@ -50,7 +50,7 @@ void GameScene::Initialize() {
 		white
 	);
 
-	bossManager.Initialize(modelManager->model_,white);
+	bossManager.Initialize(modelManager->model_);
 
 	//sprite = Sprite::Create(textureHandle_, { 0,0 });
 
@@ -240,7 +240,7 @@ void GameScene::Update() {
 			}
 		}
 
-		pause.Update(audio_, SDManager, player_.IsDead());
+		pause.Update(audio_, SDManager, player_.IsDead(),result.isResult);
 	}
 	viewProjection_.UpdateMatrix();
 

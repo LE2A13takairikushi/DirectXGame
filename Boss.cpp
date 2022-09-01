@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void Boss::Initialize(Model* model,TextureHandle tex, TextureHandle weekTex)
+void Boss::Initialize(Model* model,TextureHandle tex, TextureHandle weekTex, TextureHandle changeTex)
 {
 	//本体
 	for (int i = 0; i < bossPartsNum; i++)
@@ -15,6 +15,10 @@ void Boss::Initialize(Model* model,TextureHandle tex, TextureHandle weekTex)
 	}
 	bossParts[0].LoadTexture(tex);
 	bossParts[1].LoadTexture(weekTex);
+
+	skyBlue = tex;
+	red = weekTex;
+	green = changeTex;
 
 	bulletModel = model;
 
@@ -98,10 +102,6 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		jumpSpd -= gravity;
 	}
 
-	if (hitPoint <= HPINIT / 2 && isFormChange == false)
-	{
-		phase = ActPhase::superAttack;
-	}
 	if (hitPoint <= 0)
 	{
 		phase = ActPhase::dead;
@@ -138,6 +138,10 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		if (jumpSpd < 0)
 		{
 			phase = ActPhase::setTarget;
+			if (hitPoint <= HPINIT / 2 && isFormChange == false)
+			{
+				phase = ActPhase::superAttack;
+			}
 		}
 		//大量発生すると重かったので発生数に制限
 		if (vpManager.GetParticle().size() <= 300)
@@ -171,6 +175,14 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 			phase = ActPhase::miniJump;
 		}
 
+		if (vpManager.GetParticle().size() <= 300 &&
+			fallTimer % 10 == 0)
+		{
+			vpManager.CreateParticle(
+				bossParts[BossPartsName::body].GetPos(),
+				{ 5.0f,5.0f,5.0f }, 0.05f);
+		}
+
 		break;
 	case miniJump:
 		miniJumpTimer--;
@@ -199,10 +211,11 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		break;
 	case superAttack:
 
+		//フォームチェンジはそれ専用のcaseを作った方が管理しやすい
 		if (isFormChange == false)
 		{
-			isFormChange = true;
-			/*superAttackMoveVec.y = 0;
+			jumpSpd = 0;
+			superAttackMoveVec.y = 0;
 			move += superAttackMoveVec * moveSpd;
 			if ((bossParts[body].GetPos().x >= pos.x - 10) &&
 				(bossParts[body].GetPos().x <= pos.x + 10) &&
@@ -211,12 +224,65 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				)
 			{
 				isFormChange = true;
-			}*/
+			}
+		}
+
+		if (isFormChange && bossColorchange == false)
+		{
+			jumpSpd = 0;
+
+			static int scaleTimer = 0;
+			static int scaleCount = 0;
+			--scaleTimer;
+			if (scaleTimer <= 0)
+			{
+				//外側で爆発しまくるパーティクル
+				Vector3 plusPos;
+				plusPos.x = RNG(-5, 5) * 10.0f;
+				plusPos.y = RNG(-5, 5) * 10.0f;
+				plusPos.z = RNG(-5, 5) * 10.0f;
+				vpManager.CreateParticle({
+						bossParts[BossPartsName::body].GetPos().x + plusPos.x,
+						bossParts[BossPartsName::body].GetPos().y + plusPos.y,
+						bossParts[BossPartsName::body].GetPos().z + plusPos.z
+					},
+					{ 5,5,5 }, 0.05f);
+				//ボスの周囲で爆発するパーティクル
+				plusPos.x = RNG(-5, 5) * 5.0f;
+				plusPos.y = RNG(-5, 5) * 5.0f;
+				plusPos.z = RNG(-5, 5) * 5.0f;
+				vpManager.CreateParticle({
+						bossParts[BossPartsName::body].GetPos().x + plusPos.x,
+						bossParts[BossPartsName::body].GetPos().y + plusPos.y,
+						bossParts[BossPartsName::body].GetPos().z + plusPos.z
+					},
+					{ 3,3,3 }, 0.02f);
+				scaleTimer = 20;
+				scaleCount++;
+				isShake = true;
+				isWeekShake = true;
+				shakeTimer = 60;
+				weekShakeTimer = 60;
+				audio->PlayWave(sdmanager.bossboomSE, false, 0.1f);
+			}
+			if(scaleCount >= 30)
+			{
+				bossParts[0].LoadTexture(red);
+				bossParts[1].LoadTexture(green);
+				bossColorchange = true;
+				//弱点被弾時のダメージをアップ
+				weekMag = 5;
+
+				vpManager.CreateSplitParticle(
+					bossParts[BossPartsName::weekPoint].GetPos(),
+					{ 10,10,10 }, 0.05f, 5.0f);
+				audio->PlayWave(sdmanager.bossendboomSE, false, 0.3f);
+			}
 		}
 		
+		bulletTimer--;
 		if (onGround && isFormChange)
 		{
-			bulletTimer--;
 			if (bulletTimer <= 0)
 			{
 				//攻撃するタイミングですでに五回攻撃していたら
@@ -236,8 +302,8 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 					minus += 0.08f;
 					Attack({ cosf(PIf - minus),0, sinf(PIf - minus)});
 				}
-				bulletTimer = 240;
 				superAttackCount++;
+				bulletTimer = 240;
 			}
 		}
 		
@@ -270,7 +336,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		}
 		if (bossParts[body].worldTransform_.scale_.x >= initScale.x && onGround)
 		{
-			phase = ActPhase::miniJump;
+			phase = ActPhase::fall;
 			miniJumpTimer = 100;
 		}
 		break;
@@ -285,6 +351,28 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				vpManager.CreateParticle(
 					bossParts[BossPartsName::body].GetPos(),
 					{ 5,5,5 }, 0.05f);
+
+				Vector3 plusPos;
+				plusPos.x = RNG(-5, 5) * 10.0f;
+				plusPos.y = RNG(-5, 5) * 10.0f;
+				plusPos.z = RNG(-5, 5) * 10.0f;
+
+				vpManager.CreateParticle({
+					bossParts[BossPartsName::body].GetPos().x + plusPos.x,
+					bossParts[BossPartsName::body].GetPos().y + plusPos.y,
+					bossParts[BossPartsName::body].GetPos().z + plusPos.z
+					},
+					{ 5,5,5 }, 0.05f);
+				//ボスの周囲で爆発するパーティクル
+				plusPos.x = RNG(-5, 5) * 5.0f;
+				plusPos.y = RNG(-5, 5) * 5.0f;
+				plusPos.z = RNG(-5, 5) * 5.0f;
+				vpManager.CreateParticle({
+						bossParts[BossPartsName::body].GetPos().x + plusPos.x,
+						bossParts[BossPartsName::body].GetPos().y + plusPos.y,
+						bossParts[BossPartsName::body].GetPos().z + plusPos.z
+					},
+					{ 3,3,3 }, 0.02f);
 				audio->PlayWave(sdmanager.bossboomSE, false, 0.1f);
 				scalePTimer = 20;
 			}
@@ -410,6 +498,17 @@ void Boss::Draw(ViewProjection view,float mouseVertRota)
 		dT->SetPos(50, 170);
 		dT->Printf("oldHitPoint %f",
 			oldHitPoint);
+		dT->SetPos(50, 190);
+		dT->Printf("scale_ %f %f %f",
+			bossParts->GetWorldTrans().scale_.x,
+			bossParts->GetWorldTrans().scale_.y,
+			bossParts->GetWorldTrans().scale_.z);
+		dT->SetPos(50, 210);
+		dT->Printf("miniJumpTimer %d",
+			miniJumpTimer);
+		dT->SetPos(50, 230);
+		dT->Printf("bulletTimer %d",
+			bulletTimer);
 	}
 }
 void Boss::End()
@@ -449,14 +548,14 @@ BoxObj Boss::GetBossPart(int bossPartsNum)
 
 void Boss::OnBodyColision()
 {
-	hitPoint -= 1;
+	if(!(isFormChange && bossColorchange == false))	hitPoint -= 1;
 	isShake = true;
 	shakeTimer = 60;
 }
 
 void Boss::OnWeekColision()
 {
-	hitPoint -= 1 * 5;
+	if (!(isFormChange && bossColorchange == false)) hitPoint -= 1 * weekMag;
 	isWeekShake = true;
 	weekShakeTimer = 60;
 }

@@ -22,7 +22,7 @@ public:
 	DebugText* debugText = DebugText::GetInstance();
 
 	void Initialize();
-	void Update(Audio* audio,SoundDataManager sdmanager,bool pIsDead);
+	void Update(Audio* audio,SoundDataManager sdmanager,bool pIsDead, bool notOpenResult);
 	void MenuDraw();
 
 	void End();

@@ -34,7 +34,7 @@ void ArrowBoardManager::SetObjects()
 	CreateBoard({ 640, 340, 80 }, { 5,10,5 }, 0);
 	CreateBoard({ 490,340,260 }, { 5,10,5 }, 0);
 
-	CreateBoard({ 460,280,220 }, { 5,10,10 }, 3,1);
+	CreateBoard({ 480,280,200 }, { 5,10,10 }, 3,1);
 }
 
 void ArrowBoardManager::CreateBoard(Vector3 pos, Vector3 scale, int velocity,int mode)

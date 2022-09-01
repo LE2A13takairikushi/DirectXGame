@@ -39,12 +39,13 @@ void Pause::Initialize()
 	}
 }
 
-void Pause::Update(Audio* audio, SoundDataManager sdmanager, bool pIsDead)
+void Pause::Update(Audio* audio, SoundDataManager sdmanager, bool pIsDead,bool notOpenResult)
 {
 
 	if (input->TriggerKey(DIK_ESCAPE)) {
 		openMenu = !openMenu;
 	}
+	if (notOpenResult)openMenu = false;
 
 	static int time = 0;
 	static int timespd = 1;

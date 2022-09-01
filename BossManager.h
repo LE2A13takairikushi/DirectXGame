@@ -7,7 +7,7 @@
 class BossManager
 {
 public:
-	void Initialize(Model* model, TextureHandle tex);
+	void Initialize(Model* model);
 	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos, VanishParticleManager& vpManager,Audio* audio,SoundDataManager sdmanager);
 	void Draw(ViewProjection view, float mouseVertRota);
 	void BossUIDraw();
@@ -33,7 +33,7 @@ private:
 
 	Model* model = nullptr;
 	TextureHandle tex = 0;
-
 	TextureHandle weekTex = 0;
+	TextureHandle changeTex = 0;
 };
 

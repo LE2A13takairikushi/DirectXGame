@@ -28,6 +28,7 @@ private:
 	Input* input = nullptr;
 
 	void NumInit();
+	void NumPosInit();
 
 	static const int num = 7;
 	Sprite* resultString[num] = { nullptr };

@@ -185,8 +185,8 @@ void GroundManager::Initialize(Model* model_)
 		enforceObjects.push_back(std::move(newBox));
 	}
 
-	SetSpawnPos({ 0,0,50 }, 10);
-	//SetSpawnPos(bossStagePos, 10);
+	//SetSpawnPos({ 0,0,50 }, 10);
+	SetSpawnPos(bossStagePos, 10);
 }
 
 void GroundManager::EventStart(Vector3 playerPos)

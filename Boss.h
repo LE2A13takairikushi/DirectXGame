@@ -27,7 +27,7 @@ enum ActPhase
 class Boss
 {
 public:
-	void Initialize(Model* model, TextureHandle tex,TextureHandle weekTex);
+	void Initialize(Model* model, TextureHandle tex,TextureHandle weekTex, TextureHandle changeTex);
 	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos,VanishParticleManager& vpManager,Audio* audio,SoundDataManager sdmanager);
 	void Draw(ViewProjection view, float mouseVertRota);
 
@@ -69,9 +69,15 @@ private:
 	BoxObj bodyShakeBox;
 	BoxObj weekShakeBox;
 
+	TextureHandle red = 0;
+	TextureHandle skyBlue = 0;
+	TextureHandle green = 0;
+
 	Vector3 scalePlus = { 0,0,0 };
 	float scaleSpd = 0.03f;
 	int scalePTimer = 0;
+
+	int weekMag = 3;
 
 	static const int HPINIT = 300;
 	float hitGaugeOneSize = 0;
@@ -80,6 +86,7 @@ private:
 	bool isFormChange = false;
 	bool isSuperAttack = false;
 	bool onGround = false;
+	bool bossColorchange = false;
 
 	Vector3 move = {0,0,0};
 	float jumpSpd = 0;
