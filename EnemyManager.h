@@ -41,5 +41,6 @@ private:
 	Model* model_ = nullptr;
 	Model* partModel_ = nullptr;
 	TextureHandle tex = 0;
+	TextureHandle bTex = 0;
 };
 

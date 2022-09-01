@@ -7,13 +7,13 @@ void Bullet::Initialize()
 
 }
 
-void Bullet::Initialize(Model* model, Vector3 pos)
+void Bullet::Initialize(Model* model, Vector3 pos,TextureHandle tex)
 {
 	assert(model);
 
 	worldTransform_.Initialize();
 	model_ = model;
-	this->textureHandle_ = TextureManager::Load("bullet.png");
+	this->textureHandle_ = tex;
 
 	worldTransform_.translation_ = pos;
 

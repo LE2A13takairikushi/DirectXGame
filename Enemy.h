@@ -18,7 +18,7 @@ class Enemy : public object
 public:
 	Enemy();
 	~Enemy();
-	void Initialize(Model* model_, Model* partModel, TextureHandle tex, Vector3 popPos);
+	void Initialize(Model* model_, Model* partModel, TextureHandle tex, Vector3 popPos, TextureHandle bTex);
 	void Update(Vector3 pPos, Audio* audio, SoundDataManager sdmanager);
 	void Draw(ViewProjection viewProjection_);
 	void OnCollision();
@@ -46,6 +46,7 @@ private:
 	bool isBoxCol = false;
 
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
+	TextureHandle bulletTex = 0;
 
 	Phase phase_ = Phase::Approach;
 

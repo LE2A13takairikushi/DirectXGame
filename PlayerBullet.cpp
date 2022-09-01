@@ -1,8 +1,8 @@
 #include "PlayerBullet.h"
 
-void PlayerBullet::Initialize(Model* model, Vector3 pos,Vector3 velocity)
+void PlayerBullet::Initialize(Model* model, Vector3 pos,Vector3 velocity, TextureHandle tex)
 {
-	Bullet::Initialize(Model::Create(), pos);
+	Bullet::Initialize(Model::Create(), pos,tex);
 	velocity_ = velocity;
 	deathTimer = 180;
 }

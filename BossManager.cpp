@@ -8,6 +8,7 @@ void BossManager::Initialize(Model* model)
 
 	weekTex = TextureManager::Load("red.png");
 	changeTex = TextureManager::Load("green.png");
+	bTex = bTex = TextureManager::Load("bullet.png");
 }
 
 void BossManager::Update(Vector3 pos, Vector3 scale, Vector3 targetPos, VanishParticleManager& vpManager, Audio* audio, SoundDataManager sdmanager)
@@ -47,7 +48,7 @@ void BossManager::End()
 void BossManager::SpawnBoss(Vector3 initpos)
 {
 	unique_ptr<Boss> newBoss = make_unique<Boss>();
-	newBoss->Initialize(model, tex,weekTex, changeTex);
+	newBoss->Initialize(model, tex,weekTex, changeTex, bTex);
 	newBoss->SetPos(initpos);
 	bossList.push_back(std::move(newBoss));
 }

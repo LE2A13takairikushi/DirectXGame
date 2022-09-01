@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void Boss::Initialize(Model* model,TextureHandle tex, TextureHandle weekTex, TextureHandle changeTex)
+void Boss::Initialize(Model* model,TextureHandle tex, TextureHandle weekTex, TextureHandle changeTex,TextureHandle bTex)
 {
 	//ñ{ëÃ
 	for (int i = 0; i < bossPartsNum; i++)
@@ -19,6 +19,7 @@ void Boss::Initialize(Model* model,TextureHandle tex, TextureHandle weekTex, Tex
 	skyBlue = tex;
 	red = weekTex;
 	green = changeTex;
+	this->bTex = bTex;
 
 	bulletModel = model;
 
@@ -144,13 +145,13 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 			}
 		}
 
-		//ëÂó î≠ê∂Ç∑ÇÈÇ∆èdÇ©Ç¡ÇΩÇÃÇ≈î≠ê∂êîÇ…êßå¿
-		if (vpManager.GetParticle().size() <= 300)
-		{
-			vpManager.CreateParticle(
-				bossParts[BossPartsName::body].GetPos(),
-				{ 3.0f,3.0f,3.0f }, 0.05f);
-		}
+		////ëÂó î≠ê∂Ç∑ÇÈÇ∆èdÇ©Ç¡ÇΩÇÃÇ≈î≠ê∂êîÇ…êßå¿
+		//if (vpManager.GetParticle().size() <= 30)
+		//{
+		//	vpManager.CreateParticle(
+		//		bossParts[BossPartsName::body].GetPos(),
+		//		{ 3.0f,3.0f,3.0f }, 0.05f);
+		//}
 
 		break;
 	case setTarget:
@@ -176,13 +177,16 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 			phase = ActPhase::miniJump;
 		}
 
-		if (vpManager.GetParticle().size() <= 300 &&
-			fallTimer % 10 == 0 && onGround == false)
+		/*if (vpManager.GetParticle().size() <= 30)
 		{
-			audio->PlayWave(sdmanager.hitSE, false, 0.05f);
+			
 			vpManager.CreateParticle(
 				bossParts[BossPartsName::body].GetPos(),
 				{ 5.0f,5.0f,5.0f }, 0.05f);
+		}*/
+		if (fallTimer % 10 == 0 && onGround == false)
+		{
+			audio->PlayWave(sdmanager.hitSE, false, 0.05f);
 		}
 
 		break;
@@ -322,7 +326,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				vpManager.CreateParticle(
 					bossParts[BossPartsName::body].GetPos(),
 					{ 5,5,5 }, 0.05f);
-				scalePTimer = 20;
+				scalePTimer = 60;
 				audio->PlayWave(sdmanager.bossboomSE, false, 0.05f);
 			}
 
@@ -377,7 +381,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 					},
 					{ 3,3,3 }, 0.02f);
 				audio->PlayWave(sdmanager.bossboomSE, false, 0.1f);
-				scalePTimer = 20;
+				scalePTimer = 60;
 			}
 
 			scalePlus.x -= scaleSpd;
@@ -624,7 +628,7 @@ void Boss::Attack(Vector3 velocity)
 			bossParts[BossPartsName::weekPoint].GetPos().y + 3,
 			bossParts[BossPartsName::weekPoint].GetPos().z
 		},
-		velocity);
+		velocity,bTex);
 	bullets_.push_back(std::move(newBullet));
 }
 

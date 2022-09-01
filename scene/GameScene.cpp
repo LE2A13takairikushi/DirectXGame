@@ -96,10 +96,10 @@ void GameScene::Initialize() {
 	fpsFix.Initialize();
 
 	vpManager.Initialize(modelManager->model_,white);
-	pObjectManager.Initialize(gManager.GetBossStagePos(), 
+	/*pObjectManager.Initialize(gManager.GetBossStagePos(), 
 		gManager.GetBossStageScale(),
 		modelManager->model_,
-		white);
+		white);*/
 	pause.Initialize();
 
 
@@ -189,7 +189,7 @@ void GameScene::Update() {
 			CheckEnemyAllCollision();
 
 			vpManager.Update();
-			pObjectManager.Update();
+			//pObjectManager.Update();
 
 			enemyManager->Update(player_.GetPos(), bossManager.IsBossBattle(), vpManager,audio_,SDManager);
 
@@ -269,7 +269,9 @@ void GameScene::Update() {
 
 	if (false)
 	{
-		
+		debugText_->SetPos(50, 50);
+	debugText_->Printf("fps %f",
+		fpsFix.fps);
 	}
 	/*debugText_->SetPos(50, 170);
 	debugText_->Printf("clearWhite %f",
@@ -326,7 +328,7 @@ void GameScene::Draw() {
 		enemyEManager.Draw(viewProjection_);
 		jEManager.Draw(viewProjection_);
 		vEManager.Draw(viewProjection_);
-		pObjectManager.Draw(viewProjection_);
+		//pObjectManager.Draw(viewProjection_);
 		cManager.Draw(viewProjection_);
 		hIManager.Draw(viewProjection_);
 		aBoardManager.Draw(viewProjection_, player_.GetMouseVRota());

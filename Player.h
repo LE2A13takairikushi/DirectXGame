@@ -82,6 +82,7 @@ public:
 
 private:
 
+	TextureHandle bulletTex = 0;
 	WorldTransform prevPos;
 
 	bool isDead = false;

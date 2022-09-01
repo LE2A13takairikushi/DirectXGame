@@ -19,7 +19,7 @@ public:
 	};
 
 private:
-	static const int Max = 10;
+	static const int Max = 3;
 
 	std::list<std::unique_ptr<VanishParticle>> particles;
 	std::list<std::unique_ptr<SplitParticle>> splitParticles;

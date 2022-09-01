@@ -1,8 +1,8 @@
 #include "EnemyBullet.h"
 
-void EnemyBullet::Initialize(Model* model, Vector3 pos, Vector3 velocity)
+void EnemyBullet::Initialize(Model* model, Vector3 pos, Vector3 velocity,TextureHandle tex)
 {
-	Bullet::Initialize(model, pos);
+	Bullet::Initialize(model, pos,tex);
 	velocity_ = velocity;
 	deathTimer = 180;
 }

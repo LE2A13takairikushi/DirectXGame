@@ -73,6 +73,8 @@ void Player::Initialize(Model *model_,Model* bodyModel, Model* taiyaModel)
 		newstocks[i]->SetPosition(HPPOS_INIT[i]);
 	}
 
+	bulletTex = TextureManager::Load("bullet.png");
+
 	hpRed = Sprite::Create(TextureManager::Load("red.png"), { 0,0 });
 	hpRed->SetPosition({ newstocks[0]->GetPosition().x,newstocks[0]->GetPosition().y });
 	hpRed->SetSize(newstocks[0]->GetSize());
@@ -301,7 +303,7 @@ void Player::Dash(VanishParticleManager& vpmanager, Audio* audio, SoundDataManag
 		isDash = true;
 
 		//ダッシュ中にパーティクルを発生させる
-		if (dashCoolTime % 6 == 0)
+		if (dashCoolTime % 12 == 0)
 		{
 			vpmanager.CreateParticle(worldTransform_.translation_,
 				{ 1.0f,1.0f ,1.0f }, 0.02f);
@@ -400,7 +402,7 @@ void Player::Attack()
 	velocity *= bulletSpd;
 
 	unique_ptr<PlayerBullet> newBullet = make_unique<PlayerBullet>();
-	newBullet->Initialize(model_, worldTransform_.translation_,velocity);
+	newBullet->Initialize(model_, worldTransform_.translation_,velocity,bulletTex);
 
 	//弾を登録する
 	bullets_.push_back(std::move(newBullet));

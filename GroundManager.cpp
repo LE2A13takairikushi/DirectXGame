@@ -175,11 +175,12 @@ void GroundManager::Initialize(Model* model_)
 	SetBox(bossStagePos, bossStageScale);
 
 	//
+	TextureHandle sTex = TextureManager::Load("spawn.png");
 	for (int i = 0; i < 5; i++)
 	{
 		unique_ptr<BoxObj> newBox = make_unique<BoxObj>();
 		newBox->Initialize(model_);
-		newBox->LoadTexture(TextureManager::Load("spawn.png"));
+		newBox->LoadTexture(sTex);
 		newBox->SetPos({ 490,360 + i * 20.0f,280 });
 		newBox->SetScale({ 10,10,10 });
 		enforceObjects.push_back(std::move(newBox));

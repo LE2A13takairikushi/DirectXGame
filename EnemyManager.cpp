@@ -30,6 +30,7 @@ void EnemyManager::Initialize(Model* model_, Model* partModel, TextureHandle tex
 	this->model_ = model_;
 	this->partModel_ = partModel;
 	this->tex = tex;
+	bTex = TextureManager::Load("bullet.png");
 }
 
 void EnemyManager::EnemyPop(VanishParticleManager& vpmanager)
@@ -40,7 +41,7 @@ void EnemyManager::EnemyPop(VanishParticleManager& vpmanager)
 	tempPopPos.z += RNG(-40, 40);
 
 	unique_ptr<Enemy> newEnemy = make_unique<Enemy>();
-	newEnemy->Initialize(model_, partModel_,tex,tempPopPos);
+	newEnemy->Initialize(model_, partModel_,tex,tempPopPos, bTex);
 
 
 	newEnemy->SetAttackCount(RNG(-30, 100));

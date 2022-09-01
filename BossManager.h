@@ -35,5 +35,6 @@ private:
 	TextureHandle tex = 0;
 	TextureHandle weekTex = 0;
 	TextureHandle changeTex = 0;
+	TextureHandle bTex = 0;
 };
 

@@ -27,7 +27,7 @@ enum ActPhase
 class Boss
 {
 public:
-	void Initialize(Model* model, TextureHandle tex,TextureHandle weekTex, TextureHandle changeTex);
+	void Initialize(Model* model, TextureHandle tex,TextureHandle weekTex, TextureHandle changeTex,TextureHandle bTex);
 	void Update(Vector3 pos, Vector3 scale, Vector3 targetPos,VanishParticleManager& vpManager,Audio* audio,SoundDataManager sdmanager);
 	void Draw(ViewProjection view, float mouseVertRota);
 
@@ -72,6 +72,7 @@ private:
 	TextureHandle red = 0;
 	TextureHandle skyBlue = 0;
 	TextureHandle green = 0;
+	TextureHandle bTex = 0;
 
 	Vector3 scalePlus = { 0,0,0 };
 	float scaleSpd = 0.03f;

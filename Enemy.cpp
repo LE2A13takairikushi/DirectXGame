@@ -13,11 +13,12 @@ Enemy::~Enemy()
 	
 }
 
-void Enemy::Initialize(Model* model_, Model* partModel,TextureHandle tex, Vector3 popPos)
+void Enemy::Initialize(Model* model_, Model* partModel,TextureHandle tex, Vector3 popPos,TextureHandle bTex)
 {
 	worldTransform_.Initialize();
 	this->model_ = model_;
 	//this->textureHandle_ = TextureManager::Load("enemy.png");;
+	bulletTex = bTex;
 
 	worldTransform_.translation_ = popPos;
 	worldTransform_.scale_ = { 0,0,0 };
@@ -116,7 +117,7 @@ void Enemy::Attack(Audio* audio,SoundDataManager sdmanager)
 		tempVec = pCenterVec;
 		
 		unique_ptr<EnemyBullet> newBullet = make_unique<EnemyBullet>();
-		newBullet->Initialize(Model::Create(), worldTransform_.translation_, tempVec);
+		newBullet->Initialize(Model::Create(), worldTransform_.translation_, tempVec,bulletTex);
 
 		//’e‚ð“o˜^‚·‚é
 		bullets_.push_back(std::move(newBullet));
