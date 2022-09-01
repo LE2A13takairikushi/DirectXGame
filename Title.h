@@ -21,6 +21,8 @@ public:
 
 	void End();
 
+	void BackDraw();
+
 	void ModelDraw(ViewProjection view);
 
 	bool IsTitle() { return isTitle; };
@@ -47,6 +49,9 @@ private:
 	Sprite* mouseMozi = nullptr;
 	Sprite* spaceMozi = nullptr;
 	Sprite* alpha = nullptr;
+	Sprite* titleBack = nullptr;
+	Sprite* titleImage = nullptr;
+	Sprite* ten[3] = { nullptr };
 
 	Model* playerModel = nullptr;
 	Model* playerModel2 = nullptr;

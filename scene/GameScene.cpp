@@ -13,6 +13,11 @@ const float XM_PM = 3.14;
 
 //winAppを使う際は、winApp.h内のwinAppコンストラクタがprivateになっているため注意
 
+void GameScene::SetRedAlpha(float a)
+{
+	redSAlpha = a;
+}
+
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
@@ -22,6 +27,8 @@ GameScene::~GameScene() {
 	delete debugCamera_;
 	//delete sprite;
 	delete screenWhite;
+	delete redScreen;
+	//delete blueScreen;
 	pause.End();
 	player_.End();
 	bossManager.End();
@@ -39,8 +46,6 @@ void GameScene::Initialize() {
 	SDManager.Initialize();
 
 	modelManager = new ModelManager();
-
-	textureHandle_ = TextureManager::Load("waito.jpg");
 
 	TextureHandle white = TextureManager::Load("white.png");
 
@@ -110,10 +115,23 @@ void GameScene::Initialize() {
 
 	screenWhite = Sprite::Create(TextureManager::Load("white.png"), { 0,0 },{1,1,1,0});
 	screenWhite->SetSize({ WinApp::kWindowWidth,WinApp::kWindowHeight });
+	redScreen = Sprite::Create(TextureManager::Load("screen.png"), { 0,0 });
+	redScreen->SetSize({ WinApp::kWindowWidth,WinApp::kWindowHeight });
+	//blueScreen = Sprite::Create(TextureManager::Load("blueScreen.png"), { 0,0 });
+	//blueScreen->SetSize({ WinApp::kWindowWidth,WinApp::kWindowHeight });
 }
 
 void GameScene::Update() {
 	fpsFix.Update();
+
+	redSAlpha = player_.scrennAlpha.w;
+	if (redSAlpha > 0)
+	{
+		redSAlpha -= 0.02f;
+	}
+	player_.scrennAlpha.w = redSAlpha;
+	redScreen->SetColor(player_.scrennAlpha);
+	//blueScreen->SetColor({ 1,1,1,player_.blueA });
 
 	if (title.IsTitle())
 	{
@@ -121,6 +139,11 @@ void GameScene::Update() {
 
 		if (input_->TriggerKey(DIK_SPACE))
 		{
+			player_.SetSpawnPos({ 0,20,50 });
+			for (const unique_ptr<EventObject>& eventObj : cManager.GetObjects())
+			{
+				eventObj->EventEnd();
+			}
 			player_.DeadInit();
 			gManager.DeadInit();
 			iManager.DeadInit();
@@ -198,7 +221,7 @@ void GameScene::Update() {
 			clearTimer++;
 			if (clearTimer <= 300)
 			{
-				clearWhite += 0.007f;
+				clearWhite += 0.009f;
 			}
 			if (clearTimer >= 600)
 			{
@@ -214,7 +237,7 @@ void GameScene::Update() {
 		}
 		screenWhite->SetColor({ 1,1,1,clearWhite });
 
-		result.Update(player_.GetHeartCount(), player_.GetNoHitFlag(), clearFlag);
+		result.Update(player_.GetHeartCount(), player_.GetNoHitFlag(), clearFlag,audio_,SDManager);
 		//result.isResult = true;
 		if (result.isResult)
 		{
@@ -246,25 +269,7 @@ void GameScene::Update() {
 
 	if (false)
 	{
-		debugText_->SetPos(WinApp::kWindowWidth - 200, 50);
-		debugText_->Printf("fps %f", fpsFix.fps);
-		debugText_->SetPos(50, 50);
-		debugText_->Printf("boss %d", bossManager.GetBossList().size());
-		debugText_->SetPos(50, 70);
-		debugText_->Printf("gBGM %d",
-			audio_->IsPlaying(SDManager.gamesceneBGM));	
-		debugText_->SetPos(50, 90);
-		debugText_->Printf("tBGM %d",
-			audio_->IsPlaying(SDManager.titleBGM));
-		debugText_->SetPos(50, 110);
-		debugText_->Printf("bBGM %d",
-			audio_->IsPlaying(SDManager.bossBGM));
-		debugText_->SetPos(50, 130);
-		debugText_->Printf("bBGM2 %d",
-			audio_->IsPlaying(SDManager.bossBGM2));
-		debugText_->SetPos(50, 150);
-		debugText_->Printf("result.isResult %d",
-			result.isResult);
+		
 	}
 	/*debugText_->SetPos(50, 170);
 	debugText_->Printf("clearWhite %f",
@@ -292,7 +297,7 @@ void GameScene::Draw() {
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
 	
-	
+	title.BackDraw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -307,8 +312,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	
-	skydome.Draw(viewProjection_);
+
 
 	if (title.IsTitle())
 	{
@@ -316,6 +320,7 @@ void GameScene::Draw() {
 	}
 	else
 	{
+		skydome.Draw(viewProjection_);
 		gManager.Draw(viewProjection_);
 		iManager.Draw(viewProjection_);
 		enemyEManager.Draw(viewProjection_);
@@ -372,6 +377,8 @@ void GameScene::Draw() {
 	}
 	
 	screenWhite->Draw();
+	//blueScreen->Draw();
+	redScreen->Draw();
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
@@ -466,14 +473,19 @@ void GameScene::CheckBulletCollision()
 			posB = boss->GetBossPart(0).GetWorldTrans();
 			if (BoxColAABB(posA, posB))
 			{
+				audio_->PlayWave(SDManager.hitSE, false, 0.1f);
 				boss->OnBodyColision();
 				bullet->OnCollision();
+				vpManager.CreateParticle(posA.translation_, 
+					{ 1.5f ,1.5f ,1.5f }, 0.03f);
 			}
 			posB = boss->GetBossPart(1).GetWorldTrans();
 			if (BoxColAABB(posA, posB))
 			{
-				boss->OnWeekColision();
+				audio_->PlayWave(SDManager.hitSE, false, 0.1f);
+				boss->OnWeekColision(audio_,SDManager);
 				bullet->OnCollision();
+				vpManager.CreateSplitParticle(posA.translation_, { 3,3,3 }, 0.05f,5.0f);
 			}
 		}
 	}
@@ -487,9 +499,11 @@ void GameScene::CheckBulletCollision()
 			if (audio_->IsPlaying(SDManager.damageSE) == false
 				&& player_.mutekiTimer <= 0)
 			{
-				audio_->PlayWave(SDManager.damageSE, false, 0.08f);
+				audio_->PlayWave(SDManager.damageSE, false, 0.02f);
 			}
 			player_.OnDamage(7);
+
+		
 		}
 		for (const unique_ptr<EnemyBullet>& bossB : boss->GetBullets())
 		{
@@ -499,7 +513,7 @@ void GameScene::CheckBulletCollision()
 				if (audio_->IsPlaying(SDManager.damageSE) == false
 					&& player_.mutekiTimer <= 0)
 				{
-					audio_->PlayWave(SDManager.damageSE, false, 0.08f);
+					audio_->PlayWave(SDManager.damageSE, false, 0.07f);
 				}
 				player_.OnDamage(5);
 			}
@@ -740,6 +754,7 @@ void GameScene::CheckPlayerAllCollision()
 			spawnPos.y += 10;
 			bossManager.BossBattleStart();
 			bossManager.SpawnBoss(spawnPos);
+			audio_->PlayWave(SDManager.jumpEventSE, false, 0.1f);
 			eventObj->Erase();
 			gManager.BossBattleStart();
 		}

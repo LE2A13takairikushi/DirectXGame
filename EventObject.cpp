@@ -9,7 +9,7 @@ void EventObject::Initialize(Model* model_, TextureHandle tex)
 	}
 	else
 	{
-		object::LoadTexture(TextureManager::Load("enemy.png"));
+		object::LoadTexture(TextureManager::Load("white.png"));
 	}
 	worldTransform_.Initialize();
 }

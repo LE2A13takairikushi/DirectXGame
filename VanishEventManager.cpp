@@ -14,7 +14,7 @@ void VanishEventManager::SetObjects()
 
 	//
 	CreateEventBox({ 35,260,230 }, { 10,10,10 });
-	CreateEventBox({ 75,270,230 }, { 10,10,10 });
+	CreateEventBox({ 75,271,230 }, { 10,10,10 });
 	CreateEventBox({ 115,280,230 }, { 10,10,10 });
 
 	for (int i = 0; i < 8; i++)

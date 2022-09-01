@@ -64,17 +64,17 @@ void GroundManager::Initialize(Model* model_)
 		SetBox({ -10,250 + i * 5.0f,215 - (i * 10.0f) }, { 5,5,5 });
 	}
 
-	SetBox({ -20,270,160 }, { 10,10,10 });
-	SetBox({ -20,270,140 }, { 10,10,10 });
-	SetBox({ 0,270,160 }, { 10,10,10 });
-	SetBox({ 0,270,140 }, { 10,10,10 });
-	SetBox({ 20,270,160 }, { 10,10,10 });
-	SetBox({ 20,270,140 }, { 10,10,10 });
+	SetBox({ -20,275,160 }, { 10,10,10 });
+	SetBox({ -20,275,140 }, { 10,10,10 });
+	SetBox({ 0,275,160 }, { 10,10,10 });
+	SetBox({ 0,275,140 }, { 10,10,10 });
+	SetBox({ 20,275,160 }, { 10,10,10 });
+	SetBox({ 20,275,140 }, { 10,10,10 });
 
 	for (int i = 0; i < 6; i++)
 	{
-		SetBox({ 40 + (i * 20.0f),270 - (i * 5.0f),140}, {10,10,10});
-		SetBox({ 40 + (i * 20.0f),270 - (i * 5.0f),160}, {10,10,10});
+		SetBox({ 40 + (i * 20.0f),274 - (i * 5.0f),140}, {10,10,10});
+		SetBox({ 40 + (i * 20.0f),274 - (i * 5.0f),160}, {10,10,10});
 	}
 	SetBox({ 160,240,140 }, { 10,10,10 });
 
@@ -185,8 +185,8 @@ void GroundManager::Initialize(Model* model_)
 		enforceObjects.push_back(std::move(newBox));
 	}
 
-	//SetSpawnPos({ 0,0,50 }, 10);
-	SetSpawnPos(bossStagePos, 10);
+	SetSpawnPos({ 0,0,50 }, 10);
+	//SetSpawnPos(bossStagePos, 10);
 }
 
 void GroundManager::EventStart(Vector3 playerPos)

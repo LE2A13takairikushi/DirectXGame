@@ -107,7 +107,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		phase = ActPhase::dead;
 	}
 
-	static int superAttackCount = 0;
+	//static int superAttackCount = 0;
 	Vector3 superAttackMoveVec = { 0,0,0 };
 
 	superAttackMoveVec = pos - bossParts[body].GetPos();
@@ -126,7 +126,6 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 			vpManager.CreateSplitParticle(
 				bossParts[BossPartsName::body].GetPos(),
 				{ 5,5,5 }, 0.05f, 3.0f);
-			
 		}
 		//プレイヤーを追いかける処理
 		if (jumpSpd <= initJumpSpd * 0.5f)
@@ -137,12 +136,14 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		//上昇しきったら次のフェーズに以降
 		if (jumpSpd < 0)
 		{
+			audio->PlayWave(sdmanager.hitSE, false, 0.1f);
 			phase = ActPhase::setTarget;
 			if (hitPoint <= HPINIT / 2 && isFormChange == false)
 			{
 				phase = ActPhase::superAttack;
 			}
 		}
+
 		//大量発生すると重かったので発生数に制限
 		if (vpManager.GetParticle().size() <= 300)
 		{
@@ -176,8 +177,9 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		}
 
 		if (vpManager.GetParticle().size() <= 300 &&
-			fallTimer % 10 == 0)
+			fallTimer % 10 == 0 && onGround == false)
 		{
+			audio->PlayWave(sdmanager.hitSE, false, 0.05f);
 			vpManager.CreateParticle(
 				bossParts[BossPartsName::body].GetPos(),
 				{ 5.0f,5.0f,5.0f }, 0.05f);
@@ -193,6 +195,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 			{
 				phase = ActPhase::jump;
 				stumpStock = 0;
+				audio->PlayWave(sdmanager.hitSE, false, 0.1f);
 				break;
 			}
 			jumpSpd = 0.5f;
@@ -231,10 +234,8 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		{
 			jumpSpd = 0;
 
-			static int scaleTimer = 0;
-			static int scaleCount = 0;
-			--scaleTimer;
-			if (scaleTimer <= 0)
+			--scaleFTimer;
+			if (scaleFTimer <= 0)
 			{
 				//外側で爆発しまくるパーティクル
 				Vector3 plusPos;
@@ -257,15 +258,15 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 						bossParts[BossPartsName::body].GetPos().z + plusPos.z
 					},
 					{ 3,3,3 }, 0.02f);
-				scaleTimer = 20;
-				scaleCount++;
+				scaleFTimer = 20;
+				scaleFCount++;
 				isShake = true;
 				isWeekShake = true;
 				shakeTimer = 60;
 				weekShakeTimer = 60;
-				audio->PlayWave(sdmanager.bossboomSE, false, 0.1f);
+				audio->PlayWave(sdmanager.bossboomSE, false, 0.05f);
 			}
-			if(scaleCount >= 30)
+			if(scaleFCount >= 30)
 			{
 				bossParts[0].LoadTexture(red);
 				bossParts[1].LoadTexture(green);
@@ -276,7 +277,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				vpManager.CreateSplitParticle(
 					bossParts[BossPartsName::weekPoint].GetPos(),
 					{ 10,10,10 }, 0.05f, 5.0f);
-				audio->PlayWave(sdmanager.bossendboomSE, false, 0.3f);
+				audio->PlayWave(sdmanager.bossendboomSE, false, 0.2f);
 			}
 		}
 		
@@ -302,6 +303,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 					minus += 0.08f;
 					Attack({ cosf(PIf - minus),0, sinf(PIf - minus)});
 				}
+				audio->PlayWave(sdmanager.shotSE, false, 0.3f);
 				superAttackCount++;
 				bulletTimer = 240;
 			}
@@ -321,6 +323,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 					bossParts[BossPartsName::body].GetPos(),
 					{ 5,5,5 }, 0.05f);
 				scalePTimer = 20;
+				audio->PlayWave(sdmanager.bossboomSE, false, 0.05f);
 			}
 
 			scalePlus.x += scaleSpd;
@@ -415,6 +418,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 		vpManager.CreateSplitParticle(
 			bossParts[BossPartsName::weekPoint].GetPos(),
 			{ 5,5,5 }, 0.05f, 3.0f);
+		audio->PlayWave(sdmanager.hitSE, false, 0.1f);
 		if (isFormChange && isSuperAttack)
 		{
 			phase = ActPhase::superAttack;
@@ -473,7 +477,7 @@ void Boss::Draw(ViewProjection view,float mouseVertRota)
 		exclamationObj.Draw(view);
 	}
 	
-	if (true)
+	if (false)
 	{
 		dT->SetPos(50, 50);
 		dT->Printf("bossPos %f %f %f",
@@ -553,9 +557,13 @@ void Boss::OnBodyColision()
 	shakeTimer = 60;
 }
 
-void Boss::OnWeekColision()
+void Boss::OnWeekColision(Audio *audio,SoundDataManager sdmanager)
 {
-	if (!(isFormChange && bossColorchange == false)) hitPoint -= 1 * weekMag;
+	if (!(isFormChange && bossColorchange == false))
+	{
+		audio->PlayWave(sdmanager.criticalSE, false, 0.05f);
+		hitPoint -= 1 * weekMag;
+	}
 	isWeekShake = true;
 	weekShakeTimer = 60;
 }

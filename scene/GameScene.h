@@ -83,9 +83,6 @@ private: // メンバ変数
 	DebugText* debugText_ = nullptr;
 	WinApp winApp_;
 
-	//テクスチャハンドル
-	TextureHandle textureHandle_ = 0;
-
 	//モデル
 	ModelManager *modelManager;
 
@@ -122,6 +119,11 @@ private: // メンバ変数
 	Result result;
 
 	Sprite* screenWhite = nullptr;
+	Sprite* redScreen = nullptr;
+
+	float redSAlpha = 0;
+
+	void SetRedAlpha(float a);
 
 	//サウンド
 	//BGM

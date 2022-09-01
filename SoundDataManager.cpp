@@ -2,10 +2,7 @@
 
 void SoundDataManager::Initialize()
 {
-	titleBGM = audio->LoadWave("title_bgm.wav");
 	gamesceneBGM = audio->LoadWave("gamescene_bgm.wav");
-	bossBGM = audio->LoadWave("boss_bgm.wav");
-	bossBGM2 = audio->LoadWave("boss_bgm_2.wav");
 	
 	shotSE = audio->LoadWave("shot.wav");
 	jumpSE = audio->LoadWave("jump.wav");
@@ -25,4 +22,6 @@ void SoundDataManager::Initialize()
 	checkpointSE = audio->LoadWave("checkpoint.wav");
 	pushSE = audio->LoadWave("push.wav");
 	dashSE = audio->LoadWave("dash_2.wav");
+	bossJumpEndSE = audio->LoadWave("boss_jumpend.wav");
+	criticalSE = audio->LoadWave("critical.wav");
 }

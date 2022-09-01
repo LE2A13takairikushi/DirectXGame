@@ -75,6 +75,11 @@ public:
 
 	bool GetNoHitFlag() { return nohitFlag; };
 
+	Vector4 scrennAlpha;
+	//Vector4 blueA;
+	//float redA = 0;
+	//float blueA = 0;
+
 private:
 
 	WorldTransform prevPos;
@@ -110,7 +115,7 @@ private:
 	float horizontalRotation = 0;
 
 	//マウスの感度
-	float mouseSpd = 0.01f;
+	float mouseSpd = 0.005f;
 
 	//hp
 	int stock = 3;

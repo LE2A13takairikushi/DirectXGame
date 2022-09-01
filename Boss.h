@@ -49,7 +49,7 @@ public:
 	BoxObj GetBossPart(int bossPartsNum);
 
 	void OnBodyColision();
-	void OnWeekColision();
+	void OnWeekColision(Audio* audio, SoundDataManager sdmanager);
 
 	Vector3 GetTargetVec() { return targetDirectVec; };
 
@@ -95,6 +95,10 @@ private:
 	int fallTimer = 0;
 	int miniJumpTimer = 0;
 	int bulletTimer = 0;
+
+	int scaleFTimer = 0;
+	int scaleFCount = 0;
+	int superAttackCount = 0;
 
 	int stumpStock = 0;
 

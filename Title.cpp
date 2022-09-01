@@ -22,11 +22,21 @@ void Title::Initialize(Model* model, Model* model2, Model* model3, ViewProjectio
 		{ 600,50 });
 	mozi[3] = Sprite::Create(TextureManager::Load("K.png"),
 		{ 800,50 });
+	ten[0] = Sprite::Create(TextureManager::Load("ten.png"),
+		{ 250,50 });	
+	ten[1] = Sprite::Create(TextureManager::Load("ten.png"),
+		{ 450,50 });
+	ten[2] = Sprite::Create(TextureManager::Load("ten.png"),
+		{ 650,50 });
+
 	curser = Sprite::Create(TextureManager::Load("curser.png"),
 		{ 0,0 });
 	alpha = Sprite::Create(TextureManager::Load("alpha.png"),
 		{ WinApp::kWindowWidth - 300,WinApp::kWindowHeight - 120 });
 	alpha->SetSize({ 240,100 });
+	titleBack = Sprite::Create(TextureManager::Load("titlebackImaga.png"),
+		{ 0,0});
+	titleBack->SetSize({ WinApp::kWindowWidth,WinApp::kWindowHeight });
 
 	mouseImage[0] = Sprite::Create(TextureManager::Load("mouseImage.png"),
 		{ WinApp::kWindowWidth - 300,WinApp::kWindowHeight - 120 });
@@ -50,6 +60,10 @@ void Title::Initialize(Model* model, Model* model2, Model* model3, ViewProjectio
 	{
 		mozi[i]->SetSize({ 200, 200 });
 	}
+	for (int i = 0; i < 3; i++)
+	{
+		ten[i]->SetSize({ 100,100 });
+	}
 
 	UI[0] = Sprite::Create(TextureManager::Load("gameStart.png"),
 		{ 100,WinApp::kWindowHeight - 300 });
@@ -60,6 +74,10 @@ void Title::Initialize(Model* model, Model* model2, Model* model3, ViewProjectio
 	uiPos[1] = UI[1]->GetPosition();
 
 	curser->SetSize({100, 100});
+
+	titleImage = Sprite::Create(TextureManager::Load("titleImage.png"),
+		{ 100,0 });
+	titleImage->SetSize({ 800 * 1.3f,400 * 1.2f });
 }
 
 void Title::Update(Audio* audio, SoundDataManager sdmanager)
@@ -106,6 +124,10 @@ void Title::Update(Audio* audio, SoundDataManager sdmanager)
 		}
 	}
 
+	titleImage->SetPosition({ 100,
+		-20 + cosf(DegreeConversionRad(time[0])) * 10.0f
+		});
+
 	mouseAnimeTime++;
 	if (mouseAnimeTime == 60){mouseAnimeNum = 1;}
 	if (mouseAnimeTime == 120){mouseAnimeNum = 0;}
@@ -115,10 +137,14 @@ void Title::Update(Audio* audio, SoundDataManager sdmanager)
 		mouseAnimeNum = 0;
 	}
 	
-	mozi[0]->SetPosition({ 200,50 + cosf(DegreeConversionRad(time[0])) * 30.0f});
-	mozi[1]->SetPosition({ 400,50 + cosf(DegreeConversionRad(time[1])) * 30.0f });
-	mozi[2]->SetPosition({ 600,50 + cosf(DegreeConversionRad(time[2])) * 30.0f });
-	mozi[3]->SetPosition({ 800,50 + cosf(DegreeConversionRad(time[3])) * 30.0f });
+	mozi[0]->SetPosition({ 200,130 + cosf(DegreeConversionRad(time[0])) * 20.0f});
+	mozi[1]->SetPosition({ 380,130 + cosf(DegreeConversionRad(time[0])) * 20.0f });
+	mozi[2]->SetPosition({ 600,130 + cosf(DegreeConversionRad(time[0])) * 20.0f });
+	mozi[3]->SetPosition({ 800,130 + cosf(DegreeConversionRad(time[0])) * 20.0f });
+	
+	ten[0]->SetPosition({ 310,180 + cosf(DegreeConversionRad(time[0])) * 20.0f });
+	ten[1]->SetPosition({ 520,180 + cosf(DegreeConversionRad(time[0])) * 20.0f });
+	ten[2]->SetPosition({ 730,180 + cosf(DegreeConversionRad(time[0])) * 20.0f });
 
 	curser->SetPosition({ 
 		UI[titleMenu]->GetPosition().x - 70,
@@ -141,7 +167,7 @@ void Title::Update(Audio* audio, SoundDataManager sdmanager)
 	}
 
 	//マウスを非表示に
-	ShowCursor(false);
+	//ShowCursor(false);
 
 	//マウスの現在位置を取得する処理
 	POINT point;
@@ -151,14 +177,17 @@ void Title::Update(Audio* audio, SoundDataManager sdmanager)
 	Vector2 temp = { 1920 / 2, 1080 / 2 };
 
 	//マウスを固定する処理
-	SetCursorPos(temp.x, temp.y);
+	//SetCursorPos(temp.x, temp.y);
+
+	oldHori = horizontalRotation;
+	oldVer = verticalRotation;
 
 	//マウスの移動量に応じてカメラを動かす処理
 	horizontalRotation += (point.x - temp.x) * 0.01f;
 	verticalRotation += (point.y - temp.y) * -0.01f;
 
-	modelTrans.rotation_.y = horizontalRotation;
-	modelTrans.rotation_.x = verticalRotation;
+	modelTrans.rotation_.y = horizontalRotation - oldHori;
+	modelTrans.rotation_.x = verticalRotation - oldVer;
 
 	modelTrans.UpdateMatrix();
 	modelTrans.TransferMatrix();
@@ -167,10 +196,6 @@ void Title::Update(Audio* audio, SoundDataManager sdmanager)
 
 void Title::Draw()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		mozi[i]->Draw();
-	}
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -208,6 +233,27 @@ void Title::End()
 	delete mouseMozi;
 	delete spaceMozi;
 	delete alpha;
+	delete titleBack;
+	delete titleImage;
+	for (int i = 0; i < 3; i++)
+	{
+		delete ten[i];
+	}
+}
+
+void Title::BackDraw()
+{
+	titleBack->Draw();
+
+	titleImage->Draw();
+	for (int i = 0; i < 4; i++)
+	{
+		mozi[i]->Draw();
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		ten[i]->Draw();
+	}
 }
 
 void Title::ModelDraw(ViewProjection view)

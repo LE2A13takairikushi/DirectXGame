@@ -32,6 +32,7 @@ void Player::End()
 
 void Player::HealEffect(int heal)
 {
+	scrennAlpha = { 0,1,0,1 };
 	hp += heal;
 	if (hp > stock * 10)
 	{
@@ -127,6 +128,7 @@ void Player::SetSpawnPos(Vector3 pos)
 
 void Player::Update(VanishParticleManager &vpmanager,Audio* audio, SoundDataManager sdmanager)
 {
+	//blueA-=0.01f;
 	hpRed->SetSize({ hp * 10.0f ,100 });
 	DamageHitEffect();
 
@@ -143,6 +145,7 @@ void Player::Update(VanishParticleManager &vpmanager,Audio* audio, SoundDataMana
 			jumpEfectManageFlag = true;
 		}
 	}
+
 	oldIsJumpCheck = isJumpCheck;
 
 	//’e‚Ìíœ
@@ -287,7 +290,7 @@ void Player::Dash(VanishParticleManager& vpmanager, Audio* audio, SoundDataManag
 		dashCoolTime = 180;
 		isDash = true;
 		SetMuteki();
-		
+		scrennAlpha = { 0,0.5f,1,1 };
 	}
 	if(dashCoolTime > 160) posY[1] -= 3.0f;
 
@@ -645,6 +648,7 @@ void Player::StockPlus()
 		stock += 1;
 	}
 	hp = stock * 10;
+	scrennAlpha = { 0,1,0,1 };
 }
 
 void Player::OnDamage(int damage)
@@ -654,8 +658,9 @@ void Player::OnDamage(int damage)
 		SetMuteki();
 		isDamageHit = true;
 		hp -= damage;
+		scrennAlpha = { 1,0,0,1 };
+		nohitFlag = false;
 	}
-	nohitFlag = false;
 }
 
 void Player::EnforceJumpOnCol()

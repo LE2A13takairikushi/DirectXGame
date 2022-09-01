@@ -105,10 +105,12 @@ void Result::Initialize()
 	uiPos[1] = resultString[6]->GetPosition();
 }
 
-void Result::Update(int getHeart,bool nohitFlag,bool clearFlag)
+void Result::Update(int getHeart,bool nohitFlag,bool clearFlag,Audio* audio,SoundDataManager sdmanager)
 {
 	static int time = 0;
 	static int timespd = 1;
+
+	
 
 	time += timespd;
 	if (time >= 360 || time <= 0)
@@ -177,21 +179,56 @@ void Result::Update(int getHeart,bool nohitFlag,bool clearFlag)
 	{
 		starGraph[i]->SetSize({ a[i],a[i] });
 		starBlankGraph[i]->SetSize({ a[i],a[i] });
+	
 	}
 
 	if (starGraph[0]->GetSize().x <= 100)
 	{
-		a[0] += 5;
+		a[0] += starSpd;
 	}
 	if (starGraph[0]->GetSize().x >= 100 && 
 		starGraph[1]->GetSize().x < 100)
 	{
-		a[1] += 5;
+		a[1] += starSpd;
 	}
 	if (starGraph[1]->GetSize().x >= 100 && 
 		starGraph[2]->GetSize().x < 100)
 	{
-		a[2] += 5;
+		a[2] += starSpd;
+	}
+
+	if (isResult)
+	{
+		if (a[0] == starSpd)
+		{
+			if (clearFlag) {
+				audio->PlayWave(sdmanager.criticalSE, false, 0.1f);
+			}
+			else
+			{
+				audio->PlayWave(sdmanager.bossboomSE, false, 0.1f);
+			}
+		}
+		if (a[1] == starSpd)
+		{
+			if (allHeartFlag) {
+				audio->PlayWave(sdmanager.criticalSE, false, 0.1f);
+			}
+			else
+			{
+				audio->PlayWave(sdmanager.bossboomSE, false, 0.1f);
+			}
+		}
+		if (a[2] == starSpd)
+		{
+			if (nohitFlag) {
+				audio->PlayWave(sdmanager.criticalSE, false, 0.1f);
+			}
+			else
+			{
+				audio->PlayWave(sdmanager.bossboomSE, false, 0.1f);
+			}
+		}
 	}
 
 	if (starGraph[2]->GetSize().x >= 100)
@@ -235,6 +272,18 @@ void Result::Update(int getHeart,bool nohitFlag,bool clearFlag)
 					}
 				);
 			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 5 + 1; i++)
+		{
+			numberGraph[i]->SetPosition(
+				{
+					-114514,
+					-114514
+				}
+			);
 		}
 	}
 }

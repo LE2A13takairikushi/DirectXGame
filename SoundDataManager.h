@@ -26,11 +26,10 @@ public:
 	SoundDataHandle pushSE = 0;
 	SoundDataHandle jumpEndSE = 0;
 	SoundDataHandle dashSE = 0;
+	SoundDataHandle bossJumpEndSE = 0;
+	SoundDataHandle criticalSE = 0;
 
-	SoundDataHandle titleBGM = 0;
 	SoundDataHandle gamesceneBGM = 0;
-	SoundDataHandle bossBGM = 0;
-	SoundDataHandle bossBGM2 = 0;
 private:
 	Audio* audio = Audio::GetInstance();
 

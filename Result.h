@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include "Sprite.h"
 #include "Input.h"
+#include "SoundDataManager.h"
 
 enum startChoese
 {
@@ -14,7 +15,7 @@ class Result
 {
 public:
 	void Initialize();
-	void Update(int getHeart, bool noHitFlag, bool clearFlag);
+	void Update(int getHeart, bool noHitFlag, bool clearFlag, Audio* audio, SoundDataManager sdmanager);
 	void Draw();
 
 	void End();
@@ -29,6 +30,8 @@ private:
 
 	void NumInit();
 	void NumPosInit();
+
+	float starSpd = 3;
 
 	static const int num = 7;
 	Sprite* resultString[num] = { nullptr };
