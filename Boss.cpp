@@ -326,7 +326,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 				vpManager.CreateParticle(
 					bossParts[BossPartsName::body].GetPos(),
 					{ 5,5,5 }, 0.05f);
-				scalePTimer = 60;
+				scalePTimer = 20;
 				audio->PlayWave(sdmanager.bossboomSE, false, 0.05f);
 			}
 
@@ -381,7 +381,7 @@ void Boss::Update(Vector3 pos, Vector3 scale,Vector3 targetPos, VanishParticleMa
 					},
 					{ 3,3,3 }, 0.02f);
 				audio->PlayWave(sdmanager.bossboomSE, false, 0.1f);
-				scalePTimer = 60;
+				scalePTimer = 20;
 			}
 
 			scalePlus.x -= scaleSpd;
